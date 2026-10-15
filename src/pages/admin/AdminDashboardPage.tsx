@@ -30,6 +30,7 @@ import {
   Globe
 } from 'lucide-react';
 import { SpotlightCard } from '../../components/reactbits/SpotlightCard';
+import { Modal } from '../../components/shared/Modal';
 
 export interface InternshipApplicationData {
   id: string;
@@ -1949,27 +1950,15 @@ export const AdminDashboardPage: React.FC = () => {
       {/* ============================================================= */}
       {/* MODAL: COMPLETE INQUIRY DETAILS */}
       {/* ============================================================= */}
-      {selectedInquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-2xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div>
-                <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider block">
-                  Lead Details • {selectedInquiry.id}
-                </span>
-                <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white">
-                  {selectedInquiry.fullName}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedInquiry(null)}
-                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-
+      <Modal
+        isOpen={!!selectedInquiry}
+        onClose={() => setSelectedInquiry(null)}
+        maxWidth="2xl"
+        subtitle={selectedInquiry ? `Lead Details • ${selectedInquiry.id}` : undefined}
+        title={selectedInquiry?.fullName}
+      >
+        {selectedInquiry && (
+          <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="p-3.5 rounded-xl bg-[#101A31] space-y-1">
                 <span className="text-slate-400 font-mono text-[10px] uppercase block">Email Address</span>
@@ -2072,38 +2061,41 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* ============================================================= */}
       {/* MODAL: COMPLETE PROJECT DOSSIER / FULL SPECS */}
       {/* ============================================================= */}
-      {selectedProjectDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-3xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-cyan-400 font-semibold">{selectedProjectDetail.industry}</span>
-                  {selectedProjectDetail.featured && (
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-blue-900/60 text-cyan-300 font-mono">
-                      Featured
-                    </span>
-                  )}
-                </div>
-                <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white mt-1">
-                  {selectedProjectDetail.name}
-                </h3>
-                <p className="text-xs text-slate-300 font-medium">{selectedProjectDetail.tagline}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedProjectDetail(null)}
-                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
+      <Modal
+        isOpen={!!selectedProjectDetail}
+        onClose={() => setSelectedProjectDetail(null)}
+        maxWidth="3xl"
+        subtitle={
+          selectedProjectDetail ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-cyan-400 font-semibold">{selectedProjectDetail.industry}</span>
+              {selectedProjectDetail.featured && (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-900/60 text-cyan-300 font-mono">
+                  Featured
+                </span>
+              )}
             </div>
+          ) : undefined
+        }
+        title={
+          selectedProjectDetail ? (
+            <div>
+              <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white mt-1">
+                {selectedProjectDetail.name}
+              </h3>
+              <p className="text-xs text-slate-300 font-medium">{selectedProjectDetail.tagline}</p>
+            </div>
+          ) : undefined
+        }
+      >
+        {selectedProjectDetail && (
+          <div className="space-y-6">
 
             {/* Quick Specs Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
@@ -2289,45 +2281,42 @@ export const AdminDashboardPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* ============================================================= */}
       {/* MODAL: COMPLETE CLIENT DOSSIER & CRM PROFILE */}
       {/* ============================================================= */}
-      {selectedUserDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-3xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-blue-950 border border-blue-500/40 flex items-center justify-center font-bold text-cyan-300 font-['Space_Grotesk'] text-xl">
-                  {selectedUserDetail.fullName.charAt(0)}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white">
-                      {selectedUserDetail.fullName}
-                    </h3>
-                    <span className="text-xs px-2 py-0.5 rounded bg-blue-950 border border-blue-500/30 text-cyan-300 font-mono uppercase">
-                      {selectedUserDetail.role}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 font-mono">
-                    {selectedUserDetail.company ? `${selectedUserDetail.company} • ` : ''}
-                    Client ID: {selectedUserDetail.id}
-                  </p>
-                </div>
+      <Modal
+        isOpen={!!selectedUserDetail}
+        onClose={() => setSelectedUserDetail(null)}
+        maxWidth="3xl"
+        title={
+          selectedUserDetail ? (
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-950 border border-blue-500/40 flex items-center justify-center font-bold text-cyan-300 font-['Space_Grotesk'] text-xl shrink-0">
+                {selectedUserDetail.fullName.charAt(0)}
               </div>
-
-              <button
-                type="button"
-                onClick={() => setSelectedUserDetail(null)}
-                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-['Space_Grotesk'] text-2xl font-bold text-white">
+                    {selectedUserDetail.fullName}
+                  </span>
+                  <span className="text-xs px-2 py-0.5 rounded bg-blue-950 border border-blue-500/30 text-cyan-300 font-mono uppercase">
+                    {selectedUserDetail.role}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 font-mono font-normal mt-0.5">
+                  {selectedUserDetail.company ? `${selectedUserDetail.company} • ` : ''}
+                  Client ID: {selectedUserDetail.id}
+                </p>
+              </div>
             </div>
-
+          ) : undefined
+        }
+      >
+        {selectedUserDetail && (
+          <div className="space-y-6">
             {/* Contact Roster */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
               <div className="p-3.5 rounded-xl bg-[#101A31] space-y-1">
@@ -2504,29 +2493,19 @@ export const AdminDashboardPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* ============================================================= */}
       {/* MODAL: ADD / EDIT PROJECT (COMPLETE FIELDS) */}
       {/* ============================================================= */}
-      {isProjectModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-2xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <h3 className="font-['Space_Grotesk'] text-xl font-bold text-white">
-                {editingProject ? 'Edit Project Specifications' : 'Publish New Live Project'}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsProjectModalOpen(false)}
-                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveProject} className="space-y-4 text-xs">
+      <Modal
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+        maxWidth="2xl"
+        title={editingProject ? 'Edit Project Specifications' : 'Publish New Live Project'}
+      >
+        <form onSubmit={handleSaveProject} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-slate-400 font-mono text-[10px] uppercase mb-1">
@@ -2762,30 +2741,18 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* ============================================================= */}
       {/* MODAL: ADD / EDIT CLIENT PROFILE (COMPLETE FIELDS) */}
       {/* ============================================================= */}
-      {isUserModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-2xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <h3 className="font-['Space_Grotesk'] text-xl font-bold text-white">
-                {editingUser ? 'Edit Client CRM Profile' : 'Register New Client Profile'}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsUserModalOpen(false)}
-                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveUser} className="space-y-4 text-xs">
+      <Modal
+        isOpen={isUserModalOpen}
+        onClose={() => setIsUserModalOpen(false)}
+        maxWidth="2xl"
+        title={editingUser ? 'Edit Client CRM Profile' : 'Register New Client Profile'}
+      >
+        <form onSubmit={handleSaveUser} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-slate-400 font-mono text-[10px] uppercase mb-1">
@@ -2948,56 +2915,53 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* ============================================================= */}
       {/* MODAL: COMPLETE INTERNSHIP CANDIDATE DOSSIER */}
       {/* ============================================================= */}
-      {selectedInternshipDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-3xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            {/* Header */}
-            <div className="flex items-start justify-between border-b border-slate-800 pb-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
-                    Candidate Dossier • {selectedInternshipDetail.id}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
-                      selectedInternshipDetail.status === 'accepted'
-                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                        : selectedInternshipDetail.status === 'shortlisted' || selectedInternshipDetail.status === 'interview'
-                        ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
-                        : selectedInternshipDetail.status === 'reviewing'
-                        ? 'bg-blue-950 text-blue-300 border border-blue-500/40'
-                        : selectedInternshipDetail.status === 'rejected'
-                        ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
-                        : 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                    }`}
-                  >
-                    {selectedInternshipDetail.status}
-                  </span>
-                </div>
-                <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white">
-                  {selectedInternshipDetail.fullName}
-                </h3>
-                <p className="text-xs text-slate-300 font-mono">
-                  {selectedInternshipDetail.college} • {selectedInternshipDetail.degree} (Class of{' '}
-                  {selectedInternshipDetail.graduationYear})
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSelectedInternshipDetail(null)}
-                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+      <Modal
+        isOpen={!!selectedInternshipDetail}
+        onClose={() => setSelectedInternshipDetail(null)}
+        maxWidth="3xl"
+        subtitle={
+          selectedInternshipDetail ? (
+            <div className="flex items-center gap-2">
+              <span>Candidate Dossier • {selectedInternshipDetail.id}</span>
+              <span
+                className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
+                  selectedInternshipDetail.status === 'accepted'
+                    ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                    : selectedInternshipDetail.status === 'shortlisted' || selectedInternshipDetail.status === 'interview'
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
+                    : selectedInternshipDetail.status === 'reviewing'
+                    ? 'bg-blue-950 text-blue-300 border border-blue-500/40'
+                    : selectedInternshipDetail.status === 'rejected'
+                    ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                    : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                }`}
               >
-                ✕
-              </button>
+                {selectedInternshipDetail.status}
+              </span>
             </div>
+          ) : undefined
+        }
+        title={
+          selectedInternshipDetail ? (
+            <div>
+              <span className="font-['Space_Grotesk'] text-2xl font-bold text-white">
+                {selectedInternshipDetail.fullName}
+              </span>
+              <p className="text-xs text-slate-300 font-mono mt-1 font-normal">
+                {selectedInternshipDetail.college} • {selectedInternshipDetail.degree} (Class of{' '}
+                {selectedInternshipDetail.graduationYear})
+              </p>
+            </div>
+          ) : undefined
+        }
+      >
+        {selectedInternshipDetail && (
+          <div className="space-y-6">
 
             {/* Quick Metadata Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
@@ -3200,8 +3164,8 @@ export const AdminDashboardPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 };

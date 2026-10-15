@@ -22,6 +22,7 @@ import {
 import { SpotlightCard } from '../components/reactbits/SpotlightCard';
 import { ShinyText } from '../components/reactbits/ShinyText';
 import { Magnet } from '../components/reactbits/Magnet';
+import { Modal } from '../components/shared/Modal';
 
 export interface DomainTrack {
   id: string;
@@ -675,72 +676,67 @@ export const CareersPage: React.FC = () => {
       {/* ============================================================= */}
       {/* APPLICATION MODAL / MULTI-STEP SUBMISSION DRAWER */}
       {/* ============================================================= */}
-      {isApplyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-3xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
-            {submittedApplicationId ? (
-              /* Success Confirmation Screen */
-              <div className="text-center py-8 space-y-5">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h3 className="font-['Space_Grotesk'] text-3xl font-bold text-white">
-                  Application Submitted Successfully!
-                </h3>
-                <p className="text-slate-300 text-sm max-w-md mx-auto">
-                  Thank you for applying to Alpha Encoders. Our engineering and research review board will examine your
-                  portfolio and reach out within 2-4 business days.
-                </p>
+      {/* ============================================================= */}
+      {/* APPLICATION MODAL / MULTI-STEP SUBMISSION DRAWER */}
+      {/* ============================================================= */}
+      <Modal
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        maxWidth="3xl"
+        subtitle={!submittedApplicationId ? "Talent Cohort 2026" : undefined}
+        title={
+          !submittedApplicationId ? (
+            <h3 className="font-['Space_Grotesk'] text-xl sm:text-2xl font-bold text-white">
+              Internship Application • <span className="text-cyan-400">{selectedDomainForForm}</span>
+            </h3>
+          ) : undefined
+        }
+      >
+        {submittedApplicationId ? (
+          /* Success Confirmation Screen */
+          <div className="text-center py-8 space-y-5">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <h3 className="font-['Space_Grotesk'] text-3xl font-bold text-white">
+              Application Submitted Successfully!
+            </h3>
+            <p className="text-slate-300 text-sm max-w-md mx-auto">
+              Thank you for applying to Alpha Encoders. Our engineering and research review board will examine your
+              portfolio and reach out within 2-4 business days.
+            </p>
 
-                <div className="p-4 rounded-2xl bg-[#101A31] border border-slate-700 max-w-sm mx-auto font-mono text-center">
-                  <span className="text-xs text-slate-400 block uppercase">Your Application Reference ID:</span>
-                  <span className="text-xl font-bold text-cyan-300 select-all block mt-1">
-                    {submittedApplicationId}
-                  </span>
-                </div>
+            <div className="p-4 rounded-2xl bg-[#101A31] border border-slate-700 max-w-sm mx-auto font-mono text-center">
+              <span className="text-xs text-slate-400 block uppercase">Your Application Reference ID:</span>
+              <span className="text-xl font-bold text-cyan-300 select-all block mt-1">
+                {submittedApplicationId}
+              </span>
+            </div>
 
-                <div className="pt-4 flex justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsApplyModalOpen(false);
-                      setSubmittedApplicationId(null);
-                    }}
-                    className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all"
-                  >
-                    Done
-                  </button>
-                </div>
+            <div className="pt-4 flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsApplyModalOpen(false);
+                  setSubmittedApplicationId(null);
+                }}
+                className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Application Form */
+          <>
+            {formError && (
+              <div className="p-3.5 mb-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{formError}</span>
               </div>
-            ) : (
-              /* Application Form */
-              <>
-                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                  <div>
-                    <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider block">
-                      Talent Cohort 2026
-                    </span>
-                    <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white">
-                      Internship Application • <span className="text-cyan-400">{selectedDomainForForm}</span>
-                    </h3>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsApplyModalOpen(false)}
-                    className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-                  >
-                    ✕
-                  </button>
-                </div>
+            )}
 
-                {formError && (
-                  <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-300 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>{formError}</span>
-                  </div>
-                )}
-
-                <form onSubmit={handleFormSubmit} className="space-y-6">
+            <form onSubmit={handleFormSubmit} className="space-y-6">
                   {/* Section 1: Candidate Basics */}
                   <div className="space-y-4">
                     <h4 className="font-['Space_Grotesk'] text-sm font-bold text-white border-l-2 border-cyan-400 pl-2">
@@ -1009,9 +1005,7 @@ export const CareersPage: React.FC = () => {
                 </form>
               </>
             )}
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

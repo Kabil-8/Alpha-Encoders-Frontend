@@ -4,6 +4,7 @@ import { ExternalLink, CheckCircle, Shield, Layers, ChevronRight, Sparkles, Term
 import { Link } from 'react-router-dom';
 import { BorderBeam } from '../reactbits/BorderBeam';
 import { Magnet } from '../reactbits/Magnet';
+import { Modal } from './Modal';
 
 interface ProjectCardProps {
   project: ProjectItem;
@@ -334,81 +335,64 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, featuredLarge
         </div>
       </div>
 
-      {/* Case Study Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-2xl rounded-2xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-              <div>
-                <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider block mb-1">
-                  Architecture & Case Study
-                </span>
-                <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white">
-                  {project.name}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-                aria-label="Close modal"
+      {/* Case Study Modal via Portal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        maxWidth="2xl"
+        subtitle="Architecture & Case Study"
+        title={project.name}
+      >
+        <div className="space-y-6 text-sm text-slate-300">
+          <div>
+            <h4 className="font-['Space_Grotesk'] text-white font-semibold mb-2 text-base">
+              Project Overview
+            </h4>
+            <p className="leading-relaxed">{project.description}</p>
+          </div>
+
+          <div>
+            <h4 className="font-['Space_Grotesk'] text-white font-semibold mb-2 text-base">
+              Technical Architecture & Engineering
+            </h4>
+            <p className="leading-relaxed text-slate-400">{project.architectureOverview}</p>
+          </div>
+
+          <div>
+            <h4 className="font-['Space_Grotesk'] text-white font-semibold mb-2 text-base">
+              Key Engineering Highlights
+            </h4>
+            <ul className="space-y-2">
+              {project.highlights.map((h, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                  <span>{h}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <Link
+              to={`/contact?project=${project.slug}`}
+              onClick={() => setIsModalOpen(false)}
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-colors"
+            >
+              Discuss a Similar Project
+            </Link>
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:underline"
               >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-6 text-sm text-slate-300">
-              <div>
-                <h4 className="font-['Space_Grotesk'] text-white font-semibold mb-2 text-base">
-                  Project Overview
-                </h4>
-                <p className="leading-relaxed">{project.description}</p>
-              </div>
-
-              <div>
-                <h4 className="font-['Space_Grotesk'] text-white font-semibold mb-2 text-base">
-                  Technical Architecture & Engineering
-                </h4>
-                <p className="leading-relaxed text-slate-400">{project.architectureOverview}</p>
-              </div>
-
-              <div>
-                <h4 className="font-['Space_Grotesk'] text-white font-semibold mb-2 text-base">
-                  Key Engineering Highlights
-                </h4>
-                <ul className="space-y-2">
-                  {project.highlights.map((h, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                <Link
-                  to={`/contact?project=${project.slug}`}
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-colors"
-                >
-                  Discuss a Similar Project
-                </Link>
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:underline"
-                  >
-                    Open Live Deployment <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
-              </div>
-            </div>
+                Open Live Deployment <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
           </div>
         </div>
-      )}
+      </Modal>
     </>
   );
 };
