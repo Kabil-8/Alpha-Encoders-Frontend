@@ -102,12 +102,14 @@
 .text-gradient-primary {
   background: linear-gradient(135deg, #F5F8FF 20%, #A5B4CF 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-blue {
   background: linear-gradient(135deg, #22D3EE 0%, #3B82F6 50%, #2563FF 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -260,7 +262,7 @@
     page-break-inside: avoid;
   }
   #quotation-document * {
-    color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
