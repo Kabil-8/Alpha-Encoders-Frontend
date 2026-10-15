@@ -25,9 +25,35 @@ import {
   ChevronRight,
   UserPlus,
   Edit3,
-  FileText
+  FileText,
+  GraduationCap,
+  Globe
 } from 'lucide-react';
 import { SpotlightCard } from '../../components/reactbits/SpotlightCard';
+
+export interface InternshipApplicationData {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  college: string;
+  degree: string;
+  graduationYear: string;
+  domain: string;
+  experienceLevel: string;
+  skills: string[];
+  portfolioUrl?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  resumeUrl: string;
+  statementOfPurpose: string;
+  duration: string;
+  startDate: string;
+  status: 'pending' | 'reviewing' | 'shortlisted' | 'interview' | 'accepted' | 'rejected';
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
 
 export interface InquiryItem {
   id: string;
@@ -120,17 +146,21 @@ export interface AdminStats {
   totalUsers: number;
   activeClients: number;
   estimatedPipeline: number;
+  totalInternships?: number;
+  pendingInternships?: number;
+  shortlistedInternships?: number;
   currency: string;
 }
 
 export const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'inquiries' | 'projects' | 'users'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'inquiries' | 'projects' | 'users' | 'internships'>('overview');
 
   // Main Datasets
   const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
   const [projects, setProjects] = useState<ProjectItemData[]>([]);
   const [users, setUsers] = useState<UserItemData[]>([]);
+  const [internships, setInternships] = useState<InternshipApplicationData[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -145,10 +175,17 @@ export const AdminDashboardPage: React.FC = () => {
   const [userStatusFilter, setUserStatusFilter] = useState('all');
   const [userSearch, setUserSearch] = useState('');
 
+  const [internshipDomainFilter, setInternshipDomainFilter] = useState('all');
+  const [internshipStatusFilter, setInternshipStatusFilter] = useState('all');
+  const [internshipSearch, setInternshipSearch] = useState('');
+
   // Modals & Detail Drawers
   const [selectedInquiry, setSelectedInquiry] = useState<InquiryItem | null>(null);
   const [selectedProjectDetail, setSelectedProjectDetail] = useState<ProjectItemData | null>(null);
   const [selectedUserDetail, setSelectedUserDetail] = useState<UserItemData | null>(null);
+  const [selectedInternshipDetail, setSelectedInternshipDetail] = useState<InternshipApplicationData | null>(null);
+  const [internshipNoteEdit, setInternshipNoteEdit] = useState('');
+  const [isSavingInternshipNote, setIsSavingInternshipNote] = useState(false);
 
   // Project Add / Edit Modal State
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -204,22 +241,25 @@ export const AdminDashboardPage: React.FC = () => {
   const fetchAllData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [inqRes, projRes, usersRes, statsRes] = await Promise.all([
+      const [inqRes, projRes, usersRes, statsRes, internRes] = await Promise.all([
         fetch('/api/inquiries'),
         fetch('/api/projects'),
         fetch('/api/users'),
         fetch('/api/admin/stats'),
+        fetch('/api/internships')
       ]);
 
       const inqData = await inqRes.json();
       const projData = await projRes.json();
       const usersData = await usersRes.json();
       const statsData = await statsRes.json();
+      const internData = await internRes.json();
 
       if (inqData.success) setInquiries(inqData.inquiries || []);
       if (projData.success) setProjects(projData.projects || []);
       if (usersData.success) setUsers(usersData.users || []);
       if (statsData.success) setStats(statsData.stats || null);
+      if (internData.success) setInternships(internData.internships || []);
     } catch (err) {
       console.error('Failed to fetch admin data', err);
     } finally {
@@ -559,6 +599,123 @@ export const AdminDashboardPage: React.FC = () => {
     downloadAnchor.remove();
   };
 
+  const exportInternshipsCSV = () => {
+    const headers = [
+      'ID',
+      'Full Name',
+      'Email',
+      'Phone',
+      'College',
+      'Degree',
+      'Graduation Year',
+      'Domain',
+      'Experience Level',
+      'Skills',
+      'Resume URL',
+      'GitHub',
+      'Portfolio',
+      'LinkedIn',
+      'Duration',
+      'Start Date',
+      'Status',
+      'Admin Notes',
+      'Submitted Date'
+    ];
+    const rows = internships.map((i) => [
+      i.id,
+      `"${i.fullName}"`,
+      i.email,
+      `"${i.phone || ''}"`,
+      `"${i.college}"`,
+      `"${i.degree}"`,
+      i.graduationYear,
+      `"${i.domain}"`,
+      i.experienceLevel,
+      `"${(i.skills || []).join('; ')}"`,
+      `"${i.resumeUrl}"`,
+      `"${i.githubUrl || ''}"`,
+      `"${i.portfolioUrl || ''}"`,
+      `"${i.linkedinUrl || ''}"`,
+      `"${i.duration}"`,
+      `"${i.startDate}"`,
+      i.status,
+      `"${(i.adminNotes || '').replace(/"/g, '""')}"`,
+      i.createdAt
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `alpha_encoders_internships_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // -------------------------------------------------------------------
+  // INTERNSHIP ACTIONS
+  // -------------------------------------------------------------------
+  const handleUpdateInternshipStatus = async (id: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/internships/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setInternships((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status: newStatus as any } : item))
+        );
+        if (selectedInternshipDetail && selectedInternshipDetail.id === id) {
+          setSelectedInternshipDetail((prev) => (prev ? { ...prev, status: newStatus as any } : null));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to update internship status', err);
+    }
+  };
+
+  const handleSaveInternshipNotes = async (id: string) => {
+    setIsSavingInternshipNote(true);
+    try {
+      const res = await fetch(`/api/internships/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminNotes: internshipNoteEdit }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setInternships((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, adminNotes: internshipNoteEdit } : item))
+        );
+        if (selectedInternshipDetail && selectedInternshipDetail.id === id) {
+          setSelectedInternshipDetail((prev) => (prev ? { ...prev, adminNotes: internshipNoteEdit } : null));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to save internship note', err);
+    } finally {
+      setIsSavingInternshipNote(false);
+    }
+  };
+
+  const handleDeleteInternship = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this internship application?')) return;
+    try {
+      const res = await fetch(`/api/internships/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setInternships((prev) => prev.filter((i) => i.id !== id));
+        if (selectedInternshipDetail && selectedInternshipDetail.id === id) {
+          setSelectedInternshipDetail(null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete internship application', err);
+    }
+  };
+
   // -------------------------------------------------------------------
   // FILTERED DATASETS
   // -------------------------------------------------------------------
@@ -597,6 +754,20 @@ export const AdminDashboardPage: React.FC = () => {
       (u.phone && u.phone.toLowerCase().includes(userSearch.toLowerCase())) ||
       (u.location && u.location.toLowerCase().includes(userSearch.toLowerCase()));
     return matchesRole && matchesStatus && matchesSearch;
+  });
+
+  const filteredInternships = internships.filter((item) => {
+    const matchesDomain =
+      internshipDomainFilter === 'all' || item.domain.toLowerCase() === internshipDomainFilter.toLowerCase();
+    const matchesStatus = internshipStatusFilter === 'all' || item.status === internshipStatusFilter;
+    const matchesSearch =
+      internshipSearch === '' ||
+      item.fullName.toLowerCase().includes(internshipSearch.toLowerCase()) ||
+      item.email.toLowerCase().includes(internshipSearch.toLowerCase()) ||
+      item.college.toLowerCase().includes(internshipSearch.toLowerCase()) ||
+      item.domain.toLowerCase().includes(internshipSearch.toLowerCase()) ||
+      (item.skills && item.skills.some((s) => s.toLowerCase().includes(internshipSearch.toLowerCase())));
+    return matchesDomain && matchesStatus && matchesSearch;
   });
 
   return (
@@ -796,6 +967,27 @@ export const AdminDashboardPage: React.FC = () => {
             <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/60 text-cyan-300 font-mono">
               {users.length}
             </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('internships')}
+            className={`inline-flex items-center gap-2 py-3 px-4 border-b-2 font-['Space_Grotesk'] text-sm font-semibold transition-colors whitespace-nowrap ${
+              activeTab === 'internships'
+                ? 'border-blue-500 text-cyan-300'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <GraduationCap className="w-4 h-4 text-cyan-400" />
+            <span>Internships & Talent</span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/60 text-cyan-300 font-mono">
+              {internships.length}
+            </span>
+            {internships.filter((i) => i.status === 'pending').length > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-500/30">
+                {internships.filter((i) => i.status === 'pending').length} new
+              </span>
+            )}
           </button>
         </div>
 
@@ -1478,6 +1670,278 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ============================================================= */}
+        {/* TAB 5: INTERNSHIPS & TALENT PIPELINE */}
+        {/* ============================================================= */}
+        {activeTab === 'internships' && (
+          <div className="space-y-6 animate-in fade-in">
+            {/* Top Filter & Action Bar */}
+            <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+              <div className="flex flex-wrap gap-2 items-center w-full lg:w-auto">
+                {/* Search */}
+                <div className="relative flex-grow sm:flex-grow-0 sm:w-64">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search candidate, college, skills..."
+                    value={internshipSearch}
+                    onChange={(e) => setInternshipSearch(e.target.value)}
+                    className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-[#101A31] border border-slate-700/60 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+
+                {/* Domain Selector */}
+                <select
+                  value={internshipDomainFilter}
+                  onChange={(e) => setInternshipDomainFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-[#101A31] border border-slate-700/60 text-xs text-cyan-300 font-mono focus:outline-none"
+                >
+                  <option value="all">All Domains (8 Tracks)</option>
+                  <option value="Full-Stack Web Development">Full-Stack Web</option>
+                  <option value="Frontend Engineering & UI/UX Design">Frontend & UI/UX</option>
+                  <option value="Backend & Cloud Architecture">Backend & Cloud</option>
+                  <option value="AI & Machine Learning / GenAI">AI & ML / GenAI</option>
+                  <option value="Mobile Application Development">Mobile App Dev</option>
+                  <option value="Computer Science Research & Technical Whitepapers">CS Research & Papers</option>
+                  <option value="Cybersecurity & DevSecOps">Cybersecurity</option>
+                  <option value="Digital Growth, SEO & Product Strategy">Digital SEO & Growth</option>
+                </select>
+
+                {/* Status Filter Buttons */}
+                <div className="hidden sm:flex items-center gap-1 bg-[#101A31] p-1 rounded-xl border border-slate-800">
+                  {['all', 'pending', 'reviewing', 'shortlisted', 'accepted', 'rejected'].map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => setInternshipStatusFilter(st)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-mono capitalize transition-all ${
+                        internshipStatusFilter === st
+                          ? 'bg-blue-600 text-white font-semibold shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={exportInternshipsCSV}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#101A31] hover:bg-slate-800 border border-slate-700/60 text-xs font-mono text-cyan-300 transition-all shadow-sm"
+                  title="Download candidate roster as CSV"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export CSV</span>
+                </button>
+
+                <a
+                  href="/careers#apply"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-all"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Public Careers Portal</span>
+                  <ExternalLink className="w-3 h-3 ml-0.5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-slate-800 flex items-center justify-between">
+                <span className="text-slate-400">Total Applicants</span>
+                <span className="font-bold text-white text-sm">{internships.length}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-amber-500/20 flex items-center justify-between">
+                <span className="text-amber-300">Pending Review</span>
+                <span className="font-bold text-amber-300 text-sm">
+                  {internships.filter((i) => i.status === 'pending').length}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-purple-500/20 flex items-center justify-between">
+                <span className="text-purple-300">Shortlisted / Interview</span>
+                <span className="font-bold text-purple-300 text-sm">
+                  {internships.filter((i) => i.status === 'shortlisted' || i.status === 'interview').length}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-emerald-500/20 flex items-center justify-between">
+                <span className="text-emerald-300">Offers / Accepted</span>
+                <span className="font-bold text-emerald-300 text-sm">
+                  {internships.filter((i) => i.status === 'accepted').length}
+                </span>
+              </div>
+            </div>
+
+            {/* Candidate Applications Table / Grid */}
+            {filteredInternships.length === 0 ? (
+              <div className="text-center py-16 rounded-2xl bg-[#0A1024] border border-slate-800 space-y-3">
+                <GraduationCap className="w-10 h-10 text-slate-600 mx-auto" />
+                <h4 className="font-['Space_Grotesk'] text-base font-bold text-white">No applications match your filter</h4>
+                <p className="text-xs text-slate-400">Try adjusting your domain track, search term, or status filter.</p>
+              </div>
+            ) : (
+              <div className="rounded-2xl bg-[#0A1024] border border-slate-800 overflow-hidden shadow-xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-slate-300">
+                    <thead className="bg-[#101A31] text-slate-400 font-mono uppercase text-[10px] tracking-wider border-b border-slate-800">
+                      <tr>
+                        <th className="py-3.5 px-4">Candidate</th>
+                        <th className="py-3.5 px-4">College & Degree</th>
+                        <th className="py-3.5 px-4">Domain Track</th>
+                        <th className="py-3.5 px-4">Duration & Start</th>
+                        <th className="py-3.5 px-4">Status & Decision</th>
+                        <th className="py-3.5 px-4">Portfolio Links</th>
+                        <th className="py-3.5 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/80">
+                      {filteredInternships.map((app) => (
+                        <tr key={app.id} className="hover:bg-slate-900/60 transition-colors">
+                          {/* Candidate Name & Contact */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                {app.fullName.slice(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="font-bold text-white">{app.fullName}</div>
+                                <div className="text-[11px] text-slate-400 font-mono">{app.email}</div>
+                                {app.phone && <div className="text-[10px] text-emerald-400 font-mono">{app.phone}</div>}
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* College & Degree */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-medium text-slate-200">{app.college}</div>
+                            <div className="text-[11px] text-slate-400">
+                              {app.degree} • Class of {app.graduationYear}
+                            </div>
+                          </td>
+
+                          {/* Domain Track & Experience */}
+                          <td className="py-3.5 px-4">
+                            <span className="inline-block px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-blue-950 text-cyan-300 border border-blue-500/30">
+                              {app.domain}
+                            </span>
+                            <div className="text-[10px] text-slate-400 font-mono mt-1">
+                              Level: <span className="text-slate-300">{app.experienceLevel}</span>
+                            </div>
+                          </td>
+
+                          {/* Duration & Start */}
+                          <td className="py-3.5 px-4 font-mono text-[11px]">
+                            <div className="text-slate-200 font-semibold">{app.duration}</div>
+                            <div className="text-slate-400 text-[10px]">Start: {app.startDate}</div>
+                          </td>
+
+                          {/* Status Dropdown */}
+                          <td className="py-3.5 px-4">
+                            <select
+                              value={app.status}
+                              onChange={(e) => handleUpdateInternshipStatus(app.id, e.target.value)}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold uppercase border focus:outline-none cursor-pointer ${
+                                app.status === 'accepted'
+                                  ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40'
+                                  : app.status === 'shortlisted' || app.status === 'interview'
+                                  ? 'bg-cyan-950 text-cyan-300 border-cyan-500/40'
+                                  : app.status === 'reviewing'
+                                  ? 'bg-blue-950 text-blue-300 border-blue-500/40'
+                                  : app.status === 'rejected'
+                                  ? 'bg-rose-950 text-rose-300 border-rose-500/40'
+                                  : 'bg-amber-950 text-amber-300 border-amber-500/40'
+                              }`}
+                            >
+                              <option value="pending">PENDING</option>
+                              <option value="reviewing">REVIEWING</option>
+                              <option value="shortlisted">SHORTLISTED</option>
+                              <option value="interview">INTERVIEW</option>
+                              <option value="accepted">ACCEPTED</option>
+                              <option value="rejected">REJECTED</option>
+                            </select>
+                          </td>
+
+                          {/* Direct Links */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-2">
+                              {app.resumeUrl && (
+                                <a
+                                  href={app.resumeUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#101A31] hover:bg-blue-600 text-cyan-300 hover:text-white transition-all text-[11px] font-mono border border-slate-700/60"
+                                  title="View Resume / CV"
+                                >
+                                  <FileText className="w-3 h-3" />
+                                  <span>Resume</span>
+                                </a>
+                              )}
+                              {app.githubUrl && (
+                                <a
+                                  href={app.githubUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded bg-[#101A31] hover:bg-slate-800 text-slate-300 hover:text-white transition-all border border-slate-700/60"
+                                  title="Open GitHub"
+                                >
+                                  <GitBranch className="w-3 h-3" />
+                                </a>
+                              )}
+                              {app.portfolioUrl && (
+                                <a
+                                  href={app.portfolioUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded bg-[#101A31] hover:bg-slate-800 text-cyan-400 hover:text-white transition-all border border-slate-700/60"
+                                  title="Open Portfolio"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3.5 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedInternshipDetail(app);
+                                  setInternshipNoteEdit(app.adminNotes || '');
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#101A31] hover:bg-blue-600 text-cyan-300 hover:text-white font-semibold text-xs transition-all border border-slate-700/60"
+                                title="Inspect Full Application Dossier"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Dossier</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteInternship(app.id)}
+                                className="p-1.5 rounded-lg bg-rose-950/60 text-rose-300 hover:bg-rose-600 hover:text-white transition-all border border-rose-500/30"
+                                title="Delete Application"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -2484,6 +2948,257 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================= */}
+      {/* MODAL: COMPLETE INTERNSHIP CANDIDATE DOSSIER */}
+      {/* ============================================================= */}
+      {selectedInternshipDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+          <div className="relative w-full max-w-3xl rounded-3xl bg-[#0A1024] border border-blue-500/40 p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-800 pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+                    Candidate Dossier • {selectedInternshipDetail.id}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
+                      selectedInternshipDetail.status === 'accepted'
+                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                        : selectedInternshipDetail.status === 'shortlisted' || selectedInternshipDetail.status === 'interview'
+                        ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
+                        : selectedInternshipDetail.status === 'reviewing'
+                        ? 'bg-blue-950 text-blue-300 border border-blue-500/40'
+                        : selectedInternshipDetail.status === 'rejected'
+                        ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                        : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                    }`}
+                  >
+                    {selectedInternshipDetail.status}
+                  </span>
+                </div>
+                <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white">
+                  {selectedInternshipDetail.fullName}
+                </h3>
+                <p className="text-xs text-slate-300 font-mono">
+                  {selectedInternshipDetail.college} • {selectedInternshipDetail.degree} (Class of{' '}
+                  {selectedInternshipDetail.graduationYear})
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedInternshipDetail(null)}
+                className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick Metadata Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+              <div className="p-3 rounded-xl bg-[#101A31]">
+                <span className="text-slate-400 text-[10px] uppercase block">Domain Track</span>
+                <span className="text-cyan-300 font-bold">{selectedInternshipDetail.domain}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#101A31]">
+                <span className="text-slate-400 text-[10px] uppercase block">Experience</span>
+                <span className="text-white font-semibold">{selectedInternshipDetail.experienceLevel}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#101A31]">
+                <span className="text-slate-400 text-[10px] uppercase block">Duration</span>
+                <span className="text-emerald-400 font-bold">{selectedInternshipDetail.duration}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#101A31]">
+                <span className="text-slate-400 text-[10px] uppercase block">Start Date</span>
+                <span className="text-blue-300 font-semibold">{selectedInternshipDetail.startDate}</span>
+              </div>
+            </div>
+
+            {/* Contact Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-[#101A31] flex items-center justify-between">
+                <div>
+                  <span className="text-slate-400 font-mono text-[10px] uppercase block">Email</span>
+                  <a
+                    href={`mailto:${selectedInternshipDetail.email}`}
+                    className="text-cyan-300 hover:underline font-mono"
+                  >
+                    {selectedInternshipDetail.email}
+                  </a>
+                </div>
+                <Mail className="w-4 h-4 text-blue-400" />
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#101A31] flex items-center justify-between">
+                <div>
+                  <span className="text-slate-400 font-mono text-[10px] uppercase block">Phone / WhatsApp</span>
+                  <span className="text-emerald-400 font-mono">
+                    {selectedInternshipDetail.phone || 'Not provided'}
+                  </span>
+                </div>
+                <Phone className="w-4 h-4 text-emerald-400" />
+              </div>
+            </div>
+
+            {/* External Links Bar */}
+            <div className="p-4 rounded-2xl bg-[#101A31]/60 border border-slate-800 space-y-2">
+              <span className="text-xs font-mono uppercase text-cyan-400 font-semibold block">
+                Portfolio, Resume & Artifacts
+              </span>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {selectedInternshipDetail.resumeUrl && (
+                  <a
+                    href={selectedInternshipDetail.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md transition-all"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Open Official Resume / CV</span>
+                    <ExternalLink className="w-3 h-3 ml-0.5" />
+                  </a>
+                )}
+
+                {selectedInternshipDetail.githubUrl && (
+                  <a
+                    href={selectedInternshipDetail.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1024] hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono transition-all"
+                  >
+                    <GitBranch className="w-3.5 h-3.5" />
+                    <span>GitHub Profile</span>
+                    <ExternalLink className="w-3 h-3 ml-0.5" />
+                  </a>
+                )}
+
+                {selectedInternshipDetail.portfolioUrl && (
+                  <a
+                    href={selectedInternshipDetail.portfolioUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1024] hover:bg-slate-800 border border-slate-700 text-cyan-300 text-xs font-mono transition-all"
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Live Portfolio</span>
+                    <ExternalLink className="w-3 h-3 ml-0.5" />
+                  </a>
+                )}
+
+                {selectedInternshipDetail.linkedinUrl && (
+                  <a
+                    href={selectedInternshipDetail.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1024] hover:bg-slate-800 border border-slate-700 text-blue-300 text-xs font-mono transition-all"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>LinkedIn Profile</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Technical Skills */}
+            {selectedInternshipDetail.skills && selectedInternshipDetail.skills.length > 0 && (
+              <div>
+                <span className="text-xs font-mono uppercase text-slate-400 font-semibold block mb-2">
+                  Technical Stack & Skills
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedInternshipDetail.skills.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-lg bg-[#101A31] border border-slate-800 text-cyan-300 text-xs font-mono"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Statement of Purpose */}
+            <div>
+              <span className="text-xs font-mono uppercase text-slate-400 font-semibold block mb-2">
+                Statement of Purpose / Motivation
+              </span>
+              <div className="p-4 rounded-2xl bg-[#101A31]/40 border border-slate-800 text-xs text-slate-300 leading-relaxed italic">
+                "{selectedInternshipDetail.statementOfPurpose}"
+              </div>
+            </div>
+
+            {/* Review Decision & Admin Notes */}
+            <div className="p-4 rounded-2xl bg-[#101A31] border border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono uppercase text-cyan-400 font-semibold">
+                  Board Review & Decision
+                </span>
+                <select
+                  value={selectedInternshipDetail.status}
+                  onChange={(e) =>
+                    handleUpdateInternshipStatus(selectedInternshipDetail.id, e.target.value)
+                  }
+                  className="px-3 py-1 rounded-lg text-xs font-mono font-semibold uppercase bg-[#0A1024] border border-slate-700 text-white focus:outline-none"
+                >
+                  <option value="pending">PENDING REVIEW</option>
+                  <option value="reviewing">UNDER REVIEW</option>
+                  <option value="shortlisted">SHORTLISTED</option>
+                  <option value="interview">INTERVIEW SCHEDULED</option>
+                  <option value="accepted">ACCEPTED / OFFER SENT</option>
+                  <option value="rejected">REJECTED</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-mono text-[10px] uppercase mb-1">
+                  Internal Review Notes & Interview Feedback
+                </label>
+                <textarea
+                  rows={3}
+                  value={internshipNoteEdit}
+                  onChange={(e) => setInternshipNoteEdit(e.target.value)}
+                  placeholder="Record evaluation, GitHub code quality assessment, interview questions, or follow-up instructions..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#0A1024] border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSaveInternshipNotes(selectedInternshipDetail.id)}
+                  disabled={isSavingInternshipNote}
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all disabled:opacity-50"
+                >
+                  {isSavingInternshipNote ? 'Saving...' : 'Save Review Notes'}
+                </button>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => handleDeleteInternship(selectedInternshipDetail.id)}
+                className="inline-flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 font-mono"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Application</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedInternshipDetail(null)}
+                className="px-5 py-2 rounded-xl bg-[#101A31] hover:bg-slate-800 text-slate-300 text-xs font-semibold"
+              >
+                Close Dossier
+              </button>
+            </div>
           </div>
         </div>
       )}

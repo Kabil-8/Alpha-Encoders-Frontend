@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ProjectItem } from '../../types';
-import { ExternalLink, CheckCircle, Shield, Layers, ChevronRight, Sparkles } from 'lucide-react';
+import { ExternalLink, CheckCircle, Shield, Layers, ChevronRight, Sparkles, Terminal, FileText, Code2, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BorderBeam } from '../reactbits/BorderBeam';
 import { Magnet } from '../reactbits/Magnet';
@@ -52,8 +52,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, featuredLarge
 
           {/* Interactive Screen Preview Container */}
           <div className="relative rounded-xl bg-[#0A1024] border border-slate-850 p-4 sm:p-5 overflow-hidden min-h-[220px] sm:min-h-[280px] flex flex-col justify-center transition-transform duration-500 group-hover:scale-[1.01]">
-            {project.id === 'the-custom-nest' ? (
-              // Specific visual mockup for TheCustomNest
+            {project.id === 'the-custom-nest' || project.slug === 'the-custom-nest' ? (
+              // 1. BESPOKE MOCKUP: TheCustomNest
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                   <div className="flex items-center gap-2.5">
@@ -95,8 +95,98 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, featuredLarge
                   <span className="font-mono text-slate-400">0.38s Edge Load</span>
                 </div>
               </div>
+            ) : project.id === 'javalearn' || project.slug === 'javalearn' ? (
+              // 2. BESPOKE MOCKUP: JavaLearn (Developer Code Sandbox)
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-blue-950/60 border border-blue-400/40 flex items-center justify-center text-blue-300 font-mono font-bold text-sm">
+                      JL
+                    </div>
+                    <div>
+                      <h4 className="font-['Space_Grotesk'] text-white font-bold text-sm">JavaLearn Platform</h4>
+                      <p className="text-[10px] text-blue-400 font-mono">Algorithms & Architecture Engine</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                    Live Platform
+                  </span>
+                </div>
+
+                {/* Real-time Code Editor Sandbox Visual */}
+                <div className="p-3 rounded-xl bg-[#050816] border border-blue-500/20 font-mono text-[11px] space-y-1">
+                  <div className="flex items-center justify-between text-slate-500 pb-1 border-b border-slate-800/60 text-[10px]">
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <Terminal className="w-3 h-3 text-cyan-400" />
+                      ConcurrentPipeline.java
+                    </span>
+                    <span className="text-emerald-400">JDK 21 VirtualThreads</span>
+                  </div>
+                  <div className="text-blue-400 pt-1">
+                    public class <span className="text-cyan-300">PipelineExecutor</span> {'{'}
+                  </div>
+                  <div className="pl-3 text-slate-300">
+                    <span className="text-purple-400">var</span> stream = data.<span className="text-cyan-300">parallelStream()</span>;
+                  </div>
+                  <div className="pl-3 text-slate-400">
+                    // Zero lock contention event stream
+                  </div>
+                  <div className="text-blue-400">{'}'}</div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
+                  <span className="flex items-center gap-1.5 text-cyan-300 font-mono">
+                    <Code2 className="w-3.5 h-3.5 text-blue-400" />
+                    Interactive Code Drills
+                  </span>
+                  <span className="font-mono text-emerald-400">0.36s Latency</span>
+                </div>
+              </div>
+            ) : project.id === 'research-works-papers' || project.slug === 'research-works-papers' || project.category === 'Research Paper' ? (
+              // 3. BESPOKE MOCKUP: Computer Science Research & LaTeX Papers
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-purple-950/60 border border-purple-400/40 flex items-center justify-center text-purple-300 font-mono font-bold text-sm">
+                      RP
+                    </div>
+                    <div>
+                      <h4 className="font-['Space_Grotesk'] text-white font-bold text-sm">Alpha Research Lab</h4>
+                      <p className="text-[10px] text-purple-300 font-mono">IEEE / ACM LaTeX Manuscripts</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono text-cyan-300 bg-purple-950/80 px-2.5 py-1 rounded-full border border-purple-500/30">
+                    Camera-Ready
+                  </span>
+                </div>
+
+                {/* Academic LaTeX & Algorithmic Proof Visual */}
+                <div className="p-3 rounded-xl bg-[#050816] border border-purple-500/20 space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono border-b border-slate-800/80 pb-1">
+                    <span className="text-purple-300 flex items-center gap-1">
+                      <FileText className="w-3 h-3 text-purple-400" />
+                      IEEE Trans. Parallel & Dist. Syst.
+                    </span>
+                    <span className="text-cyan-400 font-bold">TeX Live 2026</span>
+                  </div>
+                  <div className="text-xs font-serif text-slate-200 italic leading-snug">
+                    "On Empirical Asymptotic Convergence in Resilient Edge-State Clusters"
+                  </div>
+                  <div className="p-1.5 rounded-lg bg-slate-900/90 font-mono text-[11px] text-cyan-300 text-center tracking-wider border border-slate-800">
+                    lim_&#123;n→∞&#125; E[T(n)] = O(n log n) ± ε
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
+                  <span className="flex items-center gap-1.5 text-purple-300 font-mono">
+                    <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+                    Formal Peer-Review Rigor
+                  </span>
+                  <span className="font-mono text-emerald-400">100% Reproducible</span>
+                </div>
+              </div>
             ) : (
-              // Specific visual mockup for EduSphere
+              // 4. BESPOKE MOCKUP: EduSphere Academy
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                   <div className="flex items-center gap-2.5">
@@ -104,7 +194,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, featuredLarge
                       ES
                     </div>
                     <div>
-                      <h4 className="font-['Space_Grotesk'] text-white font-bold text-sm">EduSphere Academy</h4>
+                      <h4 className="font-['Space_Grotesk'] text-white font-bold text-sm">EduSphere</h4>
                       <p className="text-[10px] text-cyan-400">Curriculum & Learning Portal</p>
                     </div>
                   </div>

@@ -14,6 +14,7 @@ import { ContactPage } from './pages/ContactPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
 import { QuotationPage } from './pages/QuotationPage';
+import { CareersPage } from './pages/CareersPage';
 
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
@@ -35,6 +36,7 @@ function AppLayout() {
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/process" element={<ProcessPage />} />
+            <Route path="/careers" element={<CareersPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/quotation" element={<QuotationPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />

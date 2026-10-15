@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { HeroVisual } from '../components/hero/HeroVisual';
 import { SectionHeading } from '../components/shared/SectionHeading';
-import { ProjectCard } from '../components/shared/ProjectCard';
 import { ServiceCard } from '../components/shared/ServiceCard';
-import { projectsData } from '../data/projectsData';
 import { servicesData } from '../data/servicesData';
 import { processStages } from '../data/processData';
-import type { ProjectItem } from '../types';
 
 // ReactBits Components
 import { Squares } from '../components/reactbits/Squares';
@@ -31,28 +28,11 @@ import {
   Zap,
   MessageSquare,
   Terminal,
-  Compass
+  Compass,
+  ShieldCheck
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
-  const [liveProjects, setLiveProjects] = useState<ProjectItem[]>(projectsData);
-
-  useEffect(() => {
-    let isMounted = true;
-    fetch('/api/projects')
-      .then((res) => res.json())
-      .then((data) => {
-        if (isMounted && data.success && Array.isArray(data.projects) && data.projects.length > 0) {
-          setLiveProjects(data.projects);
-        }
-      })
-      .catch(() => {
-        // use fallback silently
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
   // Select 6 primary services for home overview
   const featuredServices = servicesData.slice(0, 6);
 
@@ -98,6 +78,12 @@ export const HomePage: React.FC = () => {
       desc: 'Prioritize sub-second loading, semantic accessibility, technical schema markup, and Core Web Vitals to maximize search visibility.',
       icon: Zap,
       tag: 'Speed & Discovery'
+    },
+    {
+      title: '100% IP & Source Ownership',
+      desc: 'Zero proprietary lock-in. All Git repositories, design files, database schemas, and cloud deployment credentials are fully transferred to you.',
+      icon: ShieldCheck,
+      tag: 'Complete Ownership'
     }
   ];
 
@@ -266,34 +252,18 @@ export const HomePage: React.FC = () => {
         />
 
         {/* Interactive Live Projects 3D Slider */}
-        <div className="mt-14 mb-16">
+        <div className="mt-14">
           <LiveProjectsSlider />
         </div>
 
-        <div className="text-center mb-8">
-          <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-semibold px-3 py-1 rounded-full bg-slate-900 border border-slate-800">
-            All Verified Engineering Deployments & Case Studies
-          </span>
-        </div>
-
-        <div className="space-y-12">
-          {liveProjects.map((project, index) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              featuredLarge={index === 0}
-            />
-          ))}
-        </div>
-
         <div className="mt-12 text-center">
-          <Magnet magnetStrength={0.2}>
+          <Magnet magnetStrength={0.25}>
             <Link
               to="/projects"
-              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-semibold text-sm transition-colors py-2 px-4 rounded-xl hover:bg-blue-950/40"
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-blue-500/30 text-white font-semibold text-sm transition-all shadow-md hover:border-cyan-400"
             >
-              <span>View Detailed Project Case Studies</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Explore All Detailed Case Studies & Architecture</span>
+              <ArrowRight className="w-4 h-4 text-cyan-400" />
             </Link>
           </Magnet>
         </div>
