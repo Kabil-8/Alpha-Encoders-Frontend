@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { projectsData as fallbackProjects } from '../data/projectsData';
 import { ProjectCard } from '../components/shared/ProjectCard';
+import { LiveProjectsSlider } from '../components/shared/LiveProjectsSlider';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { Magnet } from '../components/reactbits/Magnet';
 import { ArrowRight, Code, Shield, CheckCircle2, RefreshCw } from 'lucide-react';
@@ -56,6 +57,11 @@ export const ProjectsPage: React.FC = () => {
           <p className="text-slate-300 text-lg sm:text-xl leading-relaxed">
             We don't publish concept redesigns or fictional client claims. Explore our verified client deployments engineered with modular architecture, high-converting UX, and production-grade code.
           </p>
+        </div>
+
+        {/* INTERACTIVE FEATURED SLIDER */}
+        <div className="mb-20">
+          <LiveProjectsSlider />
         </div>
 
         {/* PROJECTS SHOWCASE */}

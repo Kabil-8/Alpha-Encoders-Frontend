@@ -5,6 +5,7 @@ import { SpotlightCard } from '../components/reactbits/SpotlightCard';
 import { Magnet } from '../components/reactbits/Magnet';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
+import { TechStackMarquee } from '../components/shared/TechStackMarquee';
 import {
   ShieldCheck,
   Code2,
@@ -213,6 +214,19 @@ export const AboutPage: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* SECTION: FULL-STACK & RESEARCH TOOLING SLIDER */}
+        <div className="my-20 border-t border-slate-850 pt-16">
+          <SectionHeading
+            eyebrow="Engineered Foundations"
+            title="The Modern Stack"
+            titleHighlight="Powering Every Build."
+            description="Proven languages, frameworks, edge caching networks, and empirical research systems."
+          />
+          <div className="mt-8">
+            <TechStackMarquee />
           </div>
         </div>
 

@@ -17,6 +17,12 @@ import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { ShinyText } from '../components/reactbits/ShinyText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
 
+// Interactive Animation & Slider Showcase Components
+import { LiveProjectsSlider } from '../components/shared/LiveProjectsSlider';
+import { TechStackMarquee } from '../components/shared/TechStackMarquee';
+import { TestimonialsSlider } from '../components/shared/TestimonialsSlider';
+import { AnimatedStatsCounter } from '../components/shared/AnimatedStatsCounter';
+
 import {
   ArrowRight,
   ArrowUpRight,
@@ -178,6 +184,11 @@ export const HomePage: React.FC = () => {
             <HeroVisual />
           </div>
         </div>
+
+        {/* Dynamic Benchmark Stats Counters */}
+        <div className="mt-14 pt-8 border-t border-slate-800/80">
+          <AnimatedStatsCounter />
+        </div>
       </section>
 
       {/* SECTION B: BUSINESS CAPABILITIES MARQUEE */}
@@ -204,6 +215,16 @@ export const HomePage: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Dual-Direction Continuous Tech Stack Slider */}
+        <div className="mt-8 pt-6 border-t border-slate-800/80">
+          <div className="text-center mb-3">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400 font-semibold px-3 py-1 rounded-full bg-blue-950/80 border border-blue-500/30">
+              Modern Full-Stack & Research Tooling
+            </span>
+          </div>
+          <TechStackMarquee />
         </div>
       </section>
 
@@ -244,7 +265,18 @@ export const HomePage: React.FC = () => {
           description="Inspect completed client websites built with modular components, fast loading speeds, and purpose-driven user interfaces."
         />
 
-        <div className="space-y-12 mt-14">
+        {/* Interactive Live Projects 3D Slider */}
+        <div className="mt-14 mb-16">
+          <LiveProjectsSlider />
+        </div>
+
+        <div className="text-center mb-8">
+          <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-semibold px-3 py-1 rounded-full bg-slate-900 border border-slate-800">
+            All Verified Engineering Deployments & Case Studies
+          </span>
+        </div>
+
+        <div className="space-y-12">
           {liveProjects.map((project, index) => (
             <ProjectCard
               key={project.id}
@@ -359,6 +391,20 @@ export const HomePage: React.FC = () => {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </Magnet>
+        </div>
+      </section>
+
+      {/* SECTION: CLIENT TESTIMONIALS & VERIFIED REVIEWS SLIDER */}
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24 border-t border-slate-850 z-10">
+        <SectionHeading
+          eyebrow="Client Testimonials & Feedback"
+          title="Endorsed by Founders,"
+          titleHighlight="Trusted by Educators."
+          description="Hear directly from business owners, platform educators, and research partners who rely on Alpha Encoders engineering."
+        />
+
+        <div className="mt-14">
+          <TestimonialsSlider />
         </div>
       </section>
 
