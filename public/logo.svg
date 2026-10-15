@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <defs>
+    <linearGradient id="logo-grad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22D3EE" />
+      <stop offset="60%" stop-color="#2563FF" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+  <!-- Icon Emblem -->
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="#0A1024" stroke="rgba(37, 99, 255, 0.4)" stroke-width="1.5" />
+  <path d="M14 16L8 24L14 32" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M30 16C28 16 26 18 23 22C20 27 16 32 12 32" stroke="#22D3EE" stroke-width="2.2" stroke-linecap="round" />
+  <path d="M18 16C21 21 26 28 32 32" stroke="url(#logo-grad)" stroke-width="2.6" stroke-linecap="round" />
+  <circle cx="26" cy="22" r="3" stroke="#22D3EE" stroke-width="2" fill="#050816" />
+  <path d="M30 16L36 24L30 32" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Typography Wordmark -->
+  <text x="56" y="25" fill="#F5F8FF" font-family="'Space Grotesk', system-ui, sans-serif" font-weight="700" font-size="19" letter-spacing="-0.02em">ALPHA</text>
+  <text x="122" y="25" fill="#22D3EE" font-family="'Space Grotesk', system-ui, sans-serif" font-weight="600" font-size="19" letter-spacing="-0.02em">ENCODERS</text>
+  <text x="56" y="38" fill="#A5B4CF" font-family="'Inter', system-ui, sans-serif" font-weight="500" font-size="8.5" letter-spacing="0.18em">DIGITAL ENGINEERING STUDIO</text>
+</svg>
