@@ -23,6 +23,7 @@ import { SpotlightCard } from '../components/reactbits/SpotlightCard';
 import { ShinyText } from '../components/reactbits/ShinyText';
 import { Magnet } from '../components/reactbits/Magnet';
 import { Modal } from '../components/shared/Modal';
+import { apiUrl } from '../config/api';
 
 export interface DomainTrack {
   id: string;
@@ -264,7 +265,7 @@ export const CareersPage: React.FC = () => {
         throw new Error('Please fill out all required fields before submitting.');
       }
 
-      const res = await fetch('/api/internships', {
+      const res = await fetch(apiUrl('/api/internships'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -292,7 +293,7 @@ export const CareersPage: React.FC = () => {
     setLookupResult(null);
 
     try {
-      const res = await fetch(`/api/internships/${encodeURIComponent(lookupId.trim())}`);
+      const res = await fetch(apiUrl(`/api/internships/${encodeURIComponent(lookupId.trim())}`));
       const data = await res.json();
       if (!res.ok || !data.success || !data.internship) {
         throw new Error('No application found with this Application ID or Email. Please check and try again.');
@@ -749,7 +750,7 @@ export const CareersPage: React.FC = () => {
                           type="text"
                           name="fullName"
                           required
-                          placeholder="e.g. Aarav Sharma"
+                          placeholder="e.g. K.Kabil"
                           value={formData.fullName}
                           onChange={handleFormChange}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-[#101A31] border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
@@ -761,7 +762,7 @@ export const CareersPage: React.FC = () => {
                           type="email"
                           name="email"
                           required
-                          placeholder="name@college.edu or personal email"
+                          placeholder="kabilk2023@gmail.com"
                           value={formData.email}
                           onChange={handleFormChange}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-[#101A31] border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
@@ -772,10 +773,10 @@ export const CareersPage: React.FC = () => {
                         <input
                           type="tel"
                           name="phone"
-                          placeholder="+91 98765 43210"
+                          placeholder="+91 8667452487"
                           value={formData.phone}
                           onChange={handleFormChange}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#101A31] border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#101A31] border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
                         />
                       </div>
                       <div>

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
 import { BorderBeam } from '../../components/reactbits/BorderBeam';
 import { Magnet } from '../../components/reactbits/Magnet';
+import { apiUrl } from '../../config/api';
 
 export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ export const AdminLoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -40,7 +41,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   const fillDemoCredentials = () => {
-    setEmail('admin@alphaencoders.com');
+    setEmail('kabilk2023@gmail.com');
     setPassword('admin123');
   };
 
@@ -76,7 +77,7 @@ export const AdminLoginPage: React.FC = () => {
                 Studio Command Center
               </h1>
               <p className="text-slate-400 text-xs font-mono uppercase tracking-wider mt-1">
-                Alpha Encoders Administration
+                Alpha Encoders Administration • K.Kabil
               </p>
             </div>
           </div>
@@ -91,7 +92,7 @@ export const AdminLoginPage: React.FC = () => {
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5">
-                Admin Email
+                Admin Email (K.Kabil)
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
@@ -100,8 +101,8 @@ export const AdminLoginPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@alphaencoders.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#050816] text-white border border-slate-800 focus:border-blue-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="kabilk2023@gmail.com"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#050816] text-white border border-slate-800 focus:border-blue-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
                 />
               </div>
             </div>

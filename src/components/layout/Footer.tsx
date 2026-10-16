@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Mail, MessageSquare, Shield, Terminal } from 'lucide-react';
+import { ArrowUpRight, Mail, MessageSquare, Phone, Shield, Terminal } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -32,26 +32,37 @@ export const Footer: React.FC = () => {
             </Link>
 
             <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-              Alpha Encoders designs and develops professional websites and customized digital solutions that help businesses establish and grow their online presence.
+              Alpha Encoders designs and develops professional websites and customized digital solutions that help businesses establish and grow their online presence. Founded & led by K.Kabil.
             </p>
 
-            <div className="pt-2 flex flex-col sm:flex-row gap-3">
-              <a
-                href="mailto:contact@alphaencoders.com"
-                className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 hover:text-cyan-400 transition-colors bg-[#0A1024] px-3 py-2 rounded-lg border border-slate-800"
-              >
-                <Mail className="w-3.5 h-3.5 text-blue-400" />
-                contact@alphaencoders.com
-              </a>
-              <a
-                href="https://wa.me/?text=Hello%20Alpha%20Encoders,%20I%20would%20like%20to%20discuss%20a%20website%20project"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 hover:text-emerald-400 transition-colors bg-[#0A1024] px-3 py-2 rounded-lg border border-slate-800"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
-                WhatsApp Direct Inquiry
-              </a>
+            <div className="pt-2 flex flex-col gap-2.5">
+              <div className="flex flex-wrap gap-2.5">
+                <a
+                  href="mailto:kabilk2023@gmail.com"
+                  className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 hover:text-cyan-400 transition-colors bg-[#0A1024] px-3 py-2 rounded-lg border border-slate-800"
+                >
+                  <Mail className="w-3.5 h-3.5 text-blue-400" />
+                  kabilk2023@gmail.com
+                </a>
+                <a
+                  href="tel:+918667452487"
+                  className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 hover:text-cyan-400 transition-colors bg-[#0A1024] px-3 py-2 rounded-lg border border-slate-800 font-mono"
+                >
+                  <Phone className="w-3.5 h-3.5 text-cyan-400" />
+                  +91 8667452487
+                </a>
+              </div>
+              <div>
+                <a
+                  href="https://wa.me/918667452487?text=Hello%20K.Kabil%20(Alpha%20Encoders),%20I%20would%20like%20to%20discuss%20a%20website%20project"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-medium text-slate-300 hover:text-emerald-400 transition-colors bg-[#0A1024] px-3 py-2 rounded-lg border border-slate-800"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>WhatsApp: +91 8667452487 (K.Kabil)</span>
+                </a>
+              </div>
             </div>
           </div>
 

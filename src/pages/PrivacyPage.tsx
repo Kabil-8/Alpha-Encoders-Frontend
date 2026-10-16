@@ -70,9 +70,14 @@ export const PrivacyPage: React.FC = () => {
               5. Contact Us Regarding Your Data
             </h2>
             <p>
-              If you have any questions or wish to request the removal of any submitted project inquiry details, please reach out to us at{' '}
-              <a href="mailto:contact@alphaencoders.com" className="text-cyan-400 hover:underline">
-                contact@alphaencoders.com
+              If you have any questions or wish to request the removal of any submitted project inquiry details, please reach out directly to{' '}
+              <span className="font-semibold text-white">K.Kabil</span> at{' '}
+              <a href="mailto:kabilk2023@gmail.com" className="text-cyan-400 hover:underline">
+                kabilk2023@gmail.com
+              </a>{' '}
+              or via phone at{' '}
+              <a href="tel:+918667452487" className="text-cyan-400 hover:underline font-mono">
+                +91 8667452487
               </a>.
             </p>
           </section>

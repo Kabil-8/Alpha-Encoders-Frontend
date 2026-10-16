@@ -12,6 +12,7 @@ import {
   Sparkles,
   ArrowLeft
 } from 'lucide-react';
+import { apiUrl } from '../config/api';
 
 interface QuotationLineItem {
   id: string;
@@ -105,7 +106,7 @@ export const QuotationPage: React.FC = () => {
 
   // Load clients from server API if available to enable quick filling
   useEffect(() => {
-    fetch('/api/users')
+    fetch(apiUrl('/api/users'))
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.users)) {
@@ -341,7 +342,7 @@ export const QuotationPage: React.FC = () => {
   const handleCopySummary = () => {
     const text = `ALPHA ENCODERS • COMMERCIAL PROPOSAL / QUOTATION\nQuote Reference: ${quoteNumber}\nDate: ${issueDate}\nClient: ${clientName} (${clientCompany})\nProject: ${projectTitle}\n\nDeliverables:\n${lineItems
       .map((item, idx) => `${idx + 1}. ${item.title}: ${currencySymbol}${item.quantity * item.rate}`)
-      .join('\n')}\n\nTotal Investment: ${currencySymbol}${grandTotal.toLocaleString()} ${currencyCode}\nPayment Terms: 50% Inception, 30% Milestone Staging, 20% Production Handover.\nValid Until: ${validUntil}\nContact: contact@alphaencoders.com`;
+      .join('\n')}\n\nTotal Investment: ${currencySymbol}${grandTotal.toLocaleString()} ${currencyCode}\nPayment Terms: 50% Inception, 30% Milestone Staging, 20% Production Handover.\nValid Until: ${validUntil}\nContact: kabilk2023@gmail.com | K.Kabil (+91 8667452487)`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -798,8 +799,9 @@ export const QuotationPage: React.FC = () => {
                       From: Engineering Studio
                     </span>
                     <div className="font-bold text-white text-sm font-['Space_Grotesk']">Alpha Encoders</div>
-                    <div className="text-slate-300 font-mono">Lead Solutions Architect & Engineering Team</div>
-                    <div className="text-slate-400 font-mono">Email: contact@alphaencoders.com</div>
+                    <div className="text-slate-300 font-mono">Lead Solutions Architect: K.Kabil</div>
+                    <div className="text-slate-400 font-mono">Email: kabilk2023@gmail.com</div>
+                    <div className="text-slate-400 font-mono">Phone: +91 8667452487</div>
                     <div className="text-slate-400 font-mono">Web: https://alphaencoders.com</div>
                   </div>
 
@@ -940,11 +942,11 @@ export const QuotationPage: React.FC = () => {
                     </span>
                     <div className="pt-8 border-b border-slate-700/80 w-48 relative">
                       <span className="absolute bottom-1 left-0 font-['Space_Grotesk'] font-bold text-cyan-300 tracking-wider">
-                        ALPHA ENCODERS
+                        K.Kabil
                       </span>
                     </div>
                     <div className="font-mono text-slate-400 text-[11px]">
-                      Lead Solutions Architect & Engineering Division
+                      K.Kabil • Founder & Lead Solutions Architect
                     </div>
                   </div>
 

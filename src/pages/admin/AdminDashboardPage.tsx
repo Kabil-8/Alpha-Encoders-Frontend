@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { SpotlightCard } from '../../components/reactbits/SpotlightCard';
 import { Modal } from '../../components/shared/Modal';
+import { apiUrl } from '../../config/api';
 
 export interface InternshipApplicationData {
   id: string;
@@ -243,11 +244,11 @@ export const AdminDashboardPage: React.FC = () => {
     setIsLoading(true);
     try {
       const [inqRes, projRes, usersRes, statsRes, internRes] = await Promise.all([
-        fetch('/api/inquiries'),
-        fetch('/api/projects'),
-        fetch('/api/users'),
-        fetch('/api/admin/stats'),
-        fetch('/api/internships')
+        fetch(apiUrl('/api/inquiries')),
+        fetch(apiUrl('/api/projects')),
+        fetch(apiUrl('/api/users')),
+        fetch(apiUrl('/api/admin/stats')),
+        fetch(apiUrl('/api/internships'))
       ]);
 
       const inqData = await inqRes.json();
@@ -283,7 +284,7 @@ export const AdminDashboardPage: React.FC = () => {
   // -------------------------------------------------------------------
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`/api/inquiries/${id}`, {
+      const res = await fetch(apiUrl(`/api/inquiries/${id}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -305,7 +306,7 @@ export const AdminDashboardPage: React.FC = () => {
   const handleDeleteInquiry = async (id: string) => {
     if (!window.confirm('Are you sure you want to permanently delete this lead inquiry?')) return;
     try {
-      const res = await fetch(`/api/inquiries/${id}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/api/inquiries/${id}`), { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setInquiries((prev) => prev.filter((i) => i.id !== id));
@@ -394,13 +395,13 @@ export const AdminDashboardPage: React.FC = () => {
     try {
       let res;
       if (editingProject) {
-        res = await fetch(`/api/projects/${editingProject.id}`, {
+        res = await fetch(apiUrl(`/api/projects/${editingProject.id}`), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
       } else {
-        res = await fetch('/api/projects', {
+        res = await fetch(apiUrl('/api/projects'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -421,7 +422,7 @@ export const AdminDashboardPage: React.FC = () => {
   const handleDeleteProject = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this project?')) return;
     try {
-      const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/api/projects/${id}`), { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setProjects((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
@@ -488,13 +489,13 @@ export const AdminDashboardPage: React.FC = () => {
     try {
       let res;
       if (editingUser) {
-        res = await fetch(`/api/users/${editingUser.id}`, {
+        res = await fetch(apiUrl(`/api/users/${editingUser.id}`), {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
       } else {
-        res = await fetch('/api/users', {
+        res = await fetch(apiUrl('/api/users'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -515,7 +516,7 @@ export const AdminDashboardPage: React.FC = () => {
   const handleDeleteUser = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this client record from CRM?')) return;
     try {
-      const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/api/users/${id}`), { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setUsers((prev) => prev.filter((u) => u.id !== id));
@@ -530,7 +531,7 @@ export const AdminDashboardPage: React.FC = () => {
     if (!selectedUserDetail) return;
     setIsSavingNote(true);
     try {
-      const res = await fetch(`/api/users/${selectedUserDetail.id}`, {
+      const res = await fetch(apiUrl(`/api/users/${selectedUserDetail.id}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notes: dossierNote })
@@ -658,7 +659,7 @@ export const AdminDashboardPage: React.FC = () => {
   // -------------------------------------------------------------------
   const handleUpdateInternshipStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`/api/internships/${id}/status`, {
+      const res = await fetch(apiUrl(`/api/internships/${id}/status`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -680,7 +681,7 @@ export const AdminDashboardPage: React.FC = () => {
   const handleSaveInternshipNotes = async (id: string) => {
     setIsSavingInternshipNote(true);
     try {
-      const res = await fetch(`/api/internships/${id}/status`, {
+      const res = await fetch(apiUrl(`/api/internships/${id}/status`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adminNotes: internshipNoteEdit }),
@@ -704,7 +705,7 @@ export const AdminDashboardPage: React.FC = () => {
   const handleDeleteInternship = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this internship application?')) return;
     try {
-      const res = await fetch(`/api/internships/${id}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/api/internships/${id}`), { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setInternships((prev) => prev.filter((i) => i.id !== id));
@@ -788,7 +789,7 @@ export const AdminDashboardPage: React.FC = () => {
               </span>
             </Link>
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-950 border border-blue-500/30 text-cyan-300 font-mono hidden sm:inline">
-              Control Center v2.4
+              Control Center • K.Kabil (kabilk2023@gmail.com)
             </span>
           </div>
 
@@ -2777,7 +2778,7 @@ export const AdminDashboardPage: React.FC = () => {
                     required
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="sarah@company.com"
+                    placeholder="kabilk2023@gmail.com"
                     className="w-full px-3.5 py-2 rounded-xl bg-[#101A31] border border-slate-800 text-white focus:outline-none focus:border-blue-500 font-mono"
                   />
                 </div>
@@ -2792,7 +2793,7 @@ export const AdminDashboardPage: React.FC = () => {
                     type="text"
                     value={userPhone}
                     onChange={(e) => setUserPhone(e.target.value)}
-                    placeholder="+1 415-555-0182"
+                    placeholder="+91 8667452487"
                     className="w-full px-3.5 py-2 rounded-xl bg-[#101A31] border border-slate-800 text-white focus:outline-none focus:border-blue-500 font-mono"
                   />
                 </div>

@@ -71,8 +71,13 @@ export const TermsPage: React.FC = () => {
             </h2>
             <p>
               For any questions regarding commercial terms or project agreements, please contact{' '}
-              <a href="mailto:contact@alphaencoders.com" className="text-cyan-400 hover:underline">
-                contact@alphaencoders.com
+              <span className="font-semibold text-white">K.Kabil</span> at{' '}
+              <a href="mailto:kabilk2023@gmail.com" className="text-cyan-400 hover:underline">
+                kabilk2023@gmail.com
+              </a>{' '}
+              or via phone / WhatsApp at{' '}
+              <a href="tel:+918667452487" className="text-cyan-400 hover:underline font-mono">
+                +91 8667452487
               </a>.
             </p>
           </section>

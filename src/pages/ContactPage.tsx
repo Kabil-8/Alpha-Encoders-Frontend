@@ -10,10 +10,12 @@ import {
   AlertCircle,
   Mail,
   MessageSquare,
+  Phone,
   Clock,
   Shield,
   Sparkles
 } from 'lucide-react';
+import { apiUrl } from '../config/api';
 
 interface FormErrors {
   fullName?: string;
@@ -131,7 +133,7 @@ export const ContactPage: React.FC = () => {
     if (!email.trim()) {
       errs.email = 'Please provide your email address.';
     } else if (!emailRegex.test(email)) {
-      errs.email = 'Please provide a valid email format (e.g., name@company.com).';
+      errs.email = 'Please provide a valid email format (e.g., kabilk2023@gmail.com).';
     }
 
     if (!websiteType) {
@@ -164,7 +166,7 @@ export const ContactPage: React.FC = () => {
 
     try {
       // Dispatch project inquiry directly to backend API
-      const res = await fetch('/api/inquiries', {
+      const res = await fetch(apiUrl('/api/inquiries'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -216,8 +218,8 @@ export const ContactPage: React.FC = () => {
   };
 
   // WhatsApp quick text constructor
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-    `Hello Alpha Encoders! My name is ${fullName || 'a client'}. I am interested in building a ${websiteType} for ${company || 'my business'}.`
+  const whatsappUrl = `https://wa.me/918667452487?text=${encodeURIComponent(
+    `Hello K.Kabil (Alpha Encoders)! My name is ${fullName || 'a client'}. I am interested in building a ${websiteType} for ${company || 'my business'}.`
   )}`;
 
   return (
@@ -359,7 +361,7 @@ export const ContactPage: React.FC = () => {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="e.g. alex@yourcompany.com"
+                          placeholder="kabilk2023@gmail.com"
                           className={`w-full px-4 py-3 rounded-xl bg-[#050816] text-white border text-sm placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                             errors.email ? 'border-rose-500' : 'border-slate-800 focus:border-blue-500'
                           }`}
@@ -382,8 +384,8 @@ export const ContactPage: React.FC = () => {
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          placeholder="+1 (555) 000-0000"
-                          className="w-full px-4 py-3 rounded-xl bg-[#050816] text-white border border-slate-800 focus:border-blue-500 text-sm placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                          placeholder="+91 8667452487"
+                          className="w-full px-4 py-3 rounded-xl bg-[#050816] text-white border border-slate-800 focus:border-blue-500 text-sm placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-mono"
                         />
                       </div>
 
@@ -565,24 +567,46 @@ export const ContactPage: React.FC = () => {
           <div className="lg:col-span-4 space-y-6">
             {/* Direct Contact Card */}
             <div className="rounded-3xl bg-[#0A1024] border border-slate-800 p-6 space-y-5">
-              <h3 className="font-['Space_Grotesk'] text-lg font-bold text-white">
-                Direct Inquiries
-              </h3>
+              <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                <h3 className="font-['Space_Grotesk'] text-lg font-bold text-white">
+                  Direct Inquiries
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950 border border-blue-500/30 text-cyan-300">
+                  Lead: K.Kabil
+                </span>
+              </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3.5">
                 <a
-                  href="mailto:contact@alphaencoders.com"
+                  href="mailto:kabilk2023@gmail.com"
                   className="flex items-start gap-3 p-3.5 rounded-xl bg-[#050816] border border-slate-800 hover:border-blue-500/40 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-lg bg-blue-950/60 border border-blue-500/30 flex items-center justify-center text-cyan-300 shrink-0">
                     <Mail className="w-5 h-5" />
                   </div>
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">
+                      Email Lead Engineer (K.Kabil)
+                    </span>
+                    <span className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors block truncate">
+                      kabilk2023@gmail.com
+                    </span>
+                  </div>
+                </a>
+
+                <a
+                  href="tel:+918667452487"
+                  className="flex items-start gap-3 p-3.5 rounded-xl bg-[#050816] border border-slate-800 hover:border-cyan-500/40 transition-colors group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                    <Phone className="w-5 h-5" />
+                  </div>
                   <div>
                     <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">
-                      Email Us Directly
+                      Direct Phone Call
                     </span>
-                    <span className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
-                      contact@alphaencoders.com
+                    <span className="text-sm font-semibold font-mono text-white group-hover:text-cyan-300 transition-colors">
+                      +91 8667452487
                     </span>
                   </div>
                 </a>
@@ -601,7 +625,7 @@ export const ContactPage: React.FC = () => {
                       WhatsApp Quick Chat
                     </span>
                     <span className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
-                      Start WhatsApp Thread
+                      +91 8667452487 (K.Kabil)
                     </span>
                   </div>
                 </a>

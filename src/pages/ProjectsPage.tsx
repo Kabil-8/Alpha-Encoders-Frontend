@@ -7,6 +7,7 @@ import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { Magnet } from '../components/reactbits/Magnet';
 import { ArrowRight, Code, Shield, CheckCircle2, RefreshCw } from 'lucide-react';
 import type { ProjectItem } from '../types';
+import { apiUrl } from '../config/api';
 
 export const ProjectsPage: React.FC = () => {
   const [projects, setProjects] = useState<ProjectItem[]>(fallbackProjects);
@@ -14,7 +15,7 @@ export const ProjectsPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    fetch('/api/projects')
+    fetch(apiUrl('/api/projects'))
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.projects) && data.projects.length > 0) {
