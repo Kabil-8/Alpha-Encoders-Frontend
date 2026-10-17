@@ -12,16 +12,16 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Start page transition progress bar
+    // Ultra-snappy sub-200ms page progress indication
     setIsLoading(true);
-    setLoadingProgress(25);
+    setLoadingProgress(40);
 
-    const timer1 = setTimeout(() => setLoadingProgress(70), 80);
-    const timer2 = setTimeout(() => setLoadingProgress(100), 220);
+    const timer1 = setTimeout(() => setLoadingProgress(85), 60);
+    const timer2 = setTimeout(() => setLoadingProgress(100), 140);
     const timer3 = setTimeout(() => {
       setIsLoading(false);
       setLoadingProgress(0);
-    }, 400);
+    }, 240);
 
     return () => {
       clearTimeout(timer1);
@@ -34,22 +34,22 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
     <>
       {/* Top Loading Progress Bar */}
       {isLoading && (
-        <div className="fixed top-0 left-0 right-0 h-[3px] z-[100] bg-transparent pointer-events-none">
+        <div className="fixed top-0 left-0 right-0 h-[2px] z-[9999] bg-transparent pointer-events-none">
           <div
-            className="h-full bg-gradient-to-r from-[#2563FF] via-[#22D3EE] to-[#3B82F6] shadow-[0_0_12px_rgba(34,211,238,0.8)] transition-all duration-200 ease-out"
+            className="h-full bg-gradient-to-r from-blue-600 via-cyan-400 to-indigo-500 shadow-[0_0_10px_rgba(34,211,238,0.8)] transition-all duration-150 ease-out"
             style={{ width: `${loadingProgress}%` }}
           />
         </div>
       )}
 
-      {/* Animated Route Viewport */}
+      {/* Silky-smooth Route Viewport Animation */}
       <AnimatePresence mode="wait">
         <motion.div
           key={location.pathname}
-          initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
           className="flex-grow flex flex-col"
         >
           {children}

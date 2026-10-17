@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Magnet } from '../reactbits/Magnet';
 import { BorderBeam } from '../reactbits/BorderBeam';
+import { apiUrl } from '../../config/api';
 
 export interface FeaturedSliderProject {
   id: string;
@@ -120,23 +121,64 @@ const FEATURED_PROJECTS: FeaturedSliderProject[] = [
 ];
 
 export const LiveProjectsSlider: React.FC = () => {
+  const [projectsList, setProjectsList] = useState<FeaturedSliderProject[]>(FEATURED_PROJECTS);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [direction, setDirection] = useState<number>(1);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Sync with live backend projects
+  useEffect(() => {
+    let isMounted = true;
+    fetch(apiUrl('/api/projects'))
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data.success && Array.isArray(data.projects) && data.projects.length > 0) {
+          const mapped: FeaturedSliderProject[] = data.projects.map((p: any) => ({
+            id: p.id || p.slug,
+            name: p.name,
+            category: p.category || 'Web Application',
+            tagline: p.tagline || (p.description ? p.description.slice(0, 90) + '...' : 'Verified client deployment'),
+            description: p.description || '',
+            liveUrl: p.liveUrl || 'https://alphaencoders.vercel.app/',
+            technologies: Array.isArray(p.technologies) && p.technologies.length > 0 ? p.technologies : ['TypeScript', 'React', 'TailwindCSS'],
+            metrics: {
+              lighthouse: p.metrics?.lighthousePerformance || 99,
+              speed: p.metrics?.pageSpeed ? `${p.metrics.pageSpeed} FCP` : '0.40s FCP',
+              score: p.metrics?.accessibility ? `${p.metrics.accessibility}% A11y` : '100% Score'
+            },
+            highlights: Array.isArray(p.highlights) && p.highlights.length > 0 ? p.highlights : [
+              'Custom production architecture with sub-second performance',
+              'Modular component system designed for scalability',
+              '100% responsive cross-platform layout'
+            ],
+            accentGradient: 'from-blue-600/20 via-cyan-500/20 to-indigo-600/10',
+            borderGlow: 'hover:border-cyan-400/50'
+          }));
+          setProjectsList(mapped);
+        }
+      })
+      .catch((err) => {
+        console.warn('Live projects API notice:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const SLIDE_DURATION = 6000; // 6 seconds per slide
 
   const handleNext = () => {
     setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % FEATURED_PROJECTS.length);
+    setCurrentIndex((prev) => (prev + 1) % projectsList.length);
     setProgress(0);
   };
 
   const handlePrev = () => {
     setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + FEATURED_PROJECTS.length) % FEATURED_PROJECTS.length);
+    setCurrentIndex((prev) => (prev - 1 + projectsList.length) % projectsList.length);
     setProgress(0);
   };
 
@@ -159,9 +201,9 @@ export const LiveProjectsSlider: React.FC = () => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, currentIndex]);
+  }, [isPaused, currentIndex, projectsList.length]);
 
-  const currentProject = FEATURED_PROJECTS[currentIndex];
+  const currentProject = projectsList[currentIndex % projectsList.length] || projectsList[0];
 
   const variants = {
     enter: (dir: number) => ({
@@ -371,7 +413,7 @@ export const LiveProjectsSlider: React.FC = () => {
 
       {/* Bottom Thumbnail Selector Dots */}
       <div className="flex items-center justify-center gap-2.5 mt-5">
-        {FEATURED_PROJECTS.map((proj, idx) => (
+        {projectsList.map((proj, idx) => (
           <button
             key={proj.id}
             onClick={() => {

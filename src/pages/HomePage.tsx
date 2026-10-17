@@ -13,6 +13,7 @@ import { Magnet } from '../components/reactbits/Magnet';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { ShinyText } from '../components/reactbits/ShinyText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
+import Hyperspeed from '../components/reactbits/Hyperspeed';
 
 // Interactive Animation & Slider Showcase Components
 import { LiveProjectsSlider } from '../components/shared/LiveProjectsSlider';
@@ -89,18 +90,34 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="relative pt-24 sm:pt-28 pb-16 overflow-hidden">
-      {/* ReactBits Interactive Animated Squares Background */}
-      <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-        <Squares
-          direction="diagonal"
-          speed={0.4}
-          squareSize={42}
-          borderColor="rgba(148, 163, 184, 0.06)"
-          hoverFillColor="rgba(37, 99, 255, 0.15)"
+      {/* ReactBits Hyperspeed Interactive Highway Warp Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto opacity-35">
+        <Hyperspeed
+          curve="gentle"
+          curvature={0.7}
+          speed={1.1}
+          boost={2.4}
+          roadOpacity={0.06}
+          glow={0.55}
+          density={32}
+          trailLength={1.3}
+          lightSize={1.1}
+          theme="dark"
+          tailColors={['#00e5ff', '#3b82f6', '#6366f1']}
+          headColors={['#38bdf8', '#0ea5e9', '#0284c7']}
+          poleColors={['#0284c7']}
         />
       </div>
 
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/10 blur-[140px] pointer-events-none" />
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <Squares
+          direction="diagonal"
+          speed={0.3}
+          squareSize={48}
+          borderColor="rgba(148, 163, 184, 0.05)"
+          hoverFillColor="rgba(37, 99, 255, 0.12)"
+        />
+      </div>
 
       {/* SECTION A: HERO */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 lg:pb-24 z-10">

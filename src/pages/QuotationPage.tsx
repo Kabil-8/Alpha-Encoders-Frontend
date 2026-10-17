@@ -10,7 +10,9 @@ import {
   Check,
   Building,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  CloudUpload,
+  CheckCircle2
 } from 'lucide-react';
 import { apiUrl } from '../config/api';
 
@@ -359,6 +361,55 @@ export const QuotationPage: React.FC = () => {
     setTimeout(() => setCopied(false), 2500);
   };
 
+  const [isSavingCloud, setIsSavingCloud] = useState<boolean>(false);
+  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+
+  // Synchronize Quotation with MongoDB Atlas API
+  const handleSaveToCloud = async () => {
+    setIsSavingCloud(true);
+    setSaveSuccessMessage(null);
+    try {
+      const payload = {
+        quoteNumber,
+        issueDate,
+        validUntil,
+        currencyCode,
+        currencySymbol,
+        client: {
+          name: clientName,
+          company: clientCompany,
+          email: clientEmail,
+          phone: clientPhone,
+          location: clientLocation
+        },
+        projectTitle,
+        lineItems,
+        subtotal,
+        discountPercent,
+        taxPercent,
+        grandTotal,
+        notes,
+        status: 'sent'
+      };
+
+      const res = await fetch(apiUrl('/api/quotations'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to save quotation to cloud database.');
+      }
+      setSaveSuccessMessage('Quotation synchronized to MongoDB Atlas cloud database!');
+      setTimeout(() => setSaveSuccessMessage(null), 3500);
+    } catch (err: any) {
+      alert(err.message || 'Error saving quotation to cloud.');
+    } finally {
+      setIsSavingCloud(false);
+    }
+  };
+
   return (
     <div className="relative min-h-screen bg-[#050816] text-[#F5F8FF] pt-24 pb-20 selection:bg-blue-600/30 selection:text-cyan-300">
       {/* Background Lighting */}
@@ -382,7 +433,7 @@ export const QuotationPage: React.FC = () => {
                 Official Agency Quotation Engine
               </span>
             </div>
-            <h1 className="font-['Space_Grotesk'] text-3xl sm:text-4xl font-bold text-white tracking-tight">
+            <h1 className="font-['Bricolage_Grotesque'] text-3xl sm:text-4xl font-bold text-white tracking-tight">
               Commercial Quotation & Proposal Builder
             </h1>
             <p className="text-sm text-slate-400 mt-1">
@@ -394,8 +445,19 @@ export const QuotationPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
+              onClick={handleSaveToCloud}
+              disabled={isSavingCloud}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-xs font-mono text-cyan-300 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+              title="Save to MongoDB Atlas Cloud Database"
+            >
+              <CloudUpload className="w-4 h-4 text-cyan-400" />
+              <span>{isSavingCloud ? 'Saving...' : 'Save to Cloud DB'}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={handleCopySummary}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-slate-300 transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-slate-300 transition-all shadow-sm cursor-pointer"
               title="Copy text summary for WhatsApp or Email"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
@@ -405,7 +467,7 @@ export const QuotationPage: React.FC = () => {
             <button
               type="button"
               onClick={handleExportJSON}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-cyan-300 transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-cyan-300 transition-all shadow-sm cursor-pointer"
             >
               <Download className="w-4 h-4" />
               <span>Export JSON</span>
@@ -421,6 +483,14 @@ export const QuotationPage: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Cloud Save Notification */}
+        {saveSuccessMessage && (
+          <div className="mt-4 p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-mono flex items-center gap-2 no-print">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span>{saveSuccessMessage}</span>
+          </div>
+        )}
 
         {/* WORKSPACE GRID: Controls Form on Left, Document Sheet on Right (Hidden during print) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8">

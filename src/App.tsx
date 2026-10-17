@@ -3,7 +3,6 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ScrollToTop } from './components/shared/ScrollToTop';
 import { PageTransition } from './components/reactbits/PageTransition';
-import { Preloader } from './components/reactbits/Preloader';
 
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
@@ -59,7 +58,6 @@ function AppLayout() {
 export function App() {
   return (
     <Router>
-      <Preloader />
       <AppLayout />
     </Router>
   );
