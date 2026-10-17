@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText,
   Printer,
@@ -31,6 +31,16 @@ interface ClientPreset {
 }
 
 export const QuotationPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  // Authentication Guard: Quotation engine is strictly accessible in Admin
+  useEffect(() => {
+    const token = localStorage.getItem('ae_admin_token');
+    if (!token) {
+      navigate('/admin/login', { replace: true });
+    }
+  }, [navigate]);
+
   // Quotation Metadata
   const [quoteNumber, setQuoteNumber] = useState<string>(
     `AE-QUO-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`

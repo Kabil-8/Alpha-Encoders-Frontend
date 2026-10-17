@@ -38,7 +38,7 @@ function AppLayout() {
             <Route path="/process" element={<ProcessPage />} />
             <Route path="/careers" element={<CareersPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/quotation" element={<QuotationPage />} />
+            <Route path="/quotation" element={<Navigate to="/admin/quotation" replace />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
 

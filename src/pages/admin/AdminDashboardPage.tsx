@@ -806,9 +806,7 @@ export const AdminDashboardPage: React.FC = () => {
             </button>
 
             <Link
-              to="/quotation"
-              target="_blank"
-              rel="noopener noreferrer"
+              to="/admin/quotation"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/80 hover:bg-blue-600 border border-blue-500/40 text-xs font-mono text-white transition-all shadow-sm"
               title="Open Proposal & Quotation Engine"
             >
@@ -991,6 +989,17 @@ export const AdminDashboardPage: React.FC = () => {
               </span>
             )}
           </button>
+
+          <Link
+            to="/admin/quotation"
+            className="inline-flex items-center gap-2 py-3 px-4 border-b-2 border-transparent text-slate-400 hover:text-cyan-300 font-['Space_Grotesk'] text-sm font-semibold transition-colors whitespace-nowrap ml-auto"
+          >
+            <FileText className="w-4 h-4 text-cyan-400" />
+            <span>Quotation & Proposal Builder</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-950 border border-blue-500/30 text-cyan-300 font-mono">
+              Admin
+            </span>
+          </Link>
         </div>
 
         {/* ============================================================= */}
