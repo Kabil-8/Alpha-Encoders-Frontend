@@ -12,8 +12,12 @@ import {
   Sparkles,
   ArrowLeft,
   CloudUpload,
-  CheckCircle2
+  CheckCircle2,
+  Loader2,
+  FileDown
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import { apiUrl } from '../config/api';
 
 interface QuotationLineItem {
@@ -313,9 +317,79 @@ export const QuotationPage: React.FC = () => {
   const taxAmount = (taxableAmount * taxPercent) / 100;
   const grandTotal = taxableAmount + taxAmount;
 
-  // Print & PDF Export Execution
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState<boolean>(false);
+  const [sheetTheme, setSheetTheme] = useState<'light' | 'dark'>('light');
+
+  // Direct High-Resolution PDF Generator (No browser margin artifacts, no broken dark blocks)
+  const handleDownloadPDF = async () => {
+    const docElement = document.getElementById('quotation-document');
+    if (!docElement) return;
+
+    setIsGeneratingPDF(true);
+    const prevTheme = sheetTheme;
+    if (prevTheme === 'dark') {
+      setSheetTheme('light');
+      await new Promise((r) => setTimeout(r, 120));
+    }
+
+    try {
+      const canvas = await html2canvas(docElement, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        windowWidth: 1200
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth(); // 210mm
+      const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
+      const margin = 8;
+      const printableWidth = pageWidth - margin * 2;
+      const printableHeight = (canvas.height * printableWidth) / canvas.width;
+
+      let heightLeft = printableHeight;
+      let position = margin;
+
+      pdf.addImage(imgData, 'PNG', margin, position, printableWidth, printableHeight, undefined, 'FAST');
+      heightLeft -= pageHeight - margin * 2;
+
+      while (heightLeft > 0) {
+        position = heightLeft - printableHeight + margin;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', margin, position, printableWidth, printableHeight, undefined, 'FAST');
+        heightLeft -= pageHeight - margin * 2;
+      }
+
+      pdf.save(`${quoteNumber}_Alpha_Encoders_Quotation.pdf`);
+    } catch (error) {
+      console.error('Direct PDF export error:', error);
+      window.print();
+    } finally {
+      if (prevTheme === 'dark') {
+        setSheetTheme('dark');
+      }
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  // Browser Print & PDF Export Execution
   const handlePrintPDF = () => {
-    window.print();
+    if (sheetTheme === 'dark') {
+      setSheetTheme('light');
+      setTimeout(() => {
+        window.print();
+      }, 150);
+    } else {
+      window.print();
+    }
   };
 
   // Export Quote Data as JSON
@@ -411,7 +485,7 @@ export const QuotationPage: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050816] text-[#F5F8FF] pt-24 pb-20 selection:bg-blue-600/30 selection:text-cyan-300">
+    <div className="quotation-page-root relative min-h-screen bg-[#050816] text-[#F5F8FF] pt-24 pb-20 selection:bg-blue-600/30 selection:text-cyan-300">
       {/* Background Lighting */}
       <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none no-print" />
       <div className="absolute top-20 right-1/4 w-[600px] h-[350px] bg-blue-600/10 blur-[130px] pointer-events-none no-print" />
@@ -442,44 +516,63 @@ export const QuotationPage: React.FC = () => {
           </div>
 
           {/* Action Trigger Buttons */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
               onClick={handleSaveToCloud}
               disabled={isSavingCloud}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-xs font-mono text-cyan-300 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-xs font-mono text-cyan-300 transition-all shadow-sm cursor-pointer disabled:opacity-50"
               title="Save to MongoDB Atlas Cloud Database"
             >
-              <CloudUpload className="w-4 h-4 text-cyan-400" />
+              <CloudUpload className="w-3.5 h-3.5 text-cyan-400" />
               <span>{isSavingCloud ? 'Saving...' : 'Save to Cloud DB'}</span>
             </button>
 
             <button
               type="button"
               onClick={handleCopySummary}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-slate-300 transition-all shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-slate-300 transition-all shadow-sm cursor-pointer"
               title="Copy text summary for WhatsApp or Email"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
-              <span>{copied ? 'Summary Copied' : 'Copy Summary'}</span>
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+              <span>{copied ? 'Copied' : 'Copy Summary'}</span>
             </button>
 
             <button
               type="button"
               onClick={handleExportJSON}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-cyan-300 transition-all shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0A1024] hover:bg-[#101A31] border border-slate-700 text-xs font-mono text-cyan-300 transition-all shadow-sm cursor-pointer"
+              title="Download backup in JSON format"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5" />
               <span>Export JSON</span>
             </button>
 
+            {/* Direct High-Resolution PDF Download Button */}
+            <button
+              type="button"
+              onClick={handleDownloadPDF}
+              disabled={isGeneratingPDF}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/25 transition-all cursor-pointer disabled:opacity-50"
+              title="Download pristine high-resolution PDF document directly"
+            >
+              {isGeneratingPDF ? (
+                <Loader2 className="w-4 h-4 animate-spin text-cyan-200" />
+              ) : (
+                <FileDown className="w-4 h-4 text-cyan-200" />
+              )}
+              <span>{isGeneratingPDF ? 'Generating PDF...' : 'Download PDF'}</span>
+            </button>
+
+            {/* Browser Print / System PDF Dialog */}
             <button
               type="button"
               onClick={handlePrintPDF}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-semibold text-xs shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-medium text-xs transition-all cursor-pointer shadow-sm"
+              title="Open System Print / Save as PDF dialog"
             >
-              <Printer className="w-4 h-4" />
-              <span>Export to PDF / Print</span>
+              <Printer className="w-3.5 h-3.5 text-slate-300" />
+              <span>Print / System PDF</span>
             </button>
           </div>
         </div>
@@ -818,43 +911,93 @@ export const QuotationPage: React.FC = () => {
           {/* ========================================================= */}
           {/* RIGHT COLUMN: THE PRINTABLE QUOTATION DOCUMENT SHEET */}
           {/* ========================================================= */}
-          <div className="lg:col-span-7">
-            <div className="sticky top-24 space-y-3">
-              <div className="flex items-center justify-between text-xs font-mono text-slate-400 px-2 no-print">
+          <div className="quotation-sheet-col lg:col-span-7">
+            <div className="quotation-sticky-wrap sticky top-24 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-slate-400 px-1 no-print">
                 <span className="flex items-center gap-1.5 text-cyan-300">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  Live Proposal Sheet Preview (A4 Dimensions)
+                  Official Proposal Sheet (A4 Dimensions)
                 </span>
-                <span>Click 'Export to PDF' to save or print</span>
+                
+                {/* Document Sheet Theme Toggle */}
+                <div className="flex items-center gap-1 bg-[#0A1024] p-1 rounded-xl border border-slate-700/80">
+                  <button
+                    type="button"
+                    onClick={() => setSheetTheme('light')}
+                    className={`px-3 py-1 rounded-lg text-xs font-sans font-medium transition-all cursor-pointer ${
+                      sheetTheme === 'light'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Executive White (PDF Match)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSheetTheme('dark')}
+                    className={`px-3 py-1 rounded-lg text-xs font-sans font-medium transition-all cursor-pointer ${
+                      sheetTheme === 'dark'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Studio Dark
+                  </button>
+                </div>
               </div>
 
-              {/* The Formal Document Container (Target of Print / PDF) */}
+              {/* The Formal Document Container (Target of Print / PDF Download) */}
               <div
                 id="quotation-document"
-                className="bg-[#0A1024] border border-blue-500/30 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-8 text-white relative overflow-hidden"
+                className={`transition-colors duration-200 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-7 relative overflow-hidden ${
+                  sheetTheme === 'light'
+                    ? 'bg-white text-slate-900 border border-slate-200/90 shadow-slate-950/20'
+                    : 'bg-[#0A1024] text-white border border-blue-500/30'
+                }`}
               >
-                {/* Visual Header Glow */}
-                <div className="absolute top-0 right-0 w-80 h-40 bg-blue-600/10 blur-[90px] pointer-events-none no-print" />
+                {/* Visual Header Glow (only in dark mode, hidden in print) */}
+                {sheetTheme === 'dark' && (
+                  <div className="absolute top-0 right-0 w-80 h-40 bg-blue-600/10 blur-[90px] pointer-events-none no-print" />
+                )}
 
                 {/* 1. DOCUMENT TOP HEADER WITH LOGO & IDENTIFIERS */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-b border-slate-800 pb-6">
-                  {/* Brand Logo & Name */}
+                <div
+                  className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b print-break-inside-avoid ${
+                    sheetTheme === 'light' ? 'border-slate-200' : 'border-slate-800'
+                  }`}
+                >
+                  {/* Brand Logo Emblem & Wordmark */}
                   <div className="flex items-center gap-3.5">
-                    <div className="w-14 h-14 rounded-2xl bg-[#101A31] border border-blue-500/40 p-2 shadow-md flex items-center justify-center shrink-0">
+                    <div className="w-13 h-13 rounded-2xl bg-[#0A1024] border border-blue-500/40 p-2 shadow-md flex items-center justify-center shrink-0">
                       <img
-                        src="/alpha-encoders-icon-dark.png"
-                        alt="Alpha Encoders Official Logo"
+                        src="/favicon.svg"
+                        alt="Alpha Encoders Official Emblem"
                         className="w-full h-full object-contain"
                       />
                     </div>
                     <div>
-                      <div className="font-['Space_Grotesk'] text-2xl font-bold tracking-tight text-white flex items-center gap-1.5">
-                        ALPHA <span className="text-cyan-400 font-extrabold">ENCODERS</span>
+                      <div
+                        className={`font-['Space_Grotesk'] text-2xl font-bold tracking-tight flex items-center gap-1.5 ${
+                          sheetTheme === 'light' ? 'text-slate-900' : 'text-white'
+                        }`}
+                      >
+                        <span className={sheetTheme === 'light' ? 'text-slate-900' : 'text-white'}>ALPHA</span>{' '}
+                        <span className={sheetTheme === 'light' ? 'text-blue-600 font-extrabold' : 'text-cyan-400 font-extrabold'}>
+                          ENCODERS
+                        </span>
                       </div>
-                      <span className="text-[10px] tracking-widest text-slate-400 uppercase font-mono font-semibold block">
+                      <span
+                        className={`text-[10px] tracking-widest uppercase font-mono font-semibold block ${
+                          sheetTheme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                        }`}
+                      >
                         Digital Engineering & Research Studio
                       </span>
-                      <span className="text-[10px] text-cyan-400 font-mono">
+                      <span
+                        className={`text-[10px] font-mono font-medium ${
+                          sheetTheme === 'light' ? 'text-blue-600' : 'text-cyan-400'
+                        }`}
+                      >
                         Available for Q1 Projects • Verified Deployments
                       </span>
                     </div>
@@ -862,77 +1005,222 @@ export const QuotationPage: React.FC = () => {
 
                   {/* Document Type & Reference */}
                   <div className="text-left sm:text-right font-mono space-y-1">
-                    <span className="inline-block px-3 py-1 rounded-full bg-blue-950/80 border border-blue-500/40 text-cyan-300 text-xs font-bold uppercase tracking-wider">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                        sheetTheme === 'light'
+                          ? 'bg-blue-50 border border-blue-200 text-blue-700'
+                          : 'bg-blue-950/80 border border-blue-500/40 text-cyan-300'
+                      }`}
+                    >
                       Commercial Quotation
                     </span>
-                    <div className="text-xs font-bold text-white pt-1">{quoteNumber}</div>
-                    <div className="text-[11px] text-slate-400">Date: {new Date(issueDate).toLocaleDateString()}</div>
-                    <div className="text-[11px] text-amber-300">Valid Through: {new Date(validUntil).toLocaleDateString()}</div>
+                    <div
+                      className={`text-xs font-bold pt-1 ${
+                        sheetTheme === 'light' ? 'text-slate-900' : 'text-white'
+                      }`}
+                    >
+                      {quoteNumber}
+                    </div>
+                    <div
+                      className={`text-[11px] ${
+                        sheetTheme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                      }`}
+                    >
+                      Date: {new Date(issueDate).toLocaleDateString()}
+                    </div>
+                    <div
+                      className={`text-[11px] font-semibold ${
+                        sheetTheme === 'light' ? 'text-amber-700' : 'text-amber-300'
+                      }`}
+                    >
+                      Valid Through: {new Date(validUntil).toLocaleDateString()}
+                    </div>
                   </div>
                 </div>
 
                 {/* 2. TWO-COLUMN ADDRESS ROSTER (PREPARED BY & PREPARED FOR) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs border-b border-slate-800/80 pb-6">
+                <div
+                  className={`grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs pb-6 border-b print-break-inside-avoid ${
+                    sheetTheme === 'light' ? 'border-slate-200' : 'border-slate-800/80'
+                  }`}
+                >
                   {/* Studio Details */}
-                  <div className="space-y-1.5 p-4 rounded-2xl bg-[#101A31]/40 border border-slate-800/80">
-                    <span className="text-[10px] font-mono uppercase text-cyan-400 font-bold tracking-wider block">
+                  <div
+                    className={`space-y-1.5 p-4 rounded-2xl ${
+                      sheetTheme === 'light'
+                        ? 'bg-slate-50 border border-slate-200'
+                        : 'bg-[#101A31]/40 border border-slate-800/80'
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px] font-mono uppercase font-bold tracking-wider block ${
+                        sheetTheme === 'light' ? 'text-blue-700' : 'text-cyan-400'
+                      }`}
+                    >
                       From: Engineering Studio
                     </span>
-                    <div className="font-bold text-white text-sm font-['Space_Grotesk']">Alpha Encoders</div>
-                    <div className="text-slate-300 font-mono">Lead Solutions Architect: K.Kabil</div>
-                    <div className="text-slate-400 font-mono">Email: kabilk2023@gmail.com</div>
-                    <div className="text-slate-400 font-mono">Phone: +91 8667452487</div>
-                    <div className="text-slate-400 font-mono">Web: https://alphaencoders.com</div>
+                    <div
+                      className={`font-bold text-sm font-['Space_Grotesk'] ${
+                        sheetTheme === 'light' ? 'text-slate-900' : 'text-white'
+                      }`}
+                    >
+                      Alpha Encoders
+                    </div>
+                    <div className={sheetTheme === 'light' ? 'text-slate-700 font-mono' : 'text-slate-300 font-mono'}>
+                      Lead Solutions Architect: K.Kabil
+                    </div>
+                    <div className={sheetTheme === 'light' ? 'text-slate-600 font-mono' : 'text-slate-400 font-mono'}>
+                      Email: kabilk2023@gmail.com
+                    </div>
+                    <div className={sheetTheme === 'light' ? 'text-slate-600 font-mono' : 'text-slate-400 font-mono'}>
+                      Phone: +91 8667452487
+                    </div>
+                    <div className={sheetTheme === 'light' ? 'text-slate-600 font-mono' : 'text-slate-400 font-mono'}>
+                      Web: https://alphaencoders.com
+                    </div>
                   </div>
 
                   {/* Client Details */}
-                  <div className="space-y-1.5 p-4 rounded-2xl bg-[#101A31]/40 border border-slate-800/80">
-                    <span className="text-[10px] font-mono uppercase text-cyan-400 font-bold tracking-wider block">
+                  <div
+                    className={`space-y-1.5 p-4 rounded-2xl ${
+                      sheetTheme === 'light'
+                        ? 'bg-slate-50 border border-slate-200'
+                        : 'bg-[#101A31]/40 border border-slate-800/80'
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px] font-mono uppercase font-bold tracking-wider block ${
+                        sheetTheme === 'light' ? 'text-blue-700' : 'text-cyan-400'
+                      }`}
+                    >
                       Prepared For: Client Partner
                     </span>
-                    <div className="font-bold text-white text-sm font-['Space_Grotesk']">{clientName}</div>
-                    <div className="text-slate-200 font-medium">{clientCompany || 'Direct Client Account'}</div>
-                    <div className="text-slate-400 font-mono">{clientEmail}</div>
-                    {clientPhone && <div className="text-emerald-400 font-mono">{clientPhone}</div>}
-                    {clientLocation && <div className="text-slate-400 font-mono">{clientLocation}</div>}
+                    <div
+                      className={`font-bold text-sm font-['Space_Grotesk'] ${
+                        sheetTheme === 'light' ? 'text-slate-900' : 'text-white'
+                      }`}
+                    >
+                      {clientName}
+                    </div>
+                    <div className={sheetTheme === 'light' ? 'text-slate-700 font-medium' : 'text-slate-200 font-medium'}>
+                      {clientCompany || 'Direct Client Account'}
+                    </div>
+                    <div className={sheetTheme === 'light' ? 'text-slate-600 font-mono' : 'text-slate-400 font-mono'}>
+                      {clientEmail}
+                    </div>
+                    {clientPhone && (
+                      <div className={sheetTheme === 'light' ? 'text-emerald-700 font-mono font-medium' : 'text-emerald-400 font-mono'}>
+                        {clientPhone}
+                      </div>
+                    )}
+                    {clientLocation && (
+                      <div className={sheetTheme === 'light' ? 'text-slate-600 font-mono' : 'text-slate-400 font-mono'}>
+                        {clientLocation}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* 3. PROJECT SCOPE TITLE BANNER */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/70 to-[#101A31] border border-blue-500/30">
-                  <span className="text-[10px] font-mono uppercase text-cyan-400 font-semibold block tracking-wider">
+                <div
+                  className={`p-4 rounded-2xl border print-break-inside-avoid ${
+                    sheetTheme === 'light'
+                      ? 'bg-gradient-to-r from-blue-50/80 to-indigo-50/60 border-blue-200/80 border-l-4 border-l-blue-600'
+                      : 'bg-gradient-to-r from-blue-950/70 to-[#101A31] border-blue-500/30'
+                  }`}
+                >
+                  <span
+                    className={`text-[10px] font-mono uppercase font-bold block tracking-wider ${
+                      sheetTheme === 'light' ? 'text-blue-700' : 'text-cyan-400'
+                    }`}
+                  >
                     Project Scope of Work
                   </span>
-                  <h2 className="font-['Space_Grotesk'] text-lg font-bold text-white mt-0.5">
+                  <h2
+                    className={`font-['Space_Grotesk'] text-base sm:text-lg font-bold mt-0.5 ${
+                      sheetTheme === 'light' ? 'text-slate-900' : 'text-white'
+                    }`}
+                  >
                     {projectTitle}
                   </h2>
                 </div>
 
                 {/* 4. DELIVERABLES & PRICING TABLE */}
-                <div className="overflow-x-auto">
+                <div
+                  className={`overflow-x-auto rounded-2xl border print-break-inside-avoid ${
+                    sheetTheme === 'light' ? 'border-slate-200' : 'border-slate-800'
+                  }`}
+                >
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-800 bg-[#101A31] text-slate-300 font-mono uppercase text-[10px]">
-                        <th className="py-3 px-3 w-8">#</th>
+                      <tr
+                        className={`font-mono uppercase text-[10px] border-b ${
+                          sheetTheme === 'light'
+                            ? 'bg-slate-100/80 text-slate-700 border-slate-200'
+                            : 'bg-[#101A31] text-slate-300 border-slate-800'
+                        }`}
+                      >
+                        <th className="py-3 px-3 w-8 text-center">#</th>
                         <th className="py-3 px-4">Deliverable / Scope Specification</th>
                         <th className="py-3 px-3 text-center">Qty</th>
                         <th className="py-3 px-4 text-right">Rate</th>
                         <th className="py-3 px-4 text-right">Amount</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/70">
+                    <tbody className={sheetTheme === 'light' ? 'divide-y divide-slate-200' : 'divide-y divide-slate-800/70'}>
                       {lineItems.map((item, index) => (
-                        <tr key={item.id} className="hover:bg-slate-900/30">
-                          <td className="py-3.5 px-3 font-mono text-slate-500 text-center">{index + 1}</td>
-                          <td className="py-3.5 px-4 space-y-1">
-                            <div className="font-bold text-white text-sm font-['Space_Grotesk']">{item.title}</div>
-                            <div className="text-slate-400 text-xs leading-relaxed max-w-md">{item.description}</div>
+                        <tr
+                          key={item.id}
+                          className={
+                            sheetTheme === 'light'
+                              ? index % 2 === 1
+                                ? 'bg-slate-50/70'
+                                : 'bg-white'
+                              : 'hover:bg-slate-900/30'
+                          }
+                        >
+                          <td
+                            className={`py-3.5 px-3 font-mono text-center text-xs ${
+                              sheetTheme === 'light' ? 'text-slate-400' : 'text-slate-500'
+                            }`}
+                          >
+                            {index + 1}
                           </td>
-                          <td className="py-3.5 px-3 font-mono text-center text-slate-300">{item.quantity}</td>
-                          <td className="py-3.5 px-4 font-mono text-right text-slate-300">
+                          <td className="py-3.5 px-4 space-y-1">
+                            <div
+                              className={`font-bold text-sm font-['Space_Grotesk'] ${
+                                sheetTheme === 'light' ? 'text-slate-900' : 'text-white'
+                              }`}
+                            >
+                              {item.title}
+                            </div>
+                            <div
+                              className={`text-xs leading-relaxed max-w-md ${
+                                sheetTheme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                              }`}
+                            >
+                              {item.description}
+                            </div>
+                          </td>
+                          <td
+                            className={`py-3.5 px-3 font-mono text-center ${
+                              sheetTheme === 'light' ? 'text-slate-700' : 'text-slate-300'
+                            }`}
+                          >
+                            {item.quantity}
+                          </td>
+                          <td
+                            className={`py-3.5 px-4 font-mono text-right ${
+                              sheetTheme === 'light' ? 'text-slate-700 font-medium' : 'text-slate-300'
+                            }`}
+                          >
                             {currencySymbol}{item.rate.toLocaleString()}
                           </td>
-                          <td className="py-3.5 px-4 font-mono text-right font-bold text-cyan-300 text-sm">
+                          <td
+                            className={`py-3.5 px-4 font-mono text-right font-bold text-sm ${
+                              sheetTheme === 'light' ? 'text-blue-700' : 'text-cyan-300'
+                            }`}
+                          >
                             {currencySymbol}{(item.quantity * item.rate).toLocaleString()}
                           </td>
                         </tr>
@@ -942,30 +1230,54 @@ export const QuotationPage: React.FC = () => {
                 </div>
 
                 {/* 5. FINANCIAL TOTALS BLOCK */}
-                <div className="flex flex-col sm:flex-row justify-end items-end pt-4">
-                  <div className="w-full sm:w-72 space-y-2 text-xs font-mono">
-                    <div className="flex justify-between text-slate-400 pb-1 border-b border-slate-800/70">
+                <div className="flex flex-col sm:flex-row justify-end items-end pt-2 print-break-inside-avoid">
+                  <div className="w-full sm:w-76 space-y-2 text-xs font-mono">
+                    <div
+                      className={`flex justify-between pb-1.5 border-b ${
+                        sheetTheme === 'light' ? 'text-slate-600 border-slate-200' : 'text-slate-400 border-slate-800/70'
+                      }`}
+                    >
                       <span>Subtotal:</span>
-                      <span className="text-white font-semibold">{currencySymbol}{subtotal.toLocaleString()}</span>
+                      <span className={sheetTheme === 'light' ? 'text-slate-900 font-semibold' : 'text-white font-semibold'}>
+                        {currencySymbol}{subtotal.toLocaleString()}
+                      </span>
                     </div>
 
                     {discountPercent > 0 && (
-                      <div className="flex justify-between text-emerald-400 pb-1 border-b border-slate-800/70">
+                      <div
+                        className={`flex justify-between pb-1.5 border-b ${
+                          sheetTheme === 'light'
+                            ? 'text-emerald-700 font-medium border-slate-200'
+                            : 'text-emerald-400 border-slate-800/70'
+                        }`}
+                      >
                         <span>Discount ({discountPercent}%):</span>
                         <span>-{currencySymbol}{discountAmount.toLocaleString()}</span>
                       </div>
                     )}
 
                     {taxPercent > 0 && (
-                      <div className="flex justify-between text-slate-400 pb-1 border-b border-slate-800/70">
+                      <div
+                        className={`flex justify-between pb-1.5 border-b ${
+                          sheetTheme === 'light' ? 'text-slate-600 border-slate-200' : 'text-slate-400 border-slate-800/70'
+                        }`}
+                      >
                         <span>Tax / GST ({taxPercent}%):</span>
-                        <span className="text-white">+{currencySymbol}{taxAmount.toLocaleString()}</span>
+                        <span className={sheetTheme === 'light' ? 'text-slate-900' : 'text-white'}>
+                          +{currencySymbol}{taxAmount.toLocaleString()}
+                        </span>
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center pt-2 p-3 rounded-xl bg-blue-950/70 border border-blue-500/40 text-sm">
-                      <span className="font-bold text-white font-['Space_Grotesk']">Grand Total:</span>
-                      <span className="font-bold text-cyan-300 text-lg">
+                    <div
+                      className={`flex justify-between items-center p-3.5 rounded-xl border text-sm ${
+                        sheetTheme === 'light'
+                          ? 'bg-blue-50/90 border-blue-200 text-blue-950 shadow-xs'
+                          : 'bg-blue-950/70 border-blue-500/40 text-white'
+                      }`}
+                    >
+                      <span className="font-bold font-['Space_Grotesk']">Grand Total:</span>
+                      <span className={`font-bold text-lg ${sheetTheme === 'light' ? 'text-blue-700' : 'text-cyan-300'}`}>
                         {currencySymbol}{grandTotal.toLocaleString()} {currencyCode}
                       </span>
                     </div>
@@ -973,72 +1285,170 @@ export const QuotationPage: React.FC = () => {
                 </div>
 
                 {/* 6. PAYMENT MILESTONE SCHEDULE */}
-                <div className="p-4 rounded-2xl bg-[#101A31]/50 border border-slate-800 space-y-3">
-                  <span className="text-[10px] font-mono uppercase text-cyan-400 font-bold block tracking-wider">
+                <div
+                  className={`p-4 rounded-2xl border space-y-3 print-break-inside-avoid ${
+                    sheetTheme === 'light'
+                      ? 'bg-slate-50 border-slate-200'
+                      : 'bg-[#101A31]/50 border border-slate-800'
+                  }`}
+                >
+                  <span
+                    className={`text-[10px] font-mono uppercase font-bold block tracking-wider ${
+                      sheetTheme === 'light' ? 'text-blue-700' : 'text-cyan-400'
+                    }`}
+                  >
                     Commercial Terms & Payment Milestone Schedule
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
-                    <div className="p-3 rounded-xl bg-[#0A1024] border border-slate-800/80">
-                      <div className="font-bold text-emerald-400 text-sm">50% Inception</div>
-                      <div className="text-slate-300 text-[11px] mt-0.5">
-                        {currencySymbol}{(grandTotal * 0.5).toLocaleString()} upon contract execution
+                    <div
+                      className={`p-3 rounded-xl border ${
+                        sheetTheme === 'light'
+                          ? 'bg-white border-emerald-200 shadow-xs'
+                          : 'bg-[#0A1024] border-slate-800/80'
+                      }`}
+                    >
+                      <div className={sheetTheme === 'light' ? 'font-bold text-emerald-700 text-sm' : 'font-bold text-emerald-400 text-sm'}>
+                        50% Inception
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-1">Architecture, UI & wireframe approval</div>
+                      <div className={sheetTheme === 'light' ? 'text-slate-800 font-semibold text-[11px] mt-0.5' : 'text-slate-300 text-[11px] mt-0.5'}>
+                        {currencySymbol}{(grandTotal * 0.5).toLocaleString()} upon contract
+                      </div>
+                      <div className={sheetTheme === 'light' ? 'text-[10px] text-slate-500 mt-1' : 'text-[10px] text-slate-500 mt-1'}>
+                        Architecture, UI & wireframe approval
+                      </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-[#0A1024] border border-slate-800/80">
-                      <div className="font-bold text-cyan-300 text-sm">30% Staging</div>
-                      <div className="text-slate-300 text-[11px] mt-0.5">
-                        {currencySymbol}{(grandTotal * 0.3).toLocaleString()} upon interactive preview
+                    <div
+                      className={`p-3 rounded-xl border ${
+                        sheetTheme === 'light'
+                          ? 'bg-white border-sky-200 shadow-xs'
+                          : 'bg-[#0A1024] border-slate-800/80'
+                      }`}
+                    >
+                      <div className={sheetTheme === 'light' ? 'font-bold text-sky-700 text-sm' : 'font-bold text-cyan-300 text-sm'}>
+                        30% Staging
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-1">Core feature completion & review</div>
+                      <div className={sheetTheme === 'light' ? 'text-slate-800 font-semibold text-[11px] mt-0.5' : 'text-slate-300 text-[11px] mt-0.5'}>
+                        {currencySymbol}{(grandTotal * 0.3).toLocaleString()} upon preview
+                      </div>
+                      <div className={sheetTheme === 'light' ? 'text-[10px] text-slate-500 mt-1' : 'text-[10px] text-slate-500 mt-1'}>
+                        Core feature completion & review
+                      </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-[#0A1024] border border-slate-800/80">
-                      <div className="font-bold text-blue-400 text-sm">20% Handover</div>
-                      <div className="text-slate-300 text-[11px] mt-0.5">
+                    <div
+                      className={`p-3 rounded-xl border ${
+                        sheetTheme === 'light'
+                          ? 'bg-white border-indigo-200 shadow-xs'
+                          : 'bg-[#0A1024] border-slate-800/80'
+                      }`}
+                    >
+                      <div className={sheetTheme === 'light' ? 'font-bold text-indigo-700 text-sm' : 'font-bold text-blue-400 text-sm'}>
+                        20% Handover
+                      </div>
+                      <div className={sheetTheme === 'light' ? 'text-slate-800 font-semibold text-[11px] mt-0.5' : 'text-slate-300 text-[11px] mt-0.5'}>
                         {currencySymbol}{(grandTotal * 0.2).toLocaleString()} upon deployment
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-1">Production launch, DNS & code transfer</div>
+                      <div className={sheetTheme === 'light' ? 'text-[10px] text-slate-500 mt-1' : 'text-[10px] text-slate-500 mt-1'}>
+                        Production launch, DNS & code transfer
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* 7. INTELLECTUAL PROPERTY & TERMS */}
-                <div className="text-xs text-slate-400 space-y-2 border-t border-slate-800 pt-6">
-                  <span className="font-bold text-slate-300 font-['Space_Grotesk'] text-sm block">
+                <div
+                  className={`text-xs space-y-2 border-t pt-5 print-break-inside-avoid ${
+                    sheetTheme === 'light' ? 'text-slate-600 border-slate-200' : 'text-slate-400 border-slate-800'
+                  }`}
+                >
+                  <span
+                    className={`font-bold font-['Space_Grotesk'] text-sm block ${
+                      sheetTheme === 'light' ? 'text-slate-900' : 'text-slate-300'
+                    }`}
+                  >
                     Ownership & Engagement Terms
                   </span>
-                  <div className="p-3.5 rounded-xl bg-[#101A31]/40 border border-slate-800 text-[11px] leading-relaxed whitespace-pre-wrap font-mono text-slate-300">
+                  <div
+                    className={`p-3.5 rounded-xl border text-[11px] leading-relaxed whitespace-pre-wrap font-mono ${
+                      sheetTheme === 'light'
+                        ? 'bg-slate-50 border-slate-200 text-slate-700'
+                        : 'bg-[#101A31]/40 border-slate-800 text-slate-300'
+                    }`}
+                  >
                     {notes}
                   </div>
                 </div>
 
                 {/* 8. SIGNATURE AND ACCEPTANCE BLOCK */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-6 border-t border-slate-800 text-xs">
-                  <div className="space-y-4">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 block font-semibold">
+                <div
+                  className={`grid grid-cols-1 sm:grid-cols-2 gap-8 pt-5 border-t text-xs print-break-inside-avoid ${
+                    sheetTheme === 'light' ? 'border-slate-200' : 'border-slate-800'
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <span
+                      className={`text-[10px] font-mono uppercase block font-semibold ${
+                        sheetTheme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                      }`}
+                    >
                       Authorized Studio Sign-off
                     </span>
-                    <div className="pt-8 border-b border-slate-700/80 w-48 relative">
-                      <span className="absolute bottom-1 left-0 font-['Space_Grotesk'] font-bold text-cyan-300 tracking-wider">
+                    <div
+                      className={`pt-7 border-b-2 w-52 relative ${
+                        sheetTheme === 'light' ? 'border-slate-300' : 'border-slate-700/80'
+                      }`}
+                    >
+                      <span
+                        className={`absolute bottom-1 left-0 font-['Space_Grotesk'] font-bold tracking-wider ${
+                          sheetTheme === 'light' ? 'text-blue-700' : 'text-cyan-300'
+                        }`}
+                      >
                         K.Kabil
                       </span>
                     </div>
-                    <div className="font-mono text-slate-400 text-[11px]">
+                    <div
+                      className={`font-mono text-[11px] ${
+                        sheetTheme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                      }`}
+                    >
                       K.Kabil • Founder & Lead Solutions Architect
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 block font-semibold">
+                  <div className="space-y-3">
+                    <span
+                      className={`text-[10px] font-mono uppercase block font-semibold ${
+                        sheetTheme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                      }`}
+                    >
                       Client Acceptance Sign-off
                     </span>
-                    <div className="pt-8 border-b border-slate-700/80 w-48"></div>
-                    <div className="font-mono text-slate-400 text-[11px]">
+                    <div
+                      className={`pt-7 border-b-2 w-52 ${
+                        sheetTheme === 'light' ? 'border-slate-300' : 'border-slate-700/80'
+                      }`}
+                    ></div>
+                    <div
+                      className={`font-mono text-[11px] ${
+                        sheetTheme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                      }`}
+                    >
                       {clientName} • {clientCompany || 'Authorized Representative'}
                     </div>
                   </div>
+                </div>
+
+                {/* 9. OFFICIAL DOCUMENT VERIFICATION FOOTER */}
+                <div
+                  className={`pt-4 border-t flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono gap-2 print-break-inside-avoid ${
+                    sheetTheme === 'light'
+                      ? 'border-slate-200 text-slate-500'
+                      : 'border-slate-800 text-slate-500'
+                  }`}
+                >
+                  <span>Alpha Encoders • Proposal Ref: {quoteNumber}</span>
+                  <span>Confidential Commercial Proposal • Valid for 30 Days</span>
                 </div>
               </div>
             </div>
