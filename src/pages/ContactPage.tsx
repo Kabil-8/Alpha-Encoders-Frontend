@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { apiUrl } from '../config/api';
 import { SignalBeaconGrid } from '../components/animations/SignalBeaconGrid';
+import { Hyperspeed } from '../components/reactbits/Hyperspeed';
 
 interface FormErrors {
   fullName?: string;
@@ -225,9 +226,29 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
+      {/* ReactBits Hyperspeed Interactive Highway Warp Background (Fit to screen & static) */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-30">
+        <Hyperspeed
+          curve="gentle"
+          curvature={0.5}
+          speed={0.9}
+          boost={1.8}
+          roadOpacity={0.04}
+          glow={0.35}
+          density={24}
+          trailLength={0.9}
+          lightSize={0.65}
+          fov={70}
+          theme="dark"
+          tailColors={['#00e5ff', '#3b82f6', '#6366f1']}
+          headColors={['#38bdf8', '#0ea5e9', '#0284c7']}
+          poleColors={['#0284c7']}
+        />
+      </div>
+
       {/* Background Ambience & Live Signal Beacon Animation */}
       <SignalBeaconGrid />
-      <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-tech-grid opacity-15 pointer-events-none" />
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

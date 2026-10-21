@@ -73,14 +73,14 @@ export const ProjectsPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* 3D Cybernetic Perspective Grid Scan Room */}
-      <div className="absolute inset-0 pointer-events-none opacity-45 z-0">
+      {/* 3D Cybernetic Perspective Grid Scan Room (Fit to screen & static) */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-35">
         <GridScan
           scanColor="#22D3EE"
           linesColor="#1E293B"
           cells={10}
           depth={4}
-          glow={0.7}
+          glow={0.6}
           lineThickness={1}
           interactive={true}
         />

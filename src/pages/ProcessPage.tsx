@@ -4,7 +4,7 @@ import { processStages } from '../data/processData';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
 import { Magnet } from '../components/reactbits/Magnet';
-import { GridScan } from '../components/reactbits/GridScan';
+import { Hyperspeed } from '../components/reactbits/Hyperspeed';
 import { ProcessPipelineAnim } from '../components/animations/ProcessPipelineAnim';
 import {
   CheckCircle2,
@@ -24,16 +24,23 @@ export const ProcessPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* 3D Cybernetic Perspective Grid Scan Room */}
-      <div className="absolute inset-0 pointer-events-none opacity-40 z-0">
-        <GridScan
-          scanColor="#22D3EE"
-          linesColor="#1E293B"
-          cells={10}
-          depth={4}
-          glow={0.7}
-          lineThickness={1}
-          interactive={true}
+      {/* ReactBits Hyperspeed Pipeline Highway Warp (Fit to screen & static) */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-30">
+        <Hyperspeed
+          curve="racing"
+          curvature={0.5}
+          speed={0.9}
+          boost={1.8}
+          roadOpacity={0.04}
+          glow={0.35}
+          density={24}
+          trailLength={0.9}
+          lightSize={0.65}
+          fov={70}
+          theme="dark"
+          tailColors={['#22d3ee', '#3b82f6', '#818cf8']}
+          headColors={['#06b6d4', '#0284c7', '#38bdf8']}
+          poleColors={['#0ea5e9']}
         />
       </div>
       <ProcessPipelineAnim className="opacity-30" />

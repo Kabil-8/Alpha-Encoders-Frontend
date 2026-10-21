@@ -25,7 +25,7 @@ import { Magnet } from '../components/reactbits/Magnet';
 import { Modal } from '../components/shared/Modal';
 import { apiUrl } from '../config/api';
 import { CodeParticleField } from '../components/animations/CodeParticleField';
-import { Hyperspeed } from '../components/reactbits/Hyperspeed';
+import { GridScan } from '../components/reactbits/GridScan';
 
 export interface DomainTrack {
   id: string;
@@ -319,22 +319,16 @@ export const CareersPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-[#050816] text-white pt-24 pb-20 overflow-hidden">
-      {/* ReactBits Hyperspeed Highway Warp Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto opacity-35">
-        <Hyperspeed
-          curve="racing"
-          curvature={0.85}
-          speed={1.1}
-          boost={2.3}
-          roadOpacity={0.06}
-          glow={0.55}
-          density={32}
-          trailLength={1.3}
-          lightSize={1.1}
-          theme="dark"
-          tailColors={['#c084fc', '#818cf8', '#22d3ee']}
-          headColors={['#a855f7', '#6366f1', '#38bdf8']}
-          poleColors={['#818cf8']}
+      {/* 3D Cybernetic Perspective Grid Scan Room (Fit to screen & static) */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-35">
+        <GridScan
+          scanColor="#22D3EE"
+          linesColor="#1E293B"
+          cells={10}
+          depth={4}
+          glow={0.6}
+          lineThickness={1}
+          interactive={true}
         />
       </div>
 
