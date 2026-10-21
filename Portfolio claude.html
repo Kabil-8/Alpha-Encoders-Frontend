@@ -1741,10 +1741,55 @@
         grid-template-columns: 1fr;
       }
 
-      footer {
-        padding: 20px 24px;
-        flex-direction: column;
-        gap: 10px;
+      .edu-grid, .lead-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    .interest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .itag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(47, 224, 196, 0.06);
+      border: 1px solid rgba(47, 224, 196, 0.3);
+      color: var(--highlight);
+    }
+
+    .quick-contacts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 16px 0 24px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .quick-contacts a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .quick-contacts a:hover {
+      color: var(--highlight);
+    }
+
+    @media(max-width:900px) {
+      .edu-grid,
+      .lead-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -1787,9 +1832,12 @@
   <nav>
     <div class="nav-logo">K.KABIL</div>
     <ul class="nav-links">
+      <li><a href="#education">Education</a></li>
       <li><a href="#skills">Skills</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#experience">Experience</a></li>
+      <li><a href="#certifications">Credentials</a></li>
+      <li><a href="#leadership">Leadership</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-dot"><span class="live"></span>AVAILABLE TO WORK</div>
@@ -1800,24 +1848,39 @@
     <div class="gridscan-wrap"><canvas id="gridScan"></canvas></div>
     <div class="hero-inner">
       <div>
-        <div class="h-chip">Full Stack Developer</div>
+        <div class="h-chip">AI/ML Full Stack Developer · Systems &amp; Applied AI</div>
         <h1 class="h-name">
           <span class="grd">Kabil</span>
-          <span class="dim">K.</span>
         </h1>
         <p class="h-type"><span id="tyText"></span><span class="ty-cursor"></span></p>
-        <p class="h-desc">Versatile Software Engineer with strong knowledge of full stack development and hands-on
-          experience building scalable web applications. Seeking a Full Stack Developer role to contribute to end-to-end
-          product development. CGPA 8.49 at Dr. Mahalingam College of Engineering &amp; Technology.</p>
+        <p class="h-desc">Versatile Full Stack Developer with hands-on experience building AI/ML-powered web applications, integrating computer vision, predictive models, and LLM-driven features into production-grade systems. Seeking an AI/ML Full Stack Developer role to build intelligent, scalable products that combine strong system design with applied machine learning.</p>
+
+        <div class="interest-tags">
+          <span class="itag">• Full Stack Web Development</span>
+          <span class="itag">• Backend Development</span>
+          <span class="itag">• Scalable System Design</span>
+          <span class="itag">• REST API Development</span>
+          <span class="itag">• Machine Learning &amp; AI Integration</span>
+        </div>
+
+        <div class="quick-contacts">
+          <a href="mailto:kabilk2023@gmail.com">✉ kabilk2023@gmail.com</a>
+          <span>|</span>
+          <a href="tel:+918667452487">☎ +91 86674 52487</a>
+          <span>|</span>
+          <a href="https://linkedin.com/in/k-kabil-091233325/" target="_blank" rel="noopener noreferrer">in linkedin.com/in/k-kabil</a>
+          <span>|</span>
+          <a href="https://github.com/kabil-8" target="_blank" rel="noopener noreferrer">⌥ github.com/kabil-8</a>
+        </div>
+
         <div class="h-btns">
-          <a href="#projects" class="btn-glow">View Projects</a>
+          <a href="#projects" class="btn-glow">View 8 Projects</a>
           <a href="#contact" class="btn-outline2">Get in Touch</a>
-          <a href="Resume_23bcs133.pdf" download="Resume_23bcs133.pdf" class="btn-resume">
-            <span class="br-icon">⬇</span> Download Resume
+          <a href="mailto:kabilk2023@gmail.com?subject=Resume%20Inquiry%20-%20Kabil" class="btn-resume">
+            <span class="br-icon">⬇</span> Request Resume
           </a>
         </div>
       </div>
-
 
       <div class="hero-card-wrap" id="heroCard">
         <div class="hero-card" id="hCard">
@@ -1831,7 +1894,7 @@
             <div class="orb-particle" style="top:50%;left:50%;margin:-2px;animation-delay:-4s;"></div>
           </div>
           <div class="card-avatar">
-            <img src="pic.jpeg" alt="Kabil K."
+            <img src="pic.jpeg" alt="Kabil"
               onerror="this.style.display='none';document.getElementById('avph').style.display='flex'">
             <div id="avph"
               style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-family:Orbitron,sans-serif;font-size:28px;font-weight:900;color:rgba(212,175,106,.4);">
@@ -1839,11 +1902,11 @@
             <div class="avatar-ring"></div>
             <div class="avatar-ring2"></div>
           </div>
-          <div class="card-name">KABIL K.</div>
-          <div class="card-title">Full Stack Developer</div>
+          <div class="card-name">KABIL</div>
+          <div class="card-title">AI/ML Full Stack Engineer</div>
           <div class="card-stats">
             <div class="cs">
-              <div class="cs-n">10+</div>
+              <div class="cs-n">08</div>
               <div class="cs-l">Projects</div>
             </div>
             <div class="cs">
@@ -1856,10 +1919,46 @@
             </div>
           </div>
           <div class="card-tags">
-            <span class="ctag">Java</span><span class="ctag">React</span>
-            <span class="ctag">Node.js</span><span class="ctag">MERN</span>
-            <span class="ctag">MongoDB</span><span class="ctag">MySQL</span>
+            <span class="ctag">Java</span><span class="ctag">Python</span>
+            <span class="ctag">React.js</span><span class="ctag">FastAPI</span>
+            <span class="ctag">Node.js</span><span class="ctag">OpenCV</span>
+            <span class="ctag">MongoDB</span><span class="ctag">Docker</span>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ EDUCATION ═══ -->
+  <section class="panel rv" id="education">
+    <div class="slabel">01 — Foundations</div>
+    <h2 class="stitle">Academic <span class="accent">Education</span></h2>
+    <div class="edu-grid">
+      <div class="cert">
+        <div class="cert-num">DEGREE</div>
+        <div class="cert-name">Bachelor of Engineering in Computer Science</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Dr. Mahalingam College of Engineering and Technology, Pollachi</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--gborder);">
+          <span class="cert-by">Expected: May 2027</span>
+          <span style="font-family:'Share Tech Mono',monospace;color:var(--highlight);font-weight:700;">CGPA: 8.49</span>
+        </div>
+      </div>
+      <div class="cert">
+        <div class="cert-num">HSC</div>
+        <div class="cert-name">Higher School Certificate – CBSE</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Honey Bunch School, Pollachi</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--gborder);">
+          <span class="cert-by">Completed: March 2023</span>
+          <span style="font-family:'Share Tech Mono',monospace;color:var(--primary);font-weight:700;">72.6%</span>
+        </div>
+      </div>
+      <div class="cert">
+        <div class="cert-num">SSLC</div>
+        <div class="cert-name">Secondary School Leaving Certificate – CBSE</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Honey Bunch School, Pollachi</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--gborder);">
+          <span class="cert-by">Completed: March 2021</span>
+          <span style="font-family:'Share Tech Mono',monospace;color:var(--highlight);font-weight:700;">90.0%</span>
         </div>
       </div>
     </div>
@@ -1929,6 +2028,20 @@
       <div class="skill-hex">
         <div class="hex-bg">
           <div class="hex-glow"></div>
+          <div class="hex-icon">⚡</div>
+          <div class="hex-name">FastAPI</div>
+        </div>
+      </div>
+      <div class="skill-hex">
+        <div class="hex-bg">
+          <div class="hex-glow"></div>
+          <div class="hex-icon">👁️</div>
+          <div class="hex-name">OpenCV</div>
+        </div>
+      </div>
+      <div class="skill-hex">
+        <div class="hex-bg">
+          <div class="hex-glow"></div>
           <div class="hex-icon">🍃</div>
           <div class="hex-name">MongoDB</div>
         </div>
@@ -1943,8 +2056,15 @@
       <div class="skill-hex">
         <div class="hex-bg">
           <div class="hex-glow"></div>
-          <div class="hex-icon">🔀</div>
-          <div class="hex-name">Git</div>
+          <div class="hex-icon">⚡</div>
+          <div class="hex-name">Redis</div>
+        </div>
+      </div>
+      <div class="skill-hex">
+        <div class="hex-bg">
+          <div class="hex-glow"></div>
+          <div class="hex-icon">🐳</div>
+          <div class="hex-name">Docker</div>
         </div>
       </div>
       <div class="skill-hex">
@@ -1957,14 +2077,14 @@
       <div class="skill-hex">
         <div class="hex-bg">
           <div class="hex-glow"></div>
-          <div class="hex-icon">🎨</div>
-          <div class="hex-name">Figma</div>
+          <div class="hex-icon">🔀</div>
+          <div class="hex-name">Git</div>
         </div>
       </div>
     </div>
     <div class="prof-wrap">
       <div class="prof-row rv2" data-level="92">
-        <div class="prof-head"><b>Java</b><span>92%</span></div>
+        <div class="prof-head"><b>Java &amp; Python</b><span>92%</span></div>
         <div class="prof-track">
           <div class="prof-fill"></div>
         </div>
@@ -1976,25 +2096,25 @@
         </div>
       </div>
       <div class="prof-row rv2" data-level="88">
-        <div class="prof-head"><b>Node.js / Express</b><span>88%</span></div>
+        <div class="prof-head"><b>Node.js &amp; FastAPI Backends</b><span>88%</span></div>
+        <div class="prof-track">
+          <div class="prof-fill"></div>
+        </div>
+      </div>
+      <div class="prof-row rv2" data-level="86">
+        <div class="prof-head"><b>AI/ML, OpenCV &amp; LLM Integrations</b><span>86%</span></div>
         <div class="prof-track">
           <div class="prof-fill"></div>
         </div>
       </div>
       <div class="prof-row rv2" data-level="85">
-        <div class="prof-head"><b>MongoDB / MySQL</b><span>85%</span></div>
+        <div class="prof-head"><b>MongoDB, MySQL &amp; Redis</b><span>85%</span></div>
         <div class="prof-track">
           <div class="prof-fill"></div>
         </div>
       </div>
-      <div class="prof-row rv2" data-level="78">
-        <div class="prof-head"><b>Python / C++</b><span>78%</span></div>
-        <div class="prof-track">
-          <div class="prof-fill"></div>
-        </div>
-      </div>
-      <div class="prof-row rv2" data-level="82">
-        <div class="prof-head"><b>System Design / REST APIs</b><span>82%</span></div>
+      <div class="prof-row rv2" data-level="84">
+        <div class="prof-head"><b>Docker, REST APIs &amp; System Architecture</b><span>84%</span></div>
         <div class="prof-track">
           <div class="prof-fill"></div>
         </div>
@@ -2008,98 +2128,80 @@
     <h2 class="stitle">Selected <span class="accent">Projects</span></h2>
     <div class="filter-tabs" id="filterTabs">
       <button class="ftab active" data-filter="all">All</button>
-      <button class="ftab" data-filter="fullstack">Full-Stack</button>
       <button class="ftab" data-filter="ai">AI / ML</button>
+      <button class="ftab" data-filter="fullstack">Full-Stack</button>
       <button class="ftab" data-filter="systems">Systems</button>
       <button class="ftab" data-filter="frontend">Frontend</button>
     </div>
     <div class="proj-grid" id="projGrid">
-      <div class="pcard" data-cat="fullstack">
+      <div class="pcard" data-cat="frontend">
         <div class="p-corner"></div>
         <div class="pnum">PROJ-01</div>
+        <div class="ptitle">TheCustomNest - Crochet E-Commerce Storefront</div>
+        <p class="pdesc">Built a crochet e-commerce storefront using React, TypeScript, Vite, Tailwind CSS, and Framer Motion, with a login-gated cart and wishlist, a role-protected admin dashboard, and order tracking.</p>
+        <div class="pdate">SEPT 2026 – OCT 2026</div><a class="parr"
+          href="https://www.thecustomnest.shop/" target="_blank" rel="noopener noreferrer"
+          aria-label="View TheCustomNest project">View project</a>
+      </div>
+      <div class="pcard" data-cat="ai">
+        <div class="p-corner"></div>
+        <div class="pnum">PROJ-02</div>
+        <div class="ptitle">EduSphere - AI Student Lifecycle Ecosystem</div>
+        <p class="pdesc">Modular AI/ML-driven student lifecycle platform unifying academic learning, coding assessments, and placement readiness, with an ML engine for performance prediction and study planning.</p>
+        <div class="pdate">JUL 2026 – SEPT 2026</div><a class="parr"
+          href="https://github.com/Kabil-8" target="_blank"
+          rel="noopener noreferrer" aria-label="View EduSphere project">View project</a>
+      </div>
+      <div class="pcard" data-cat="ai">
+        <div class="p-corner"></div>
+        <div class="pnum">PROJ-03</div>
+        <div class="ptitle">TalentAI ATS - Enterprise Applicant Tracking System</div>
+        <p class="pdesc">Architected a modular ATS with a Docker-orchestrated stack (MongoDB, Node.js/Express, Python FastAPI AI microservice, React 19), automating recruitment workflows and cutting recruiter workload by 80%.</p>
+        <div class="pdate">JUN – JUL 2026</div><a class="parr" href="https://github.com/Kabil-8"
+          target="_blank" rel="noopener noreferrer" aria-label="View TalentAI ATS project">View project</a>
+      </div>
+      <div class="pcard" data-cat="ai">
+        <div class="p-corner"></div>
+        <div class="pnum">PROJ-04</div>
+        <div class="ptitle">EmoLearn - Emotion Based Learning System</div>
+        <p class="pdesc">An AI-powered emotion-based learning platform using the MERN stack, FastAPI, OpenCV, and DeepFace, enabling real-time emotion detection and adaptive personalization with live analytics.</p>
+        <div class="pdate">MAR – MAY 2026</div><a class="parr" href="https://github.com/Kabil-8/EmoLearn---Averexis"
+          target="_blank" rel="noopener noreferrer" aria-label="View EmoLearn project">View project</a>
+      </div>
+      <div class="pcard" data-cat="ai">
+        <div class="p-corner"></div>
+        <div class="pnum">PROJ-05</div>
+        <div class="ptitle">SpendWise AI</div>
+        <p class="pdesc">An AI-powered startup spend audit platform using Next.js 15, TypeScript, Tailwind CSS, Zustand, and Anthropic Claude, delivering personalized cost-saving recommendations and audit reports.</p>
+        <div class="pdate">MAY – JUN 2026</div><a class="parr"
+          href="https://github.com/Kabil-8/SpendWise-AI" target="_blank" rel="noopener noreferrer"
+          aria-label="View SpendWise AI project">View project</a>
+      </div>
+      <div class="pcard" data-cat="fullstack">
+        <div class="p-corner"></div>
+        <div class="pnum">PROJ-06</div>
         <div class="ptitle">RealTime Collaborative Workspace</div>
-        <p class="pdesc">MERN-based real-time collaborative workspace with secure JWT authentication, role-based access
-          control, workspace and Kanban board management, and invitation-based collaboration via RESTful APIs.</p>
+        <p class="pdesc">Developed a MERN-based real-time collaborative workspace application featuring secure JWT authentication, role-based access control, workspace and Kanban board management with RESTful APIs.</p>
         <div class="pdate">JUN – JUL 2026</div><a class="parr"
           href="https://github.com/Kabil-8/Real-Time-Collaborative-Workspace" target="_blank" rel="noopener noreferrer"
           aria-label="View RealTime Collaborative Workspace project">View project</a>
       </div>
       <div class="pcard" data-cat="fullstack">
         <div class="p-corner"></div>
-        <div class="pnum">PROJ-02</div>
-        <div class="ptitle">FlowBoard</div>
-        <p class="pdesc">Full-stack MERN project management platform with JWT authentication, real-time WebSocket
-          collaboration, Kanban task management, role-based team access, and Docker-based deployment.</p>
-        <div class="pdate">MAY – JUN 2026</div><a class="parr"
-          href="https://github.com/Kabil-8/FlowBoard-Project-Management-System-Frontend" target="_blank"
-          rel="noopener noreferrer" aria-label="View FlowBoard project">View project</a>
-      </div>
-      <div class="pcard" data-cat="ai">
-        <div class="p-corner"></div>
-        <div class="pnum">PROJ-03</div>
-        <div class="ptitle">SpendWise AI</div>
-        <p class="pdesc">AI-powered startup spend audit platform built with Next.js 15, TypeScript, Tailwind CSS,
-          Zustand, and Claude — delivering personalized cost-saving recommendations, lead capture, and shareable audit
-          reports.</p>
-        <div class="pdate">MAY – JUN 2026</div><a class="parr" href="https://github.com/Kabil-8/SpendWise-AI"
-          target="_blank" rel="noopener noreferrer" aria-label="View SpendWise AI project">View project</a>
-      </div>
-      <div class="pcard" data-cat="ai">
-        <div class="p-corner"></div>
-        <div class="pnum">PROJ-04</div>
-        <div class="ptitle">EmoLearn</div>
-        <p class="pdesc">AI-powered emotion-based learning platform using the MERN stack, FastAPI, OpenCV, and DeepFace,
-          enabling real-time emotion detection and adaptive content personalization with live analytics.</p>
-        <div class="pdate">MAR – MAY 2026</div><a class="parr" href="https://github.com/Kabil-8/EmoLearn---Averexis"
-          target="_blank" rel="noopener noreferrer" aria-label="View EmoLearn project">View project</a>
-      </div>
-      <div class="pcard" data-cat="systems">
-        <div class="p-corner"></div>
-        <div class="pnum">PROJ-05</div>
-        <div class="ptitle">Wifi-Based Attendance System</div>
-        <p class="pdesc">Router-based attendance system that automatically marks attendance by detecting devices on a
-          network via MAC/IP identifiers, with optional QR-based backup verification.</p>
-        <div class="pdate">JAN – APR 2026</div><a class="parr"
-          href="https://github.com/Kabil-8/Wifi-Based-Attendance-System" target="_blank" rel="noopener noreferrer"
-          aria-label="View Wifi-Based Attendance System project">View project</a>
-      </div>
-      <div class="pcard" data-cat="frontend">
-        <div class="p-corner"></div>
-        <div class="pnum">PROJ-06</div>
-        <div class="ptitle">JavaLearn Platform</div>
-        <p class="pdesc">Structured Java learning platform with an improved UI, practice examples, and interactive
-          learning features for students.</p>
-        <div class="pdate">SEP – NOV 2025</div><a class="parr"
-          href="https://github.com/Kabil-8/JavaLearn-Java-Learning-Platform" target="_blank" rel="noopener noreferrer"
-          aria-label="View JavaLearn Platform project">View project</a>
-      </div>
-      <div class="pcard" data-cat="fullstack">
-        <div class="p-corner"></div>
         <div class="pnum">PROJ-07</div>
-        <div class="ptitle">HireFlow</div>
-        <p class="pdesc">Resume shortlisting platform that streamlines candidate screening, automates resume filtering,
-          facilitates interview scheduling, and provides comprehensive admin controls.</p>
-        <div class="pdate">AUG – SEP 2025</div><a class="parr"
+        <div class="ptitle">HireFlow - Resume Shortlisting Platform</div>
+        <p class="pdesc">Designed and implemented a Resume Shortlisting Platform to streamline candidate screening, automate resume filtering, facilitate interview scheduling, and provide comprehensive admin controls.</p>
+        <div class="pdate">AUG – SEPT 2025</div><a class="parr"
           href="https://github.com/Kabil-8/Resume-Tracker---Frontend" target="_blank" rel="noopener noreferrer"
           aria-label="View HireFlow project">View project</a>
       </div>
-      <div class="pcard" data-cat="ai">
-        <div class="p-corner"></div>
-        <div class="pnum">PROJ-08</div>
-        <div class="ptitle">LivePresence</div>
-        <p class="pdesc">HR management system handling employee attendance, leave, payroll, and profiles — centralising
-          workforce data for easier monitoring and reporting.</p>
-        <div class="pdate">JUN – AUG 2025</div><a class="parr" href="https://github.com/Kabil-8/Gen-AI-HRMS-Frontend"
-          target="_blank" rel="noopener noreferrer" aria-label="View LivePresence project">View project</a>
-      </div>
       <div class="pcard" data-cat="systems">
         <div class="p-corner"></div>
-        <div class="pnum">PROJ-09</div>
-        <div class="ptitle">Student Profile Tracker</div>
-        <p class="pdesc">Student information system storing academic and personal records securely, enabling quick
-          search, update, and profile management.</p>
-        <div class="pdate">JUN 2025</div><a class="parr" href="https://github.com/Kabil-8/Student-Dashboard"
-          target="_blank" rel="noopener noreferrer" aria-label="View Student Profile Tracker project">View project</a>
+        <div class="pnum">PROJ-08</div>
+        <div class="ptitle">LivePresence - HR Management System</div>
+        <p class="pdesc">An HR solution to manage employee attendance, leave, payroll, and profiles. Centralizes workforce data for easier monitoring and reporting with secure role controls.</p>
+        <div class="pdate">JUN – AUG 2025</div><a class="parr" href="https://github.com/Kabil-8/Gen-AI-HRMS-Frontend"
+          target="_blank" rel="noopener noreferrer" aria-label="View LivePresence project">View project</a>
       </div>
     </div>
   </section>
@@ -2114,34 +2216,30 @@
         <div>
           <div class="e-company">Averexis Solutions</div>
           <div class="e-role">Full Stack Developer Intern</div>
-          <p class="e-desc">Built responsive full-stack web applications — designing RESTful APIs, implementing secure
-            authentication, performing CRUD operations, and optimising relational database schemas for performance and
-            scalability.</p>
-        </div>
-        <div class="e-badge done">COMPLETED</div>
-      </div>
-      <div class="ecard">
-        <div class="e-period">FEB – MAR 2026</div>
-        <div>
-          <div class="e-company">BlueStock Fintech</div>
-          <div class="e-role">Software Development Intern</div>
-          <p class="e-desc">Implemented key features including user authentication and data visualization, debugged 15+
-            issues, and improved backend logic to reduce response time by 30%.</p>
+          <p class="e-desc">Built responsive full-stack web applications with designing RESTful APIs, implementing secure authentication, performing CRUD operations, and optimizing relational database schema for performance and scalability.</p>
         </div>
         <div class="e-badge done">COMPLETED</div>
       </div>
 
       <div class="ecard">
-        <div class="e-period">JUN – SEP 2025</div>
+        <div class="e-period">JUN – SEPT 2025</div>
         <div>
           <div class="e-company">Genhub Innovations</div>
           <div class="e-role">Software Developer Intern</div>
-          <p class="e-desc">Contributed to 5 scalable web solutions and built 10+ RESTful APIs, enhancing application
-            performance and user experience — resulting in a 30% reduction in load times.</p>
+          <p class="e-desc">Contributed to the development of 5 scalable web solutions and built 10+ RESTful APIs, enhancing application performance and user experience, resulting in a 30% reduction in load times.</p>
         </div>
         <div class="e-badge done">COMPLETED</div>
       </div>
-    </div>
+
+      <div class="ecard">
+        <div class="e-period">INTERNSHIP</div>
+        <div>
+          <div class="e-company">DataConquest</div>
+          <div class="e-role">Data Analyst Intern</div>
+          <p class="e-desc">Collected, cleaned, and analyzed datasets to identify trends, and prepared reports and visualizations for real-world projects. Collaborated with team members within professional workflows and business requirements, strengthening technical, analytical, communication, and teamwork skills.</p>
+        </div>
+        <div class="e-badge done">COMPLETED</div>
+      </div>
     </div>
   </section>
 
@@ -2152,33 +2250,72 @@
     <div class="cert-grid">
       <div class="cert">
         <div class="cert-num">01</div>
-        <div class="cert-name">Environment &amp; Development, Environmental Impact Assessment</div>
-        <div class="cert-by">NPTEL</div>
+        <div class="cert-name">Recognized Certification in Environment and Development, EIA &amp; Psychology of Learning</div>
+        <div class="cert-by">NPTEL Recognized</div>
       </div>
       <div class="cert">
         <div class="cert-num">02</div>
-        <div class="cert-name">Psychology of Learning</div>
-        <div class="cert-by">NPTEL</div>
-      </div>
-      <div class="cert">
-        <div class="cert-num">03</div>
-        <div class="cert-name">Cyber Security Fundamentals</div>
+        <div class="cert-name">Cyber Security Fundamentals Certification</div>
         <div class="cert-by">Cisco Networking Academy</div>
       </div>
       <div class="cert">
-        <div class="cert-num">04</div>
-        <div class="cert-name">MongoDB Introductory Credential</div>
+        <div class="cert-num">03</div>
+        <div class="cert-name">Introductory Level MongoDB Credential</div>
         <div class="cert-by">MongoDB University</div>
       </div>
       <div class="cert">
-        <div class="cert-num">05</div>
-        <div class="cert-name">Java Certification</div>
-        <div class="cert-by">Oracle</div>
+        <div class="cert-num">04</div>
+        <div class="cert-name">Certified in C, C++, and Python &amp; Oracle Certified in Java</div>
+        <div class="cert-by">Kalvi Institute &amp; Oracle</div>
       </div>
       <div class="cert">
-        <div class="cert-num">06</div>
-        <div class="cert-name">C, C++ &amp; Python Certified</div>
-        <div class="cert-by">Kalvi Institute</div>
+        <div class="cert-num">05</div>
+        <div class="cert-name">Completed 8 Hindi Exams</div>
+        <div class="cert-by">DBHPS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ LEADERSHIP & EXTRACURRICULARS ═══ -->
+  <section class="panel rv" id="leadership">
+    <div class="slabel">06 — Leadership</div>
+    <h2 class="stitle">Leadership &amp; <span class="accent">Impact</span></h2>
+    <div class="lead-grid">
+      <div class="cert">
+        <div class="cert-num">PRESIDENT</div>
+        <div class="cert-name">President – CSE Association “DigiFlash”</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Leading the association by setting strategic goals, overseeing department activities &amp; extracurricular engagement.</p>
+        <div class="cert-by">Department of CSE</div>
+      </div>
+      <div class="cert">
+        <div class="cert-num">VICE PRESIDENT</div>
+        <div class="cert-name">Vice President – CSE Association “DigiFlash”</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Led student initiatives, coordinated committees, and represented the association in faculty meetings.</p>
+        <div class="cert-by">Student Governance</div>
+      </div>
+      <div class="cert">
+        <div class="cert-num">COORDINATOR</div>
+        <div class="cert-name">Placement Coordinator – Department of CSE</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Liaised between students and recruiters, organized placement drives, and managed interview schedules.</p>
+        <div class="cert-by">Placement Cell</div>
+      </div>
+      <div class="cert">
+        <div class="cert-num">EVENT COORD</div>
+        <div class="cert-name">Event Coordinator &amp; Industrial Visit (IV) Lead</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Planned departmental events, managed logistics and registrations, and organized corporate visits.</p>
+        <div class="cert-by">Logistics &amp; Ops</div>
+      </div>
+      <div class="cert">
+        <div class="cert-num">ACHIEVEMENTS</div>
+        <div class="cert-name">Symposium Leadership &amp; Team Lead</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Organized multiple symposiums over 2 years. Led multiple engineering teams, ensuring timely delivery.</p>
+        <div class="cert-by">Event Lead</div>
+      </div>
+      <div class="cert">
+        <div class="cert-num">COMMUNICATION</div>
+        <div class="cert-name">Languages &amp; Hobbies</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px;">Languages: Tamil, English, Hindi [Read &amp; Write]<br>Hobbies: Playing Cricket, Fitness &amp; Outdoor Activities.</p>
+        <div class="cert-by">Trilingual Fluency</div>
       </div>
     </div>
   </section>
@@ -2187,10 +2324,9 @@
   <section class="panel rv" id="contact">
     <div class="contact-inner">
       <div>
-        <div class="slabel">06 — Connect</div>
+        <div class="slabel">07 — Connect</div>
         <h2 class="contact-big">Let's<br><span class="glitch">Build</span><br>Together.</h2>
-        <p class="contact-note">Open to full stack developer roles, internship extensions, and collaborative projects.
-          Based in Pollachi, Tamil Nadu.</p>
+        <p class="contact-note">Open to AI/ML Full Stack Developer roles, scalable system design, and collaborative products. Based in Pollachi, Tamil Nadu.</p>
 
         <form class="cform" id="cform" novalidate>
           <div class="cf-field" id="fName">
@@ -2606,7 +2742,7 @@
     (function () {
       const el = document.getElementById('tyText');
       if (!el) return;
-      const words = ['Backend Developer', 'Frontend Developer', 'System Designer', 'REST API Architect', 'MERN Stack Engineer'];
+      const words = ['AI/ML Full Stack Developer', 'Computer Vision & LLM Integrator', 'Backend & Distributed Systems Architect', 'REST API & Microservice Engineer', 'MERN & FastAPI Specialist'];
       let wi = 0, ci = 0, deleting = false;
       function tick() {
         const word = words[wi];
