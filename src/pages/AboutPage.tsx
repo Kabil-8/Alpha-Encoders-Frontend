@@ -263,7 +263,7 @@ export const AboutPage: React.FC = () => {
               </h2>
 
               <p className="text-slate-300 text-base leading-relaxed">
-                Kabil is the Founder &amp; CEO of Alpha Encoders, bringing deep engineering rigour and modern architectural standards to digital solutions. With extensive experience across 3 software engineering internships (Averexis Solutions, BlueStock Fintech, Genhub Innovations) and over 10+ end-to-end production &amp; open-source architectures, he personally leads project architecture and technical execution.
+                Kabil is the Founder &amp; CEO of Alpha Encoders, bringing deep engineering rigour and modern architectural standards to digital solutions. With extensive experience across 3 software engineering internships (Averexis Solutions, Genhub Innovations, DataConquest) and over 8+ end-to-end production &amp; open-source architectures, he personally leads project architecture and technical execution.
               </p>
 
               <div className="grid grid-cols-3 gap-3 pt-2 text-center">
