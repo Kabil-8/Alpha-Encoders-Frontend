@@ -375,33 +375,3 @@
     page-break-inside: avoid !important;
   }
 }
-
-/* Top to Bottom Ambient Scanbeam Animation across all pages */
-@keyframes scanTopToBottom {
-  0% {
-    top: -5%;
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.75;
-  }
-  88% {
-    opacity: 0.75;
-  }
-  100% {
-    top: 105%;
-    opacity: 0;
-  }
-}
-
-.top-to-bottom-scanbeam {
-  position: fixed;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 255, 0.25) 20%, rgba(34, 211, 238, 0.85) 50%, rgba(37, 99, 255, 0.25) 80%, transparent 100%);
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.6), 0 0 30px rgba(37, 99, 255, 0.35);
-  pointer-events: none;
-  z-index: 20;
-  animation: scanTopToBottom 7s ease-in-out infinite;
-}
