@@ -7,7 +7,6 @@ import { servicesData } from '../data/servicesData';
 import { processStages } from '../data/processData';
 
 // ReactBits Components
-import { Squares } from '../components/reactbits/Squares';
 import { SpotlightCard } from '../components/reactbits/SpotlightCard';
 import { Magnet } from '../components/reactbits/Magnet';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
@@ -106,16 +105,6 @@ export const HomePage: React.FC = () => {
           tailColors={['#00e5ff', '#3b82f6', '#6366f1']}
           headColors={['#38bdf8', '#0ea5e9', '#0284c7']}
           poleColors={['#0284c7']}
-        />
-      </div>
-
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <Squares
-          direction="diagonal"
-          speed={0.3}
-          squareSize={48}
-          borderColor="rgba(148, 163, 184, 0.05)"
-          hoverFillColor="rgba(37, 99, 255, 0.12)"
         />
       </div>
 

@@ -43,18 +43,18 @@ export const Squares: React.FC<SquaresProps> = ({
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const startX = Math.floor(gridOffset.current.x / squareSize) * squareSize;
-      const startY = Math.floor(gridOffset.current.y / squareSize) * squareSize;
+      const offsetX = ((gridOffset.current.x % squareSize) + squareSize) % squareSize;
+      const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize;
 
-      for (let x = startX; x < canvas.width + squareSize; x += squareSize) {
-        for (let y = startY; y < canvas.height + squareSize; y += squareSize) {
-          const squareX = x - (gridOffset.current.x % squareSize);
-          const squareY = y - (gridOffset.current.y % squareSize);
+      for (let x = -squareSize; x < canvas.width + squareSize * 2; x += squareSize) {
+        for (let y = -squareSize; y < canvas.height + squareSize * 2; y += squareSize) {
+          const squareX = Math.round(x + offsetX - squareSize);
+          const squareY = Math.round(y + offsetY - squareSize);
 
           if (
             hoveredSquare.current &&
-            Math.floor((x - startX) / squareSize) === hoveredSquare.current.x &&
-            Math.floor((y - startY) / squareSize) === hoveredSquare.current.y
+            hoveredSquare.current.x === Math.floor(squareX / squareSize) &&
+            hoveredSquare.current.y === Math.floor(squareY / squareSize)
           ) {
             ctx.fillStyle = hoverFillColor;
             ctx.fillRect(squareX, squareY, squareSize, squareSize);
@@ -70,20 +70,21 @@ export const Squares: React.FC<SquaresProps> = ({
       const effectiveSpeed = Math.max(speed, 0.1);
       switch (direction) {
         case 'right':
-          gridOffset.current.x -= effectiveSpeed;
-          break;
-        case 'left':
           gridOffset.current.x += effectiveSpeed;
           break;
+        case 'left':
+          gridOffset.current.x -= effectiveSpeed;
+          break;
         case 'up':
-          gridOffset.current.y += effectiveSpeed;
+          gridOffset.current.y -= effectiveSpeed;
           break;
         case 'down':
-          gridOffset.current.y -= effectiveSpeed;
+          // Drifts from top to bottom
+          gridOffset.current.y += effectiveSpeed;
           break;
         case 'diagonal':
-          gridOffset.current.x -= effectiveSpeed;
-          gridOffset.current.y -= effectiveSpeed;
+          gridOffset.current.x += effectiveSpeed;
+          gridOffset.current.y += effectiveSpeed;
           break;
       }
 

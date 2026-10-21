@@ -18,6 +18,7 @@ import { PortfolioPage } from './pages/PortfolioPage';
 
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { Squares } from './components/reactbits/Squares';
 
 function AppLayout() {
   const location = useLocation();
@@ -25,11 +26,28 @@ function AppLayout() {
   const isPortfolioRoute = location.pathname === '/portfolio';
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#050816] text-[#F5F8FF] selection:bg-[#2563FF]/30 selection:text-[#22D3EE]">
+    <div className="flex flex-col min-h-screen bg-[#050816] text-[#F5F8FF] selection:bg-[#2563FF]/30 selection:text-[#22D3EE] relative">
       <ScrollToTop />
+
+      {/* Global Top-to-Bottom Animated Ambient Grid & Scanbeam across all pages */}
+      {!isAdminRoute && !isPortfolioRoute && (
+        <>
+          <div className="fixed inset-0 z-0 pointer-events-none opacity-20 overflow-hidden">
+            <Squares
+              direction="down"
+              speed={0.35}
+              squareSize={48}
+              borderColor="rgba(148, 163, 184, 0.06)"
+              hoverFillColor="rgba(37, 99, 255, 0.12)"
+            />
+          </div>
+          <div className="top-to-bottom-scanbeam" />
+        </>
+      )}
+
       {!isAdminRoute && !isPortfolioRoute && <Navbar />}
       <PageTransition>
-        <main className="flex-grow">
+        <main className="flex-grow relative z-10">
           <Routes>
             {/* Public Agency Routes */}
             <Route path="/" element={<HomePage />} />
