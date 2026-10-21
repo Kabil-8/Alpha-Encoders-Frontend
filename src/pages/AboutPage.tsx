@@ -6,6 +6,7 @@ import { Magnet } from '../components/reactbits/Magnet';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
 import { TechStackMarquee } from '../components/shared/TechStackMarquee';
+import { ConstellationGrid } from '../components/animations/ConstellationGrid';
 import {
   ShieldCheck,
   Code2,
@@ -75,8 +76,9 @@ export const AboutPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background Grid & Lighting */}
-      <div className="absolute inset-0 bg-tech-grid opacity-25 pointer-events-none" />
+      {/* Background Architectural Matrix & Constellation Animation */}
+      <ConstellationGrid className="opacity-40" />
+      <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
       <div className="absolute top-20 left-1/3 w-[600px] h-[300px] bg-blue-600/10 blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

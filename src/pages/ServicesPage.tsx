@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { servicesData } from '../data/servicesData';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { Magnet } from '../components/reactbits/Magnet';
+import { AuroraWaves } from '../components/animations/AuroraWaves';
 import {
   Building2,
   ShoppingBag,
@@ -57,7 +58,8 @@ export const ServicesPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background Ambience */}
+      {/* Background Ambience & Full-Spectrum Aurora Waves */}
+      <AuroraWaves />
       <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
       <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
 

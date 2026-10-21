@@ -16,6 +16,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { apiUrl } from '../config/api';
+import { SignalBeaconGrid } from '../components/animations/SignalBeaconGrid';
 
 interface FormErrors {
   fullName?: string;
@@ -224,7 +225,8 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background Ambience */}
+      {/* Background Ambience & Live Signal Beacon Animation */}
+      <SignalBeaconGrid />
       <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
 

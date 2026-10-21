@@ -8,6 +8,7 @@ import { Magnet } from '../components/reactbits/Magnet';
 import { ArrowRight, Code, Shield, CheckCircle2, Search, SlidersHorizontal } from 'lucide-react';
 import type { ProjectItem } from '../types';
 import { apiUrl } from '../config/api';
+import { RadarScanGrid } from '../components/animations/RadarScanGrid';
 
 export const ProjectsPage: React.FC = () => {
   const [projects, setProjects] = useState<ProjectItem[]>(fallbackProjects);
@@ -71,7 +72,8 @@ export const ProjectsPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background Lighting */}
+      {/* Background Deployment Radar & Technical Scan Animation */}
+      <RadarScanGrid />
       <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
       <div className="absolute top-20 right-1/4 w-[600px] h-[350px] bg-blue-600/10 blur-[130px] pointer-events-none" />
 

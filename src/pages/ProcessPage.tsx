@@ -4,6 +4,7 @@ import { processStages } from '../data/processData';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
 import { Magnet } from '../components/reactbits/Magnet';
+import { ProcessPipelineAnim } from '../components/animations/ProcessPipelineAnim';
 import {
   CheckCircle2,
   ArrowRight,
@@ -22,7 +23,8 @@ export const ProcessPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background Ambience */}
+      {/* Background Engineering Pipeline Circuit Animation */}
+      <ProcessPipelineAnim />
       <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
       <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
 
