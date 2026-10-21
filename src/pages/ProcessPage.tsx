@@ -4,6 +4,7 @@ import { processStages } from '../data/processData';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
 import { Magnet } from '../components/reactbits/Magnet';
+import { Lightfall } from '../components/reactbits/Lightfall';
 import { ProcessPipelineAnim } from '../components/animations/ProcessPipelineAnim';
 import {
   CheckCircle2,
@@ -23,9 +24,21 @@ export const ProcessPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background Engineering Pipeline Circuit Animation */}
-      <ProcessPipelineAnim />
-      <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
+      {/* Background WebGL2 Luminescent Cosmic Lightfall */}
+      <div className="absolute inset-0 pointer-events-none opacity-45 z-0">
+        <Lightfall
+          colors={['#22D3EE', '#2563FF', '#A855F7']}
+          speed={0.4}
+          streakCount={3}
+          streakWidth={1.2}
+          streakLength={1.4}
+          glow={1.4}
+          zoom={2.5}
+          bloom={0.5}
+        />
+      </div>
+      <ProcessPipelineAnim className="opacity-30" />
+      <div className="absolute inset-0 bg-tech-grid opacity-15 pointer-events-none" />
       <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
