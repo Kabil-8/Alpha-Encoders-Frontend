@@ -96,8 +96,37 @@ export const ProjectsPage: React.FC = () => {
         </div>
 
         {/* INTERACTIVE FEATURED SLIDER */}
-        <div className="mb-16">
+        <div className="mb-12">
           <LiveProjectsSlider />
+        </div>
+
+        {/* FOUNDER PERSONAL PORTFOLIO LINK BANNER */}
+        <div className="mb-12 p-6 rounded-2xl bg-gradient-to-r from-[#0E1420] via-[#0A1024] to-[#050816] border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-300 font-mono font-bold text-lg shrink-0">
+              KK
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-['Space_Grotesk'] font-bold text-white text-lg">
+                  Founder's Personal Engineering &amp; Systems Portfolio
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Claude UI
+                </span>
+              </div>
+              <p className="text-slate-400 text-sm mt-0.5">
+                Explore Kabil K.'s interactive 3D showcase featuring 9+ open-source full-stack, AI, and systems builds.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/portfolio"
+            className="shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF6A] to-[#2FE0C4] text-slate-950 font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2 hover:brightness-110 transition-all shadow-md shadow-amber-500/20"
+          >
+            <span>Explore 3D Portfolio</span>
+            <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
+          </Link>
         </div>
 
         {/* LIVE SEARCH & CATEGORY BAR */}

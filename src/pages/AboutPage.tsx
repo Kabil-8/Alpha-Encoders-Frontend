@@ -230,6 +230,90 @@ export const AboutPage: React.FC = () => {
           </div>
         </div>
 
+        {/* SECTION: FOUNDER & LEADERSHIP PROFILE */}
+        <div className="my-20 rounded-3xl bg-gradient-to-br from-[#0B1229] via-[#070B14] to-[#0D1836] border border-blue-500/30 p-8 sm:p-12 relative overflow-hidden">
+          <BorderBeam size={320} duration={16} colorFrom="#D4AF6A" colorTo="#2FE0C4" />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left: Founder Bio */}
+            <div className="lg:col-span-7 space-y-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-xs font-mono font-medium text-amber-300">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                FOUNDER &amp; LEAD SOLUTIONS ARCHITECT
+              </div>
+
+              <h2 className="font-['Space_Grotesk'] text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                Kabil <span className="text-gradient-blue">K.</span>
+              </h2>
+
+              <p className="text-slate-300 text-base leading-relaxed">
+                Kabil founded Alpha Encoders to bridge the gap between heavy enterprise full-stack engineering and stunning, high-converting digital interfaces. With extensive experience across 3 software engineering internships (Averexis Solutions, BlueStock Fintech, Genhub Innovations) and over 10+ end-to-end production &amp; open-source architectures, he personally oversees architectural integrity on every project.
+              </p>
+
+              <div className="grid grid-cols-3 gap-3 pt-2 text-center">
+                <div className="p-3 rounded-xl bg-[#050816]/80 border border-slate-800">
+                  <div className="font-mono text-xl font-bold text-cyan-400">10+</div>
+                  <div className="text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">Projects</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#050816]/80 border border-slate-800">
+                  <div className="font-mono text-xl font-bold text-amber-400">03</div>
+                  <div className="text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">Internships</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#050816]/80 border border-slate-800">
+                  <div className="font-mono text-xl font-bold text-emerald-400">8.49</div>
+                  <div className="text-[11px] text-slate-400 uppercase tracking-wider mt-0.5">MCET CGPA</div>
+                </div>
+              </div>
+
+              <div className="pt-3 flex flex-wrap gap-4 items-center">
+                <Magnet magnetStrength={0.25}>
+                  <Link
+                    to="/portfolio"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#D4AF6A] to-[#2FE0C4] text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 hover:brightness-110 transition-all"
+                  >
+                    <span>Explore 3D Cyberpunk Portfolio</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </Magnet>
+                <a
+                  href="https://github.com/kabil-8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-3 rounded-xl bg-[#050816] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 text-sm font-medium transition-colors"
+                >
+                  GitHub @Kabil-8 ↗
+                </a>
+              </div>
+            </div>
+
+            {/* Right: Technical Badges & Terminal Card */}
+            <div className="lg:col-span-5 rounded-2xl bg-[#050816] border border-slate-800 p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span className="text-xs font-mono text-slate-400">Founder Architecture Profile</span>
+                <span className="text-xs font-mono text-cyan-400">Full-Stack Active</span>
+              </div>
+              <div className="space-y-2.5 text-xs font-mono">
+                <div className="p-2.5 rounded-lg bg-[#0A1024] border border-slate-800/80 flex items-center justify-between">
+                  <span className="text-slate-300">Core Systems</span>
+                  <span className="text-amber-400 font-semibold">Java · MERN · Python</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#0A1024] border border-slate-800/80 flex items-center justify-between">
+                  <span className="text-slate-300">Interactive 3D</span>
+                  <span className="text-cyan-400 font-semibold">Three.js · WebGL · Shaders</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#0A1024] border border-slate-800/80 flex items-center justify-between">
+                  <span className="text-slate-300">API Architecture</span>
+                  <span className="text-emerald-400 font-semibold">REST · JWT · WebSockets</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#0A1024] border border-slate-800/80 flex items-center justify-between">
+                  <span className="text-slate-300">Certifications</span>
+                  <span className="text-blue-400 font-semibold">Oracle · Cisco · MongoDB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* CTA FOOTER BANNER */}
         <div className="mt-20 p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-[#0A1024] to-[#101A31] border border-blue-500/40 text-center space-y-6">
           <h2 className="font-['Space_Grotesk'] text-3xl font-bold text-white">

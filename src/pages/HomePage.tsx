@@ -448,6 +448,47 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* SECTION: FOUNDER SPOTLIGHT & INTERACTIVE 3D UI */}
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 z-10">
+        <div className="rounded-3xl bg-gradient-to-r from-[#070B14] via-[#0E1420] to-[#0A1024] border border-amber-500/30 p-8 sm:p-12 relative overflow-hidden shadow-2xl">
+          <BorderBeam size={280} duration={14} colorFrom="#D4AF6A" colorTo="#2FE0C4" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-8 space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-xs font-mono font-medium text-amber-300">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                FOUNDER PORTFOLIO &amp; 3D SHOWCASE
+              </div>
+              <h2 className="font-['Space_Grotesk'] text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                Crafted with Deep Engineering. Led by <span className="text-gradient-blue">Kabil K.</span>
+              </h2>
+              <p className="text-slate-300 text-base leading-relaxed">
+                Behind Alpha Encoders is a commitment to cutting-edge full-stack architecture, 3D WebGL experiences, and high-performance algorithms. Explore our founder's personal engineering showcase featuring 9+ open-source systems, AI apps, and interactive 3D UI.
+              </p>
+              <div className="flex flex-wrap gap-2 text-xs font-mono text-slate-400 pt-1">
+                <span className="px-2.5 py-1 rounded-md bg-[#050816] border border-slate-800 text-amber-300">Java &amp; MERN</span>
+                <span className="px-2.5 py-1 rounded-md bg-[#050816] border border-slate-800 text-cyan-300">Three.js 3D</span>
+                <span className="px-2.5 py-1 rounded-md bg-[#050816] border border-slate-800 text-emerald-300">REST &amp; WebSockets</span>
+                <span className="px-2.5 py-1 rounded-md bg-[#050816] border border-slate-800 text-slate-300">10+ Verified Builds</span>
+              </div>
+            </div>
+            <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-center">
+              <Magnet magnetStrength={0.25}>
+                <Link
+                  to="/portfolio"
+                  className="w-full sm:w-auto text-center px-8 py-4 rounded-xl bg-gradient-to-r from-[#D4AF6A] to-[#2FE0C4] text-slate-950 font-bold text-base shadow-xl shadow-amber-500/20 hover:brightness-110 transition-all inline-flex items-center justify-center gap-2"
+                >
+                  <span>Launch 3D Portfolio</span>
+                  <ArrowRight className="w-4 h-4 text-slate-950" />
+                </Link>
+              </Magnet>
+              <span className="text-xs text-slate-400 mt-2 font-mono">
+                Interactive Claude UI Experience
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SECTION H: FINAL CTA WITH REACTBITS BORDERBEAM */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 z-10">
         <div className="relative rounded-3xl bg-[#0A1024] border border-blue-500/40 p-8 sm:p-14 lg:p-16 text-center overflow-hidden shadow-2xl">
