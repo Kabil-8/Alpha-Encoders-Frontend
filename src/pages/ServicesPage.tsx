@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { servicesData } from '../data/servicesData';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { Magnet } from '../components/reactbits/Magnet';
-import { LaserFlow } from '../components/reactbits/LaserFlow';
 import { AuroraWaves } from '../components/animations/AuroraWaves';
 import {
   Building2,
@@ -59,20 +58,8 @@ export const ServicesPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background WebGL2 Laser Flow & Aurora Atmosphere */}
-      <div className="absolute inset-0 pointer-events-none opacity-40 z-0">
-        <LaserFlow
-          color="#2563FF"
-          intensity={1.5}
-          beamWidth={1.4}
-          flare={1.6}
-          spread={1.8}
-          spill={1.1}
-          fog={0.25}
-          dust={1.6}
-        />
-      </div>
-      <AuroraWaves className="opacity-30" />
+      {/* Background Ambience & Full-Spectrum Aurora Waves */}
+      <AuroraWaves className="opacity-70" />
       <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
       <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
 

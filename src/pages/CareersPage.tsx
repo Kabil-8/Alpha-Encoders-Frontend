@@ -24,7 +24,6 @@ import { ShinyText } from '../components/reactbits/ShinyText';
 import { Magnet } from '../components/reactbits/Magnet';
 import { Modal } from '../components/shared/Modal';
 import { apiUrl } from '../config/api';
-import { LaserFlow } from '../components/reactbits/LaserFlow';
 import { CodeParticleField } from '../components/animations/CodeParticleField';
 
 export interface DomainTrack {
@@ -319,17 +318,8 @@ export const CareersPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-[#050816] text-white pt-24 pb-20 overflow-hidden">
-      {/* Background WebGL2 Laser Flow & Floating Developer Code Particles */}
-      <div className="absolute inset-0 pointer-events-none opacity-30 z-0">
-        <LaserFlow
-          color="#A855F7"
-          intensity={1.4}
-          beamWidth={1.2}
-          flare={1.4}
-          spread={1.5}
-        />
-      </div>
-      <CodeParticleField className="opacity-40" />
+      {/* Background Ambience & Floating Developer Code Particles */}
+      <CodeParticleField className="opacity-55" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
       <div className="absolute top-3/4 -left-48 w-[400px] h-[350px] bg-cyan-500/10 blur-[130px] pointer-events-none" />
