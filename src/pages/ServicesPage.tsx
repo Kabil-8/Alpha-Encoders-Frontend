@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { servicesData } from '../data/servicesData';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { Magnet } from '../components/reactbits/Magnet';
+import { Hyperspeed } from '../components/reactbits/Hyperspeed';
 import { AuroraWaves } from '../components/animations/AuroraWaves';
 import {
   Building2,
@@ -58,9 +59,28 @@ export const ServicesPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background Ambience & Full-Spectrum Aurora Waves */}
-      <AuroraWaves className="opacity-70" />
-      <div className="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none" />
+      {/* ReactBits Hyperspeed Interactive Highway Warp Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto opacity-35">
+        <Hyperspeed
+          curve="winding"
+          curvature={0.8}
+          speed={1.0}
+          boost={2.2}
+          roadOpacity={0.06}
+          glow={0.5}
+          density={30}
+          trailLength={1.3}
+          lightSize={1.1}
+          theme="dark"
+          tailColors={['#00e5ff', '#3b82f6', '#6366f1']}
+          headColors={['#38bdf8', '#0ea5e9', '#0284c7']}
+          poleColors={['#0284c7']}
+        />
+      </div>
+
+      {/* Ambient Aurora Wave Atmosphere */}
+      <AuroraWaves className="opacity-40" />
+      <div className="absolute inset-0 bg-tech-grid opacity-15 pointer-events-none" />
       <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

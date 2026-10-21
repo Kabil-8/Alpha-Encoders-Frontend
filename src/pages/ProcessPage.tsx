@@ -4,7 +4,7 @@ import { processStages } from '../data/processData';
 import { DecryptedText } from '../components/reactbits/DecryptedText';
 import { BorderBeam } from '../components/reactbits/BorderBeam';
 import { Magnet } from '../components/reactbits/Magnet';
-import { Lightfall } from '../components/reactbits/Lightfall';
+import { GridScan } from '../components/reactbits/GridScan';
 import { ProcessPipelineAnim } from '../components/animations/ProcessPipelineAnim';
 import {
   CheckCircle2,
@@ -24,17 +24,16 @@ export const ProcessPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 sm:pt-36 pb-20 overflow-hidden">
-      {/* Background WebGL2 Luminescent Cosmic Lightfall */}
-      <div className="absolute inset-0 pointer-events-none opacity-45 z-0">
-        <Lightfall
-          colors={['#22D3EE', '#2563FF', '#A855F7']}
-          speed={0.4}
-          streakCount={3}
-          streakWidth={1.2}
-          streakLength={1.4}
-          glow={1.4}
-          zoom={2.5}
-          bloom={0.5}
+      {/* 3D Cybernetic Perspective Grid Scan Room */}
+      <div className="absolute inset-0 pointer-events-none opacity-40 z-0">
+        <GridScan
+          scanColor="#22D3EE"
+          linesColor="#1E293B"
+          cells={10}
+          depth={4}
+          glow={0.7}
+          lineThickness={1}
+          interactive={true}
         />
       </div>
       <ProcessPipelineAnim className="opacity-30" />
