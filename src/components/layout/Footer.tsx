@@ -33,8 +33,8 @@ export const Footer: React.FC = () => {
 
             <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
               Alpha Encoders designs and develops professional websites and customized digital solutions that help businesses establish and grow their online presence. Founded &amp; led by K.Kabil.{' '}
-              <Link to="/portfolio" className="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center gap-1">
-                View 3D Portfolio →
+              <Link to="/ceo" className="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center gap-1">
+                View CEO Profile (/ceo) →
               </Link>
             </p>
 
@@ -88,9 +88,9 @@ export const Footer: React.FC = () => {
                 <Link to="/projects" className="text-slate-400 hover:text-white transition-colors">Client Projects</Link>
               </li>
               <li>
-                <Link to="/portfolio" className="text-amber-300 hover:text-amber-200 font-medium transition-colors flex items-center gap-1.5">
-                  <span>Founder Portfolio</span>
-                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">3D UI</span>
+                <Link to="/ceo" className="text-amber-300 hover:text-amber-200 font-medium transition-colors flex items-center gap-1.5">
+                  <span>Founder &amp; CEO</span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Available</span>
                 </Link>
               </li>
               <li>

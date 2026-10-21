@@ -123,10 +123,10 @@ export const ProjectsPage: React.FC = () => {
             </div>
           </div>
           <Link
-            to="/portfolio"
+            to="/ceo"
             className="shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF6A] to-[#2FE0C4] text-slate-950 font-bold text-xs uppercase tracking-wider inline-flex items-center gap-2 hover:brightness-110 transition-all shadow-md shadow-amber-500/20"
           >
-            <span>Explore 3D Portfolio</span>
+            <span>Founder &amp; CEO Portfolio</span>
             <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
           </Link>
         </div>

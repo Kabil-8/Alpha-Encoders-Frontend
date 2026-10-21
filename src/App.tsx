@@ -22,12 +22,11 @@ import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 function AppLayout() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isPortfolioRoute = location.pathname === '/portfolio';
 
   return (
     <div className="flex flex-col min-h-screen bg-[#050816] text-[#F5F8FF] selection:bg-[#2563FF]/30 selection:text-[#22D3EE] relative">
       <ScrollToTop />
-      {!isAdminRoute && !isPortfolioRoute && <Navbar />}
+      {!isAdminRoute && <Navbar />}
       <PageTransition>
         <main className="flex-grow relative z-10">
           <Routes>
@@ -36,9 +35,10 @@ function AppLayout() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/founder" element={<Navigate to="/portfolio" replace />} />
-            <Route path="/kabil" element={<Navigate to="/portfolio" replace />} />
+            <Route path="/ceo" element={<PortfolioPage />} />
+            <Route path="/portfolio" element={<Navigate to="/ceo" replace />} />
+            <Route path="/founder" element={<Navigate to="/ceo" replace />} />
+            <Route path="/kabil" element={<Navigate to="/ceo" replace />} />
             <Route path="/process" element={<ProcessPage />} />
             <Route path="/careers" element={<CareersPage />} />
             <Route path="/contact" element={<ContactPage />} />
@@ -55,7 +55,7 @@ function AppLayout() {
           </Routes>
         </main>
       </PageTransition>
-      {!isAdminRoute && !isPortfolioRoute && <Footer />}
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }

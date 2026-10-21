@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import './PortfolioPage.css';
 
@@ -628,20 +627,15 @@ export const PortfolioPage: React.FC = () => {
       {/* Background Three.js 3D WebGL Canvas */}
       <canvas ref={threeCanvasRef} className="pf-canvas" />
 
-      {/* Top Header / Navigation */}
-      <header className="pf-nav">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="pf-nav-logo" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-            <span>K.KABIL</span>
-          </Link>
-          <Link
-            to="/"
-            className="pf-back-badge"
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-          >
-            ← Alpha Encoders
-          </Link>
+      {/* Sub Navigation Strip Docked Under Main Navbar */}
+      <nav className="pf-nav" aria-label="Founder Profile Navigation">
+        <div className="flex items-center gap-3">
+          <span className="pf-nav-logo">
+            <span>KABIL K.</span>
+          </span>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 uppercase tracking-widest hidden sm:inline-block">
+            FOUNDER &amp; CEO
+          </span>
         </div>
 
         <ul className="pf-nav-links">
@@ -674,9 +668,9 @@ export const PortfolioPage: React.FC = () => {
 
         <div className="pf-nav-dot">
           <span className="pf-live" />
-          <span>AVAILABLE FOR HIRE</span>
+          <span>AVAILABLE TO WORK</span>
         </div>
-      </header>
+      </nav>
 
       {/* ═══ HERO SECTION ═══ */}
       <section className="pf-hero" id="home">
@@ -686,7 +680,7 @@ export const PortfolioPage: React.FC = () => {
 
         <div className="pf-hero-inner">
           <div>
-            <div className="pf-h-chip">Full Stack Developer & Founder</div>
+            <div className="pf-h-chip">Founder &amp; CEO · Alpha Encoders</div>
             <h1 className="pf-h-name">
               <span className="pf-grd">Kabil</span> <span className="pf-dim">K.</span>
             </h1>
@@ -695,7 +689,7 @@ export const PortfolioPage: React.FC = () => {
               <span className="pf-ty-cursor" />
             </p>
             <p className="pf-h-desc">
-              Versatile Software Engineer with deep full stack expertise and hands-on experience building scalable, production-grade web applications. Founder & Lead Solutions Architect at Alpha Encoders. CGPA 8.49 at Dr. Mahalingam College of Engineering &amp; Technology.
+              Founder &amp; CEO of Alpha Encoders. Versatile Software Engineer with deep full stack expertise and hands-on experience building scalable, production-grade web applications. Available to work on modern digital platforms, high-performance web systems, and technical leadership. CGPA 8.49 at Dr. Mahalingam College of Engineering &amp; Technology.
             </p>
             <div className="pf-h-btns">
               <a
@@ -1110,11 +1104,11 @@ export const PortfolioPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="pf-footer">
-        <p>© 2026 Kabil K. — Full Stack Developer &amp; Founder of Alpha Encoders</p>
+      {/* Portfolio Signature */}
+      <div className="pf-footer">
+        <p>© 2026 Kabil K. — Founder &amp; CEO of Alpha Encoders · Available to Work</p>
         <p>Pollachi, Tamil Nadu · India</p>
-      </footer>
+      </div>
     </div>
   );
 };

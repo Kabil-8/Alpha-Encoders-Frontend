@@ -239,9 +239,9 @@ export const AboutPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             {/* Left: Founder Bio */}
             <div className="lg:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-xs font-mono font-medium text-amber-300">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                FOUNDER &amp; LEAD SOLUTIONS ARCHITECT
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono font-medium text-emerald-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                FOUNDER &amp; CEO · AVAILABLE TO WORK
               </div>
 
               <h2 className="font-['Space_Grotesk'] text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -249,7 +249,7 @@ export const AboutPage: React.FC = () => {
               </h2>
 
               <p className="text-slate-300 text-base leading-relaxed">
-                Kabil founded Alpha Encoders to bridge the gap between heavy enterprise full-stack engineering and stunning, high-converting digital interfaces. With extensive experience across 3 software engineering internships (Averexis Solutions, BlueStock Fintech, Genhub Innovations) and over 10+ end-to-end production &amp; open-source architectures, he personally oversees architectural integrity on every project.
+                Kabil is the Founder &amp; CEO of Alpha Encoders, bringing deep engineering rigour and modern architectural standards to digital solutions. With extensive experience across 3 software engineering internships (Averexis Solutions, BlueStock Fintech, Genhub Innovations) and over 10+ end-to-end production &amp; open-source architectures, he personally leads project architecture and technical execution.
               </p>
 
               <div className="grid grid-cols-3 gap-3 pt-2 text-center">
@@ -270,10 +270,10 @@ export const AboutPage: React.FC = () => {
               <div className="pt-3 flex flex-wrap gap-4 items-center">
                 <Magnet magnetStrength={0.25}>
                   <Link
-                    to="/portfolio"
+                    to="/ceo"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#D4AF6A] to-[#2FE0C4] text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 hover:brightness-110 transition-all"
                   >
-                    <span>Explore 3D Cyberpunk Portfolio</span>
+                    <span>View Founder &amp; CEO Portfolio</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Magnet>

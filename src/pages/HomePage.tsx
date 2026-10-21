@@ -474,10 +474,10 @@ export const HomePage: React.FC = () => {
             <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-center">
               <Magnet magnetStrength={0.25}>
                 <Link
-                  to="/portfolio"
+                  to="/ceo"
                   className="w-full sm:w-auto text-center px-8 py-4 rounded-xl bg-gradient-to-r from-[#D4AF6A] to-[#2FE0C4] text-slate-950 font-bold text-base shadow-xl shadow-amber-500/20 hover:brightness-110 transition-all inline-flex items-center justify-center gap-2"
                 >
-                  <span>Launch 3D Portfolio</span>
+                  <span>Explore CEO &amp; Founder Profile</span>
                   <ArrowRight className="w-4 h-4 text-slate-950" />
                 </Link>
               </Magnet>
