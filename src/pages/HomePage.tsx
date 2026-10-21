@@ -18,7 +18,6 @@ import Hyperspeed from '../components/reactbits/Hyperspeed';
 // Interactive Animation & Slider Showcase Components
 import { LiveProjectsSlider } from '../components/shared/LiveProjectsSlider';
 import { TechStackMarquee } from '../components/shared/TechStackMarquee';
-import { TestimonialsSlider } from '../components/shared/TestimonialsSlider';
 import { AnimatedStatsCounter } from '../components/shared/AnimatedStatsCounter';
 
 import {
@@ -382,19 +381,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* SECTION: CLIENT TESTIMONIALS & VERIFIED REVIEWS SLIDER */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24 border-t border-slate-850 z-10">
-        <SectionHeading
-          eyebrow="Client Testimonials & Feedback"
-          title="Endorsed by Founders,"
-          titleHighlight="Trusted by Educators."
-          description="Hear directly from business owners, platform educators, and research partners who rely on Alpha Encoders engineering."
-        />
 
-        <div className="mt-14">
-          <TestimonialsSlider />
-        </div>
-      </section>
 
       {/* SECTION G: BUILT AROUND YOUR BUSINESS GOALS (HONEST COLLABORATION) */}
       <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24 border-t border-slate-850 z-10">

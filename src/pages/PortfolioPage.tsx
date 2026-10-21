@@ -14,74 +14,66 @@ interface Project {
 const projectsList: Project[] = [
   {
     num: 'PROJ-01',
-    title: 'RealTime Collaborative Workspace',
-    desc: 'MERN-based real-time collaborative workspace with secure JWT authentication, role-based access control, workspace and Kanban board management, and invitation-based collaboration via RESTful APIs.',
-    date: 'JUN – JUL 2026',
-    url: 'https://github.com/Kabil-8/Real-Time-Collaborative-Workspace',
-    category: 'fullstack'
+    title: 'TheCustomNest - Crochet E-Commerce Storefront',
+    desc: 'Built a crochet e-commerce storefront using React, TypeScript, Vite, Tailwind CSS, and Framer Motion, with a login-gated cart and wishlist, a role-protected admin dashboard, and order tracking.',
+    date: 'SEPT 2026 – OCT 2026',
+    url: 'https://www.thecustomnest.shop/',
+    category: 'frontend'
   },
   {
     num: 'PROJ-02',
-    title: 'FlowBoard',
-    desc: 'Full-stack MERN project management platform with JWT authentication, real-time WebSocket collaboration, Kanban task management, role-based team access, and Docker-based deployment.',
-    date: 'MAY – JUN 2026',
-    url: 'https://github.com/Kabil-8/FlowBoard-Project-Management-System-Frontend',
-    category: 'fullstack'
+    title: 'EduSphere - AI-Powered Student Lifecycle Management Ecosystem',
+    desc: 'Currently developing a modular AI/ML-driven student lifecycle platform unifying academic learning, coding assessments, and placement readiness, with an ML engine for performance prediction, risk detection, and personalized recommendations, plus an AI assistant for summarization and study planning.',
+    date: 'JUL 2026 – SEPT 2026',
+    url: 'https://github.com/Kabil-8',
+    category: 'ai'
   },
   {
     num: 'PROJ-03',
-    title: 'SpendWise AI',
-    desc: 'AI-powered startup spend audit platform built with Next.js 15, TypeScript, Tailwind CSS, Zustand, and Claude — delivering personalized cost-saving recommendations, lead capture, and shareable audit reports.',
-    date: 'MAY – JUN 2026',
-    url: 'https://github.com/Kabil-8/SpendWise-AI',
+    title: 'TalentAI ATS - Enterprise AI-Powered Applicant Tracking System',
+    desc: 'Architected a modular, enterprise-ready ATS with a Docker-orchestrated stack (MongoDB, Node.js/Express, Python FastAPI AI microservice, React 19), automating recruitment workflows and cutting recruiter workload by over 80%.',
+    date: 'JUN – JUL 2026',
+    url: 'https://github.com/Kabil-8',
     category: 'ai'
   },
   {
     num: 'PROJ-04',
-    title: 'EmoLearn',
-    desc: 'AI-powered emotion-based learning platform using the MERN stack, FastAPI, OpenCV, and DeepFace, enabling real-time emotion detection and adaptive content personalization with live analytics.',
+    title: 'EmoLearn - AI Powered Emotion based learning system',
+    desc: 'An AI-powered emotion-based learning platform using the MERN stack, FastAPI, OpenCV, and DeepFace, enabling real-time emotion detection and adaptive content personalization with secure JWT authentication and live analytics.',
     date: 'MAR – MAY 2026',
     url: 'https://github.com/Kabil-8/EmoLearn---Averexis',
     category: 'ai'
   },
   {
     num: 'PROJ-05',
-    title: 'Wifi-Based Attendance System',
-    desc: 'Router-based attendance system that automatically marks attendance by detecting devices on a network via MAC/IP identifiers, with optional QR-based backup verification.',
-    date: 'JAN – APR 2026',
-    url: 'https://github.com/Kabil-8/Wifi-Based-Attendance-System',
-    category: 'systems'
+    title: 'SpendWise AI',
+    desc: 'An AI-powered startup spend audit platform using Next.js 15, TypeScript, Tailwind CSS, Zustand, and Anthropic Claude, delivering personalized cost-saving recommendations, lead capture, and shareable audit reports.',
+    date: 'MAY – JUN 2026',
+    url: 'https://github.com/Kabil-8/SpendWise-AI',
+    category: 'ai'
   },
   {
     num: 'PROJ-06',
-    title: 'JavaLearn Platform',
-    desc: 'Structured Java learning platform with an improved UI, practice examples, and interactive learning features for students.',
-    date: 'SEP – NOV 2025',
-    url: 'https://github.com/Kabil-8/JavaLearn-Java-Learning-Platform',
-    category: 'frontend'
+    title: 'RealTime Collaborative Workspace',
+    desc: 'Developed a MERN-based real-time collaborative workspace application featuring secure JWT authentication, role-based access control, workspace and Kanban board management, invitation-based collaboration with RESTful APIs.',
+    date: 'JUN – JUL 2026',
+    url: 'https://github.com/Kabil-8/Real-Time-Collaborative-Workspace',
+    category: 'fullstack'
   },
   {
     num: 'PROJ-07',
-    title: 'HireFlow',
-    desc: 'Resume shortlisting platform that streamlines candidate screening, automates resume filtering, facilitates interview scheduling, and provides comprehensive admin controls.',
-    date: 'AUG – SEP 2025',
+    title: 'HireFlow - Resume Shortlisting Platform',
+    desc: 'Designed and implemented a Resume Shortlisting Platform to streamline candidate screening, automate resume filtering, facilitate interview scheduling, and provide comprehensive admin controls.',
+    date: 'AUG – SEPT 2025',
     url: 'https://github.com/Kabil-8/Resume-Tracker---Frontend',
     category: 'fullstack'
   },
   {
     num: 'PROJ-08',
-    title: 'LivePresence',
-    desc: 'HR management system handling employee attendance, leave, payroll, and profiles — centralising workforce data for easier monitoring and reporting.',
+    title: 'LivePresence - HR Management System',
+    desc: 'An HR solution to manage employee attendance, leave, payroll, and profiles. Centralizes workforce data for easier monitoring and reporting.',
     date: 'JUN – AUG 2025',
     url: 'https://github.com/Kabil-8/Gen-AI-HRMS-Frontend',
-    category: 'ai'
-  },
-  {
-    num: 'PROJ-09',
-    title: 'Student Profile Tracker',
-    desc: 'Student information system storing academic and personal records securely, enabling quick search, update, and profile management.',
-    date: 'JUN 2025',
-    url: 'https://github.com/Kabil-8/Student-Dashboard',
     category: 'systems'
   }
 ];
@@ -117,11 +109,11 @@ export const PortfolioPage: React.FC = () => {
   // 1. TYPING CAROUSEL
   useEffect(() => {
     const words = [
-      'Backend Developer',
-      'Frontend Developer',
-      'System Designer',
-      'REST API Architect',
-      'MERN Stack Engineer'
+      'AI/ML Full Stack Developer',
+      'Computer Vision & LLM Integrator',
+      'Backend Engineer & System Designer',
+      'REST API & Microservice Architect',
+      'MERN & FastAPI Specialist'
     ];
     let wi = 0;
     let ci = 0;
@@ -631,14 +623,19 @@ export const PortfolioPage: React.FC = () => {
       <nav className="pf-nav" aria-label="Founder Profile Navigation">
         <div className="flex items-center gap-3">
           <span className="pf-nav-logo">
-            <span>KABIL K.</span>
+            <span>KABIL</span>
           </span>
           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 uppercase tracking-widest hidden sm:inline-block">
-            FOUNDER &amp; CEO
+            AI/ML FULL STACK DEVELOPER
           </span>
         </div>
 
         <ul className="pf-nav-links">
+          <li>
+            <a href="#education" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+              Education
+            </a>
+          </li>
           <li>
             <a href="#skills" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
               Arsenal
@@ -657,6 +654,11 @@ export const PortfolioPage: React.FC = () => {
           <li>
             <a href="#certifications" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
               Credentials
+            </a>
+          </li>
+          <li>
+            <a href="#leadership" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+              Leadership
             </a>
           </li>
           <li>
@@ -680,25 +682,78 @@ export const PortfolioPage: React.FC = () => {
 
         <div className="pf-hero-inner">
           <div>
-            <div className="pf-h-chip">Founder &amp; CEO · Alpha Encoders</div>
+            <div className="pf-h-chip">AI/ML Full Stack Developer · Systems &amp; Applied AI</div>
             <h1 className="pf-h-name">
-              <span className="pf-grd">Kabil</span> <span className="pf-dim">K.</span>
+              <span className="pf-grd">Kabil</span>
             </h1>
             <p className="pf-h-type">
               <span>{typedText}</span>
               <span className="pf-ty-cursor" />
             </p>
             <p className="pf-h-desc">
-              Founder &amp; CEO of Alpha Encoders. Versatile Software Engineer with deep full stack expertise and hands-on experience building scalable, production-grade web applications. Available to work on modern digital platforms, high-performance web systems, and technical leadership. CGPA 8.49 at Dr. Mahalingam College of Engineering &amp; Technology.
+              Versatile Full Stack Developer with hands-on experience building AI/ML-powered web applications, integrating computer vision, predictive models, and LLM-driven features into production-grade systems. Seeking an AI/ML Full Stack Developer role to build intelligent, scalable products that combine strong system design with applied machine learning.
             </p>
-            <div className="pf-h-btns">
+
+            {/* Area of Interest */}
+            <div className="my-5 space-y-2">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-amber-400 font-semibold block">
+                Areas of Interest
+              </span>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {[
+                  'Full Stack Web Development',
+                  'Backend Development',
+                  'Scalable System Design',
+                  'REST API Development',
+                  'Machine Learning & AI Integration'
+                ].map((interest, i) => (
+                  <span
+                    key={i}
+                    className="px-2.5 py-1 rounded bg-[#0A1024] border border-cyan-500/30 text-cyan-300 font-mono text-[11px]"
+                  >
+                    • {interest}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Contact Info Strip */}
+            <div className="flex flex-wrap items-center gap-4 py-2 text-xs font-mono text-slate-300">
+              <a href="mailto:kabilk2023@gmail.com" className="hover:text-amber-300 transition-colors">
+                ✉ kabilk2023@gmail.com
+              </a>
+              <span className="text-slate-600">|</span>
+              <a href="tel:+918667452487" className="hover:text-amber-300 transition-colors">
+                ☎ +91 86674 52487
+              </a>
+              <span className="text-slate-600">|</span>
+              <a
+                href="https://linkedin.com/in/k-kabil-091233325/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-cyan-300 transition-colors"
+              >
+                in linkedin.com/in/k-kabil
+              </a>
+              <span className="text-slate-600">|</span>
+              <a
+                href="https://github.com/kabil-8"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-cyan-300 transition-colors"
+              >
+                ⌥ github.com/kabil-8
+              </a>
+            </div>
+
+            <div className="pf-h-btns pt-2">
               <a
                 href="#projects"
                 className="pf-btn-glow"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
-                View Projects
+                View 8 Projects
               </a>
               <a
                 href="#contact"
@@ -709,7 +764,7 @@ export const PortfolioPage: React.FC = () => {
                 Get in Touch
               </a>
               <a
-                href="mailto:kabilk2023@gmail.com?subject=Resume%20Inquiry%20-%20Kabil%20K."
+                href="mailto:kabilk2023@gmail.com?subject=Resume%20Inquiry%20-%20Kabil"
                 className="pf-btn-resume"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
@@ -735,17 +790,17 @@ export const PortfolioPage: React.FC = () => {
               </div>
 
               <div className="pf-card-avatar">
-                <div className="pf-avatar-ph">KK</div>
+                <div className="pf-avatar-ph">KABIL</div>
                 <div className="pf-avatar-ring" />
                 <div className="pf-avatar-ring2" />
               </div>
 
-              <div className="pf-card-name">KABIL K.</div>
-              <div className="pf-card-title">Full Stack Architect</div>
+              <div className="pf-card-name">KABIL</div>
+              <div className="pf-card-title">AI/ML Full Stack Engineer</div>
 
               <div className="pf-card-stats">
                 <div className="pf-cs">
-                  <div className="pf-cs-n">10+</div>
+                  <div className="pf-cs-n">08</div>
                   <div className="pf-cs-l">Projects</div>
                 </div>
                 <div className="pf-cs">
@@ -760,13 +815,69 @@ export const PortfolioPage: React.FC = () => {
 
               <div className="pf-card-tags">
                 <span className="pf-ctag">Java</span>
-                <span className="pf-ctag">React</span>
+                <span className="pf-ctag">Python</span>
+                <span className="pf-ctag">React.js</span>
+                <span className="pf-ctag">FastAPI</span>
                 <span className="pf-ctag">Node.js</span>
-                <span className="pf-ctag">TypeScript</span>
-                <span className="pf-ctag">MERN</span>
+                <span className="pf-ctag">OpenCV</span>
                 <span className="pf-ctag">MongoDB</span>
-                <span className="pf-ctag">MySQL</span>
+                <span className="pf-ctag">Docker</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ EDUCATION SECTION ═══ */}
+      <section className="pf-panel" id="education">
+        <div className="pf-slabel">01 — Foundation</div>
+        <h2 className="pf-stitle">
+          Academic <span className="pf-accent">Education</span>
+        </h2>
+
+        <div className="pf-edu-grid">
+          {/* Engineering */}
+          <div
+            className="pf-edu-card"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            <div className="pf-edu-period">EXPECTED GRADUATION: MAY 2027</div>
+            <div className="pf-edu-degree">Bachelor of Engineering in Computer Science</div>
+            <div className="pf-edu-school">Dr. Mahalingam College of Engineering and Technology, Pollachi</div>
+            <div className="pf-edu-score">
+              <span>CGPA:</span>
+              <b className="text-white">8.49</b>
+            </div>
+          </div>
+
+          {/* HSC */}
+          <div
+            className="pf-edu-card"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            <div className="pf-edu-period">COMPLETED: MARCH 2023</div>
+            <div className="pf-edu-degree">Higher School Certificate – CBSE</div>
+            <div className="pf-edu-school">Honey Bunch School, Pollachi</div>
+            <div className="pf-edu-score">
+              <span>Percentage:</span>
+              <b className="text-white">72.6%</b>
+            </div>
+          </div>
+
+          {/* SSLC */}
+          <div
+            className="pf-edu-card"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            <div className="pf-edu-period">COMPLETED: MARCH 2021</div>
+            <div className="pf-edu-degree">Secondary School Leaving Certificate – CBSE</div>
+            <div className="pf-edu-school">Honey Bunch School, Pollachi</div>
+            <div className="pf-edu-score">
+              <span>Percentage:</span>
+              <b className="text-white">90.0%</b>
             </div>
           </div>
         </div>
@@ -789,11 +900,14 @@ export const PortfolioPage: React.FC = () => {
             { icon: '⚛️', name: 'React.js' },
             { icon: '🟢', name: 'Node.js' },
             { icon: '🚂', name: 'Express.js' },
+            { icon: '⚡', name: 'FastAPI' },
+            { icon: '👁️', name: 'OpenCV' },
             { icon: '🍃', name: 'MongoDB' },
             { icon: '🗄️', name: 'MySQL' },
+            { icon: '⚡', name: 'Redis' },
+            { icon: '🐳', name: 'Docker' },
             { icon: '🔀', name: 'Git' },
-            { icon: '📮', name: 'Postman' },
-            { icon: '🎨', name: 'Figma' }
+            { icon: '📮', name: 'Postman' }
           ].map((skill, idx) => (
             <div
               key={idx}
@@ -810,15 +924,103 @@ export const PortfolioPage: React.FC = () => {
           ))}
         </div>
 
+        {/* Categorized Skills Breakdown Grid */}
+        <div className="pf-skill-cats">
+          {/* Programming Languages */}
+          <div className="pf-skill-cat">
+            <div className="pf-scat-title">
+              <span>☕</span> Programming Languages
+            </div>
+            <div className="pf-scat-pills">
+              {['Java', 'Python', 'C', 'C++'].map((s, i) => (
+                <span key={i} className="pf-spill accent">{s}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* AI/ML & Computer Vision */}
+          <div className="pf-skill-cat">
+            <div className="pf-scat-title">
+              <span>🤖</span> AI/ML &amp; Computer Vision
+            </div>
+            <div className="pf-scat-pills">
+              {[
+                'OpenCV',
+                'DeepFace',
+                'scikit-learn',
+                'Random Forest',
+                'CNN',
+                'Pandas',
+                'NumPy',
+                'LLM API Integration'
+              ].map((s, i) => (
+                <span key={i} className="pf-spill accent">{s}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Frameworks & Runtime */}
+          <div className="pf-skill-cat">
+            <div className="pf-scat-title">
+              <span>⚛️</span> Frameworks &amp; Runtime
+            </div>
+            <div className="pf-scat-pills">
+              {['React.js', 'Node.js', 'Express.js', 'FastAPI', 'HTML', 'CSS', 'JavaScript'].map((s, i) => (
+                <span key={i} className="pf-spill">{s}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Database Management */}
+          <div className="pf-skill-cat">
+            <div className="pf-scat-title">
+              <span>🗄️</span> Database Management
+            </div>
+            <div className="pf-scat-pills">
+              {['MySQL', 'MongoDB', 'Redis'].map((s, i) => (
+                <span key={i} className="pf-spill">{s}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Tools & DevOps */}
+          <div className="pf-skill-cat">
+            <div className="pf-scat-title">
+              <span>🛠️</span> Tools &amp; Technologies
+            </div>
+            <div className="pf-scat-pills">
+              {['Postman', 'Docker', 'Git', 'RESTful APIs'].map((s, i) => (
+                <span key={i} className="pf-spill">{s}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Soft Skills */}
+          <div className="pf-skill-cat">
+            <div className="pf-scat-title">
+              <span>🧠</span> Soft Skills
+            </div>
+            <div className="pf-scat-pills">
+              {[
+                'Strong Communication',
+                'Problem-Solving',
+                'Analytical and Critical Thinking'
+              ].map((s, i) => (
+                <span key={i} className="pf-spill accent">{s}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Skill Proficiency Bars */}
         <div className="pf-prof-wrap">
           {[
-            { label: 'Java Architecture', level: 92 },
-            { label: 'JavaScript / React.js / Vite', level: 90 },
-            { label: 'Node.js / Express / REST APIs', level: 88 },
-            { label: 'MongoDB / MySQL Database Design', level: 85 },
-            { label: 'Python / Systems Concurrency', level: 78 },
-            { label: 'System Design & Edge Architecture', level: 82 }
+            { label: 'AI/ML & Computer Vision Integration', level: 93 },
+            { label: 'Full Stack Web Development (MERN + FastAPI)', level: 95 },
+            { label: 'Backend Development & REST APIs', level: 92 },
+            { label: 'Scalable System Design', level: 88 },
+            { label: 'Database Architecture (MongoDB, MySQL, Redis)', level: 90 },
+            { label: 'Docker Containerization & Tooling', level: 86 }
           ].map((bar, idx) => (
             <div key={idx} className="pf-prof-row">
               <div className="pf-prof-head">
@@ -897,40 +1099,43 @@ export const PortfolioPage: React.FC = () => {
         </h2>
 
         <div className="pf-exp-grid">
+          {/* Averexis Solutions */}
           <div className="pf-ecard" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-            <div className="pf-e-period">FEB – MAY 2026</div>
+            <div className="pf-e-period">FEB 2026 – MAY 2026</div>
             <div>
               <div className="pf-e-company">Averexis Solutions</div>
               <div className="pf-e-role">Full Stack Developer Intern</div>
               <p className="pf-e-desc">
-                Built responsive full-stack web applications — designing RESTful APIs, implementing secure authentication, performing CRUD operations, and optimising relational database schemas for performance and scalability.
+                Built responsive full-stack web applications with designing RESTful APIs, implementing secure authentication, performing CRUD operations, and optimizing relational database schema for performance and scalability.
               </p>
             </div>
-            <div className="pf-e-badge">COMPLETED</div>
+            <div className="pf-e-badge pf-active">COMPLETED</div>
           </div>
 
+          {/* Genhub Innovations */}
           <div className="pf-ecard" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-            <div className="pf-e-period">FEB – MAR 2026</div>
-            <div>
-              <div className="pf-e-company">BlueStock Fintech</div>
-              <div className="pf-e-role">Software Development Intern</div>
-              <p className="pf-e-desc">
-                Implemented key features including user authentication and data visualization, debugged 15+ issues, and improved backend logic to reduce response time by 30%.
-              </p>
-            </div>
-            <div className="pf-e-badge">COMPLETED</div>
-          </div>
-
-          <div className="pf-ecard" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-            <div className="pf-e-period">JUN – SEP 2025</div>
+            <div className="pf-e-period">JUN 2025 – SEPT 2025</div>
             <div>
               <div className="pf-e-company">Genhub Innovations</div>
               <div className="pf-e-role">Software Developer Intern</div>
               <p className="pf-e-desc">
-                Contributed to 5 scalable web solutions and built 10+ RESTful APIs, enhancing application performance and user experience — resulting in a 30% reduction in load times.
+                Contributed to the development of 5 scalable web solutions and built 10+ RESTful APIs, enhancing application performance and user experience, resulting in a 30% reduction in load times.
               </p>
             </div>
-            <div className="pf-e-badge">COMPLETED</div>
+            <div className="pf-e-badge pf-active">COMPLETED</div>
+          </div>
+
+          {/* DataConquest */}
+          <div className="pf-ecard" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <div className="pf-e-period">INTERNSHIP</div>
+            <div>
+              <div className="pf-e-company">DataConquest</div>
+              <div className="pf-e-role">Data Analyst Intern</div>
+              <p className="pf-e-desc">
+                Collected, cleaned, and analyzed datasets to identify trends, and prepared reports and visualizations for real-world projects. Collaborated with team members within professional workflows and business requirements, strengthening technical, analytical, communication, and teamwork skills.
+              </p>
+            </div>
+            <div className="pf-e-badge pf-active">COMPLETED</div>
           </div>
         </div>
       </section>
@@ -944,12 +1149,31 @@ export const PortfolioPage: React.FC = () => {
 
         <div className="pf-cert-grid">
           {[
-            { num: '01', name: 'Environment & Development, Environmental Impact Assessment', by: 'NPTEL' },
-            { num: '02', name: 'Psychology of Learning', by: 'NPTEL' },
-            { num: '03', name: 'Cyber Security Fundamentals', by: 'Cisco Networking Academy' },
-            { num: '04', name: 'MongoDB Introductory Credential', by: 'MongoDB University' },
-            { num: '05', name: 'Java Certification', by: 'Oracle' },
-            { num: '06', name: 'C, C++ & Python Certified', by: 'Kalvi Institute' }
+            {
+              num: '01',
+              name: 'Environment & Development, Environmental Impact Assessment, and Psychology of Learning',
+              by: 'NPTEL'
+            },
+            {
+              num: '02',
+              name: 'Cyber Security Fundamentals Certification',
+              by: 'Cisco Networking Academy'
+            },
+            {
+              num: '03',
+              name: 'Introductory Level MongoDB Credential',
+              by: 'MongoDB University'
+            },
+            {
+              num: '04',
+              name: 'Certified in C, C++, and Python & Oracle Certification in Java',
+              by: 'Kalvi Institute & Oracle'
+            },
+            {
+              num: '05',
+              name: 'Completed 8 Hindi Exams',
+              by: 'DBHPS (Dakshina Bharat Hindi Prachar Sabha)'
+            }
           ].map((cert, idx) => (
             <div
               key={idx}
@@ -965,18 +1189,106 @@ export const PortfolioPage: React.FC = () => {
         </div>
       </section>
 
+      {/* ═══ LEADERSHIP, ACHIEVEMENTS & ACTIVITIES ═══ */}
+      <section className="pf-panel" id="leadership">
+        <div className="pf-slabel">06 — Impact &amp; Community</div>
+        <h2 className="pf-stitle">
+          Leadership &amp; <span className="pf-accent">Achievements</span>
+        </h2>
+
+        <div className="pf-lead-grid">
+          {/* President - DigiFlash */}
+          <div className="pf-lead-card" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <div className="pf-lead-role">President</div>
+            <div className="pf-lead-org">CSE Association “DigiFlash”</div>
+            <p className="pf-lead-desc">
+              Leading the association by setting strategic goals, overseeing department activities, and driving extracurricular engagement across computer science students.
+            </p>
+          </div>
+
+          {/* Vice President - DigiFlash */}
+          <div className="pf-lead-card" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <div className="pf-lead-role">Vice President</div>
+            <div className="pf-lead-org">CSE Association “DigiFlash”</div>
+            <p className="pf-lead-desc">
+              Led student initiatives, coordinated technical and cultural committees, and represented the student association in faculty alignment meetings.
+            </p>
+          </div>
+
+          {/* Event Coordinator */}
+          <div className="pf-lead-card" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <div className="pf-lead-role">Event Coordinator</div>
+            <div className="pf-lead-org">CSE Association “DigiFlash”</div>
+            <p className="pf-lead-desc">
+              Planned and executed departmental symposiums and technical events while managing volunteers, venue logistics, technical registrations, and judging criteria.
+            </p>
+          </div>
+
+          {/* Placement Coordinator */}
+          <div className="pf-lead-card" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <div className="pf-lead-role">Placement Coordinator</div>
+            <div className="pf-lead-org">Department of Computer Science &amp; Engineering</div>
+            <p className="pf-lead-desc">
+              Liaised between students and enterprise recruiters, organized campus placement drives, and managed technical interview schedules.
+            </p>
+          </div>
+
+          {/* Industrial Visit Coordinator */}
+          <div className="pf-lead-card" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <div className="pf-lead-role">Industrial Visit (IV) Coordinator</div>
+            <div className="pf-lead-org">Academic &amp; Corporate Relations</div>
+            <p className="pf-lead-desc">
+              Organized enterprise company visits by coordinating executive approvals, student travel logistics, and technical interaction sessions.
+            </p>
+          </div>
+
+          {/* Team Leadership & Achievements */}
+          <div className="pf-lead-card" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <div className="pf-lead-role">Key Achievements &amp; Projects Lead</div>
+            <div className="pf-lead-org">Technical Symposiums &amp; Systems</div>
+            <p className="pf-lead-desc">
+              Organized multiple symposiums and technical events as Vice President and Event Coordinator over 2 years. Led multiple engineering projects as a Team Lead, managing team coordination and ensuring on-schedule delivery.
+            </p>
+          </div>
+        </div>
+
+        {/* Languages and Hobbies Quick Strip */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[1100px] w-full mt-6 text-left">
+          <div className="p-5 rounded-xl bg-[#0E1420] border border-[var(--pf-gborder)]">
+            <span className="font-['Orbitron'] text-xs uppercase tracking-wider text-amber-400 block mb-2">
+              🌐 Languages Known
+            </span>
+            <div className="flex flex-wrap gap-2 text-xs font-mono text-slate-300">
+              <span className="px-2.5 py-1 rounded bg-black/40 border border-slate-800 text-cyan-300">Tamil</span>
+              <span className="px-2.5 py-1 rounded bg-black/40 border border-slate-800 text-cyan-300">English</span>
+              <span className="px-2.5 py-1 rounded bg-black/40 border border-slate-800 text-cyan-300">Hindi [Read &amp; Write]</span>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-xl bg-[#0E1420] border border-[var(--pf-gborder)]">
+            <span className="font-['Orbitron'] text-xs uppercase tracking-wider text-amber-400 block mb-2">
+              🏏 Hobbies &amp; Interests
+            </span>
+            <div className="flex flex-wrap gap-2 text-xs font-mono text-slate-300">
+              <span className="px-2.5 py-1 rounded bg-black/40 border border-slate-800 text-amber-300">Playing Cricket</span>
+              <span className="px-2.5 py-1 rounded bg-black/40 border border-slate-800 text-amber-300">Fitness &amp; Outdoor Activities</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ CONTACT SECTION ═══ */}
       <section className="pf-panel" id="contact">
         <div className="pf-contact-inner">
           <div>
-            <div className="pf-slabel">06 — Connect</div>
+            <div className="pf-slabel">07 — Connect</div>
             <h2 className="pf-contact-big">
               Let's<br />
               <span className="pf-glitch">Build</span>
               Together.
             </h2>
             <p className="pf-contact-note">
-              Open to full stack developer roles, high-impact enterprise projects, and technical collaborations. Founder & Lead Solutions Architect at Alpha Encoders. Based in Pollachi, Tamil Nadu.
+              Open to AI/ML Full Stack Developer roles, scalable system design, and technical collaborations. Founder &amp; CEO at Alpha Encoders. Based in Pollachi, Tamil Nadu.
             </p>
 
             <form className="pf-cform" onSubmit={handleContactSubmit} noValidate>
@@ -1106,7 +1418,7 @@ export const PortfolioPage: React.FC = () => {
 
       {/* Portfolio Signature */}
       <div className="pf-footer">
-        <p>© 2026 Kabil K. — Founder &amp; CEO of Alpha Encoders · Available to Work</p>
+        <p>© 2026 KABIL — AI/ML Full Stack Developer · Founder &amp; CEO of Alpha Encoders · Available to Work</p>
         <p>Pollachi, Tamil Nadu · India</p>
       </div>
     </div>
