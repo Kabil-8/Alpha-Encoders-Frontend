@@ -36,7 +36,8 @@ export const ContactPage: React.FC = () => {
   const [company, setCompany] = useState('');
   const [websiteType, setWebsiteType] = useState('Business website');
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(['Contact form', 'SEO']);
-  const [estimatedBudget, setEstimatedBudget] = useState('$1,000 – $2,500');
+  const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
+  const [estimatedBudget, setEstimatedBudget] = useState('₹15,000 – ₹35,000');
   const [completionTimeline, setCompletionTimeline] = useState('1-2 months');
   const [description, setDescription] = useState('');
   const [honeypot, setHoneypot] = useState(''); // Anti-spam trap
@@ -100,7 +101,16 @@ export const ContactPage: React.FC = () => {
     'Other'
   ];
 
-  const budgetOptions = [
+  const inrBudgetOptions = [
+    'Under ₹15,000',
+    '₹15,000 – ₹35,000',
+    '₹35,000 – ₹75,000',
+    '₹75,000 – ₹1,50,000',
+    '₹1,50,000+',
+    'To be determined with developer'
+  ];
+
+  const usdBudgetOptions = [
     'Under $1,000',
     '$1,000 – $2,500',
     '$2,500 – $5,000',
@@ -108,6 +118,15 @@ export const ContactPage: React.FC = () => {
     '$10,000+',
     'To be determined with developer'
   ];
+
+  const handleCurrencyChange = (newCurrency: 'INR' | 'USD') => {
+    setCurrency(newCurrency);
+    if (newCurrency === 'INR') {
+      setEstimatedBudget('₹15,000 – ₹35,000');
+    } else {
+      setEstimatedBudget('$1,000 – $2,500');
+    }
+  };
 
   const timelineOptions = [
     'Within 2-4 weeks',
@@ -179,6 +198,7 @@ export const ContactPage: React.FC = () => {
           websiteType,
           requiredFeatures: selectedFeatures,
           estimatedBudget,
+          currency,
           completionTimeline,
           description,
           honeypot,
@@ -216,6 +236,8 @@ export const ContactPage: React.FC = () => {
     setPhone('');
     setCompany('');
     setDescription('');
+    setCurrency('INR');
+    setEstimatedBudget('₹15,000 – ₹35,000');
     setErrors({});
   };
 
@@ -489,19 +511,50 @@ export const ContactPage: React.FC = () => {
                     {/* Budget & Timeline */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                       <div>
-                        <label
-                          htmlFor="budget"
-                          className="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-1.5"
-                        >
-                          Estimated Budget <span className="text-slate-500 font-normal">(Optional)</span>
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label
+                            htmlFor="budget"
+                            className="block text-xs font-mono text-slate-300 uppercase tracking-wider"
+                          >
+                            Estimated Budget <span className="text-slate-500 font-normal">(Optional)</span>
+                          </label>
+
+                          {/* Currency Switcher (Default: Rupees INR) */}
+                          <div className="inline-flex items-center p-0.5 rounded-lg bg-[#0A1024] border border-slate-800 text-[11px] font-mono">
+                            <button
+                              type="button"
+                              onClick={() => handleCurrencyChange('INR')}
+                              className={`px-2 py-0.5 rounded transition-all ${
+                                currency === 'INR'
+                                  ? 'bg-blue-600 text-white font-bold shadow-sm'
+                                  : 'text-slate-400 hover:text-white'
+                              }`}
+                              title="Default: Indian Rupees (₹)"
+                            >
+                              ₹ INR
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCurrencyChange('USD')}
+                              className={`px-2 py-0.5 rounded transition-all ${
+                                currency === 'USD'
+                                  ? 'bg-blue-600 text-white font-bold shadow-sm'
+                                  : 'text-slate-400 hover:text-white'
+                              }`}
+                              title="US Dollar ($)"
+                            >
+                              $ USD
+                            </button>
+                          </div>
+                        </div>
+
                         <select
                           id="budget"
                           value={estimatedBudget}
                           onChange={(e) => setEstimatedBudget(e.target.value)}
                           className="w-full px-4 py-3 rounded-xl bg-[#050816] text-white border border-slate-800 focus:border-blue-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                         >
-                          {budgetOptions.map((b) => (
+                          {(currency === 'INR' ? inrBudgetOptions : usdBudgetOptions).map((b) => (
                             <option key={b} value={b} className="bg-[#050816] text-white">
                               {b}
                             </option>
