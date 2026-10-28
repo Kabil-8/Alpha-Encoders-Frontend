@@ -1,97 +1,222 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const Preloader: React.FC = () => {
+export const Preloader = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState('INITIALIZING STUDIO CORE...');
+  const [phase, setPhase] = useState(0);
+
+  const phases = [
+    'INITIALIZING...',
+    'LOADING ASSETS...',
+    'ALMOST READY...',
+    'WELCOME',
+  ];
 
   useEffect(() => {
-    // Check if user already saw the loader in this tab session
-    const hasLoaded = sessionStorage.getItem('ae_loaded');
-    if (hasLoaded) {
+    // Only show preloader once per browser session
+    if (sessionStorage.getItem('ae_loaded')) {
       setLoading(false);
       return;
     }
 
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setLoading(false);
-            sessionStorage.setItem('ae_loaded', 'true');
-          }, 300);
-          return 100;
-        }
+    let current = 0;
+    const tick = setInterval(() => {
+      current += Math.random() * 4 + 2; // random increment 2–6
+      if (current >= 100) {
+        current = 100;
+        clearInterval(tick);
+        setProgress(100);
+        setPhase(3);
+        setTimeout(() => {
+          setLoading(false);
+          sessionStorage.setItem('ae_loaded', 'true');
+        }, 600);
+        return;
+      }
+      setProgress(Math.floor(current));
+      if (current >= 65) setPhase(2);
+      else if (current >= 30) setPhase(1);
+    }, 35);
 
-        if (prev === 30) setStatusText('CALIBRATING DESIGN SYSTEM...');
-        if (prev === 65) setStatusText('ESTABLISHING REACTBITS MOTION...');
-        if (prev === 90) setStatusText('EXPERIENCE READY');
-
-        return prev + 5;
-      });
-    }, 40);
-
-    return () => clearInterval(interval);
+    return () => clearInterval(tick);
   }, []);
 
   return (
     <AnimatePresence>
       {loading && (
         <motion.div
+          key="preloader"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[9999] bg-[#050816] flex flex-col items-center justify-center p-4 overflow-hidden select-none"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden select-none"
+          style={{ background: '#050816' }}
+          aria-label="Loading Alpha Encoders"
+          role="status"
         >
-          {/* Ambient Radial Illumination */}
-          <div className="absolute w-[450px] h-[450px] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none animate-pulse-glow" />
+          {/* ── Background layers ─────────────────────────────── */}
 
-          {/* Genuine Alpha Encoders Emblem Visual with Orbital Ring */}
-          <div className="relative mb-8 flex items-center justify-center">
-            {/* Pulsing orbital rings */}
-            <div className="absolute w-36 h-36 rounded-full border border-blue-500/20 border-dashed animate-[spin_10s_linear_infinite]" />
-            <div className="absolute w-44 h-44 rounded-full border border-cyan-400/25 animate-[spin_15s_linear_infinite_reverse]" />
+          {/* Subtle grid */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-30"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px)',
+              backgroundSize: '40px 40px',
+            }}
+          />
 
-            {/* Glowing Logo Container */}
-            <motion.div
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="relative w-24 h-24 rounded-2xl bg-[#0A1024] border border-blue-500/50 p-3 shadow-[0_0_35px_rgba(37,99,255,0.4)] flex items-center justify-center backdrop-blur-xl"
-            >
-              <img
-                src="/alpha-encoders-icon-dark.png"
-                alt="Alpha Encoders"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]"
-              />
-            </motion.div>
-          </div>
+          {/* Ambient blue glow — top-center */}
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[420px] pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse at 50% 0%, rgba(37,99,255,0.18) 0%, transparent 70%)',
+            }}
+          />
 
-          {/* Wordmark */}
-          <div className="text-center mb-6">
-            <h2 className="font-['Space_Grotesk'] text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-1.5">
-              ALPHA <span className="text-cyan-400">ENCODERS</span>
-            </h2>
-            <span className="text-[10px] tracking-[0.25em] text-slate-400 font-mono uppercase block mt-0.5">
-              DIGITAL ENGINEERING STUDIO
-            </span>
-          </div>
+          {/* Ambient cyan glow — bottom */}
+          <div
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse at 50% 100%, rgba(34,211,238,0.1) 0%, transparent 70%)',
+            }}
+          />
 
-          {/* High-Tech Progress Meter */}
-          <div className="w-64 max-w-full space-y-2">
-            <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+          {/* ── Logo block ────────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="relative flex flex-col items-center gap-6 mb-12"
+          >
+            {/* Icon + outer rings */}
+            <div className="relative flex items-center justify-center">
+              {/* Outer ring — slow spin */}
               <motion.div
-                className="h-full bg-gradient-to-r from-[#2563FF] via-[#22D3EE] to-[#3B82F6]"
-                style={{ width: `${progress}%` }}
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 14, ease: 'linear' }}
+                className="absolute w-[130px] h-[130px] rounded-full"
+                style={{
+                  border: '1px dashed rgba(37,99,255,0.25)',
+                }}
+              />
+              {/* Inner ring — counter-spin */}
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ repeat: Infinity, duration: 9, ease: 'linear' }}
+                className="absolute w-[100px] h-[100px] rounded-full"
+                style={{
+                  border: '1px solid rgba(34,211,238,0.18)',
+                }}
+              />
+
+              {/* Icon container */}
+              <motion.div
+                animate={{
+                  boxShadow: [
+                    '0 0 20px rgba(37,99,255,0.3), inset 0 0 12px rgba(34,211,238,0.08)',
+                    '0 0 40px rgba(37,99,255,0.55), inset 0 0 20px rgba(34,211,238,0.18)',
+                    '0 0 20px rgba(37,99,255,0.3), inset 0 0 12px rgba(34,211,238,0.08)',
+                  ],
+                }}
+                transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+                className="relative w-[72px] h-[72px] rounded-2xl flex items-center justify-center"
+                style={{
+                  background: '#0A1024',
+                  border: '1px solid rgba(37,99,255,0.45)',
+                }}
+              >
+                <img
+                  src="/alpha-encoders-icon-dark.png"
+                  alt="Alpha Encoders icon"
+                  className="w-[52px] h-[52px] object-contain"
+                  style={{ filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.5))' }}
+                />
+              </motion.div>
+            </div>
+
+            {/* Full logo wordmark */}
+            <div className="flex flex-col items-center gap-1.5">
+              <img
+                src="/alpha-encoders-logo-dark.png"
+                alt="Alpha Encoders"
+                className="h-9 object-contain"
+                style={{ filter: 'drop-shadow(0 0 10px rgba(37,99,255,0.35))' }}
+              />
+              <span
+                className="font-mono text-[10px] tracking-[0.3em] uppercase"
+                style={{ color: '#A5B4CF' }}
+              >
+                Digital Engineering Studio
+              </span>
+            </div>
+          </motion.div>
+
+          {/* ── Progress bar ──────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25, ease: 'easeOut' }}
+            className="flex flex-col items-center gap-3 w-72 max-w-[90vw]"
+          >
+            {/* Track */}
+            <div
+              className="w-full h-[3px] rounded-full overflow-hidden"
+              style={{ background: 'rgba(148,163,184,0.1)', border: '0 none' }}
+            >
+              <motion.div
+                className="h-full rounded-full"
+                style={{
+                  width: `${progress}%`,
+                  background: 'linear-gradient(90deg, #2563FF 0%, #22D3EE 100%)',
+                  boxShadow: '0 0 8px rgba(34,211,238,0.6)',
+                  transition: 'width 0.12s linear',
+                }}
               />
             </div>
-            <div className="flex items-center justify-between text-[11px] font-mono">
-              <span className="text-cyan-400">{statusText}</span>
-              <span className="text-slate-400 font-semibold">{progress}%</span>
+
+            {/* Status row */}
+            <div className="flex items-center justify-between w-full">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={phase}
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 6 }}
+                  transition={{ duration: 0.25 }}
+                  className="font-mono text-[11px] tracking-[0.15em]"
+                  style={{ color: '#22D3EE' }}
+                >
+                  {phases[phase]}
+                </motion.span>
+              </AnimatePresence>
+              <span
+                className="font-mono text-[11px] tabular-nums"
+                style={{ color: '#64748B' }}
+              >
+                {progress}%
+              </span>
             </div>
-          </div>
+          </motion.div>
+
+          {/* ── Corner decorations ────────────────────────────── */}
+          {(['top-4 left-4', 'top-4 right-4', 'bottom-4 left-4', 'bottom-4 right-4'] as const).map(
+            (pos) => (
+              <div
+                key={pos}
+                className={`absolute ${pos} w-5 h-5 pointer-events-none`}
+                style={{
+                  borderTop: pos.includes('top') ? '1px solid rgba(37,99,255,0.3)' : 'none',
+                  borderBottom: pos.includes('bottom') ? '1px solid rgba(37,99,255,0.3)' : 'none',
+                  borderLeft: pos.includes('left') ? '1px solid rgba(37,99,255,0.3)' : 'none',
+                  borderRight: pos.includes('right') ? '1px solid rgba(37,99,255,0.3)' : 'none',
+                }}
+              />
+            )
+          )}
         </motion.div>
       )}
     </AnimatePresence>
