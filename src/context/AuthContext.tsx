@@ -72,15 +72,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [googleClientId, setGoogleClientIdState] = useState<string>(() => {
-    return (
-      (import.meta.env.VITE_GOOGLE_CLIENT_ID as string) ||
-      localStorage.getItem('ae_google_client_id') ||
-      ''
-    );
+    const envId = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string) || '';
+    const localId = localStorage.getItem('ae_google_client_id') || '';
+    const active = (envId || localId).trim();
+    // GOCSPX is a Client Secret, not a Client ID. Ignore it if incorrectly passed.
+    if (active.startsWith('GOCSPX-')) {
+      localStorage.removeItem('ae_google_client_id');
+      return '';
+    }
+    return active;
   });
 
   const setGoogleClientId = useCallback(async (newId: string) => {
     const trimmed = newId.trim();
+    if (trimmed.startsWith('GOCSPX-')) {
+      console.warn('Cannot set Client Secret as Client ID');
+      return;
+    }
     setGoogleClientIdState(trimmed);
     localStorage.setItem('ae_google_client_id', trimmed);
     try {
