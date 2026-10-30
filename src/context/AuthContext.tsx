@@ -32,6 +32,7 @@ interface AuthContextType {
   }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   googleClientId: string;
+  setGoogleClientId: (id: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -70,8 +71,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const googleClientId =
-    (import.meta.env.VITE_GOOGLE_CLIENT_ID as string) || '';
+  const [googleClientId, setGoogleClientIdState] = useState<string>(() => {
+    return (
+      (import.meta.env.VITE_GOOGLE_CLIENT_ID as string) ||
+      localStorage.getItem('ae_google_client_id') ||
+      ''
+    );
+  });
+
+  const setGoogleClientId = useCallback(async (newId: string) => {
+    const trimmed = newId.trim();
+    setGoogleClientIdState(trimmed);
+    localStorage.setItem('ae_google_client_id', trimmed);
+    try {
+      await fetch(apiUrl('/api/config/google-client-id'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: trimmed }),
+      });
+    } catch {
+      // Safe local fallback
+    }
+  }, []);
 
   const openAuthModal = useCallback(() => setIsAuthModalOpen(true), []);
   const closeAuthModal = useCallback(() => setIsAuthModalOpen(false), []);
@@ -221,6 +242,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithGoogle,
         logout,
         googleClientId,
+        setGoogleClientId,
       }}
     >
       {children}
