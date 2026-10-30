@@ -33,7 +33,13 @@ import {
   Crown,
   Table,
   LayoutGrid,
-  UserCheck
+  UserCheck,
+  AlertCircle,
+  Receipt,
+  ZoomIn,
+  Check,
+  Image as ImageIcon,
+  Copy
 } from 'lucide-react';
 import { SpotlightCard } from '../../components/reactbits/SpotlightCard';
 import { Modal } from '../../components/shared/Modal';
@@ -59,6 +65,17 @@ export interface InternshipApplicationData {
   startDate: string;
   status: 'pending' | 'reviewing' | 'shortlisted' | 'interview' | 'accepted' | 'rejected';
   adminNotes?: string;
+  feeType?: 'free' | 'paid';
+  feeAmount?: number;
+  slotNumber?: number;
+  isFirst50?: boolean;
+  paymentScreenshot?: string;
+  transactionId?: string;
+  paymentStatus?: 'free_granted' | 'pending' | 'verified' | 'rejected';
+  loiIssued?: boolean;
+  certificateIssued?: boolean;
+  lorIssued?: boolean;
+  acceptedAt?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -186,6 +203,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   const [internshipDomainFilter, setInternshipDomainFilter] = useState('all');
   const [internshipStatusFilter, setInternshipStatusFilter] = useState('all');
+  const [internshipFeeFilter, setInternshipFeeFilter] = useState<'all' | 'free' | 'paid_pending' | 'paid_verified'>('all');
   const [internshipSearch, setInternshipSearch] = useState('');
 
   // Modals & Detail Drawers
@@ -195,6 +213,15 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedInternshipDetail, setSelectedInternshipDetail] = useState<InternshipApplicationData | null>(null);
   const [internshipNoteEdit, setInternshipNoteEdit] = useState('');
   const [isSavingInternshipNote, setIsSavingInternshipNote] = useState(false);
+  const [previewScreenshot, setPreviewScreenshot] = useState<{
+    url: string;
+    candidateName: string;
+    utr?: string;
+    amount?: number;
+    id: string;
+    app: InternshipApplicationData;
+  } | null>(null);
+  const [copiedUtr, setCopiedUtr] = useState(false);
 
   // Project Add / Edit Modal State
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -698,6 +725,55 @@ export const AdminDashboardPage: React.FC = () => {
   // -------------------------------------------------------------------
   // INTERNSHIP ACTIONS
   // -------------------------------------------------------------------
+  const handleVerifyAndAcceptInternship = async (app: InternshipApplicationData) => {
+    try {
+      const res = await fetch(apiUrl(`/api/internships/${app.id}/status`), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'accepted',
+          paymentStatus: app.feeType === 'paid' ? 'verified' : 'free_granted',
+          loiIssued: true,
+          adminNotes: app.adminNotes
+            ? `${app.adminNotes} • Verified payment & granted LOI on ${new Date().toLocaleDateString()}`
+            : `Payment verified & LOI granted on ${new Date().toLocaleDateString()}`
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setInternships((prev) =>
+          prev.map((item) =>
+            item.id === app.id
+              ? {
+                  ...item,
+                  status: 'accepted',
+                  paymentStatus: app.feeType === 'paid' ? 'verified' : 'free_granted',
+                  loiIssued: true
+                }
+              : item
+          )
+        );
+        if (selectedInternshipDetail && selectedInternshipDetail.id === app.id) {
+          setSelectedInternshipDetail((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  status: 'accepted',
+                  paymentStatus: app.feeType === 'paid' ? 'verified' : 'free_granted',
+                  loiIssued: true
+                }
+              : null
+          );
+        }
+        if (previewScreenshot && previewScreenshot.id === app.id) {
+          setPreviewScreenshot(null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to verify & accept candidate', err);
+    }
+  };
+
   const handleUpdateInternshipStatus = async (id: string, newStatus: string) => {
     try {
       const res = await fetch(apiUrl(`/api/internships/${id}/status`), {
@@ -803,14 +879,23 @@ export const AdminDashboardPage: React.FC = () => {
     const matchesDomain =
       internshipDomainFilter === 'all' || item.domain.toLowerCase() === internshipDomainFilter.toLowerCase();
     const matchesStatus = internshipStatusFilter === 'all' || item.status === internshipStatusFilter;
+    const matchesFee =
+      internshipFeeFilter === 'all'
+        ? true
+        : internshipFeeFilter === 'free'
+        ? item.feeType === 'free' || item.isFirst50 === true
+        : internshipFeeFilter === 'paid_pending'
+        ? item.feeType === 'paid' && item.paymentStatus !== 'verified'
+        : item.feeType === 'paid' && item.paymentStatus === 'verified';
     const matchesSearch =
       internshipSearch === '' ||
       item.fullName.toLowerCase().includes(internshipSearch.toLowerCase()) ||
       item.email.toLowerCase().includes(internshipSearch.toLowerCase()) ||
       item.college.toLowerCase().includes(internshipSearch.toLowerCase()) ||
       item.domain.toLowerCase().includes(internshipSearch.toLowerCase()) ||
+      (item.transactionId && item.transactionId.toLowerCase().includes(internshipSearch.toLowerCase())) ||
       (item.skills && item.skills.some((s) => s.toLowerCase().includes(internshipSearch.toLowerCase())));
-    return matchesDomain && matchesStatus && matchesSearch;
+    return matchesDomain && matchesStatus && matchesFee && matchesSearch;
   });
 
   return (
@@ -2022,6 +2107,18 @@ export const AdminDashboardPage: React.FC = () => {
                   <option value="Digital Growth, SEO & Product Strategy">Digital SEO & Growth</option>
                 </select>
 
+                {/* Fee Type Filter */}
+                <select
+                  value={internshipFeeFilter}
+                  onChange={(e) => setInternshipFeeFilter(e.target.value as any)}
+                  className="px-3 py-1.5 rounded-xl bg-[#101A31] border border-slate-700/60 text-xs text-emerald-300 font-mono focus:outline-none"
+                >
+                  <option value="all">All Admission Types</option>
+                  <option value="free">🎉 Free Early-Bird (1st 50)</option>
+                  <option value="paid_pending">💳 Paid (₹150) - Pending Proof</option>
+                  <option value="paid_verified">✅ Paid (₹150) - Verified</option>
+                </select>
+
                 {/* Status Filter Buttons */}
                 <div className="hidden sm:flex items-center gap-1 bg-[#101A31] p-1 rounded-xl border border-slate-800">
                   {['all', 'pending', 'reviewing', 'shortlisted', 'accepted', 'rejected'].map((st) => (
@@ -2067,28 +2164,55 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
 
             {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs font-mono">
               <div className="p-3 rounded-xl bg-[#0A1024] border border-slate-800 flex items-center justify-between">
-                <span className="text-slate-400">Total Applicants</span>
-                <span className="font-bold text-white text-sm">{internships.length}</span>
+                <div>
+                  <div className="text-slate-400 text-[10px]">Total Applicants</div>
+                  <div className="font-bold text-white text-base mt-0.5">{internships.length}</div>
+                </div>
+                <GraduationCap className="w-5 h-5 text-cyan-400 opacity-60" />
               </div>
-              <div className="p-3 rounded-xl bg-[#0A1024] border border-amber-500/20 flex items-center justify-between">
-                <span className="text-amber-300">Pending Review</span>
-                <span className="font-bold text-amber-300 text-sm">
-                  {internships.filter((i) => i.status === 'pending').length}
-                </span>
+
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-emerald-500/30 flex items-center justify-between">
+                <div>
+                  <div className="text-emerald-300 text-[10px]">Free 50 Slots</div>
+                  <div className="font-bold text-emerald-300 text-base mt-0.5">
+                    {internships.filter((i) => i.feeType === 'free' || i.isFirst50).length} / 50
+                  </div>
+                </div>
+                <div className="text-[10px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded font-mono">
+                  {Math.max(0, 50 - internships.filter((i) => i.feeType === 'free' || i.isFirst50).length)} Left
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0A1024] border border-purple-500/20 flex items-center justify-between">
-                <span className="text-purple-300">Shortlisted / Interview</span>
-                <span className="font-bold text-purple-300 text-sm">
-                  {internships.filter((i) => i.status === 'shortlisted' || i.status === 'interview').length}
-                </span>
+
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-cyan-500/30 flex items-center justify-between">
+                <div>
+                  <div className="text-cyan-300 text-[10px]">Paid Enrollments (₹150)</div>
+                  <div className="font-bold text-cyan-300 text-base mt-0.5">
+                    {internships.filter((i) => i.feeType === 'paid').length}
+                  </div>
+                </div>
+                <Receipt className="w-5 h-5 text-cyan-400 opacity-60" />
               </div>
-              <div className="p-3 rounded-xl bg-[#0A1024] border border-emerald-500/20 flex items-center justify-between">
-                <span className="text-emerald-300">Offers / Accepted</span>
-                <span className="font-bold text-emerald-300 text-sm">
-                  {internships.filter((i) => i.status === 'accepted').length}
-                </span>
+
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-amber-500/30 flex items-center justify-between">
+                <div>
+                  <div className="text-amber-300 text-[10px]">Awaiting Proof</div>
+                  <div className="font-bold text-amber-300 text-base mt-0.5">
+                    {internships.filter((i) => i.feeType === 'paid' && i.paymentStatus !== 'verified').length}
+                  </div>
+                </div>
+                <AlertCircle className="w-5 h-5 text-amber-400 opacity-60" />
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#0A1024] border border-blue-500/30 flex items-center justify-between">
+                <div>
+                  <div className="text-blue-300 text-[10px]">Accepted / LOI Issued</div>
+                  <div className="font-bold text-blue-300 text-base mt-0.5">
+                    {internships.filter((i) => i.status === 'accepted').length}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-blue-400 opacity-60" />
               </div>
             </div>
 
@@ -2108,7 +2232,7 @@ export const AdminDashboardPage: React.FC = () => {
                         <th className="py-3.5 px-4">Candidate</th>
                         <th className="py-3.5 px-4">College & Degree</th>
                         <th className="py-3.5 px-4">Domain Track</th>
-                        <th className="py-3.5 px-4">Duration & Start</th>
+                        <th className="py-3.5 px-4">Fee & Payment Proof</th>
                         <th className="py-3.5 px-4">Status & Decision</th>
                         <th className="py-3.5 px-4">Portfolio Links</th>
                         <th className="py-3.5 px-4 text-right">Actions</th>
@@ -2149,10 +2273,60 @@ export const AdminDashboardPage: React.FC = () => {
                             </div>
                           </td>
 
-                          {/* Duration & Start */}
-                          <td className="py-3.5 px-4 font-mono text-[11px]">
-                            <div className="text-slate-200 font-semibold">{app.duration}</div>
-                            <div className="text-slate-400 text-[10px]">Start: {app.startDate}</div>
+                          {/* Fee & Payment Proof Column */}
+                          <td className="py-3.5 px-4">
+                            {app.feeType === 'free' || app.isFirst50 ? (
+                              <div>
+                                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-mono text-[11px] font-semibold">
+                                  <span>🎉 Free Grant (#{app.slotNumber || 1}/50)</span>
+                                </div>
+                                <div className="text-[10px] text-emerald-400/80 font-mono mt-0.5">100% Scholarship Waived</div>
+                              </div>
+                            ) : (
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                                    ₹150 Fee
+                                  </span>
+                                  {app.paymentStatus === 'verified' ? (
+                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                                      <Check className="w-2.5 h-2.5" /> Verified
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-950 text-amber-300 border border-amber-500/40">
+                                      <AlertCircle className="w-2.5 h-2.5" /> Needs Proof
+                                    </span>
+                                  )}
+                                </div>
+                                {app.transactionId && (
+                                  <div className="text-[10px] text-slate-300 font-mono flex items-center gap-1">
+                                    <span className="text-slate-500">UTR:</span>
+                                    <span className="text-cyan-300 font-semibold">{app.transactionId}</span>
+                                  </div>
+                                )}
+                                {app.paymentScreenshot ? (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setPreviewScreenshot({
+                                        url: app.paymentScreenshot!,
+                                        candidateName: app.fullName,
+                                        utr: app.transactionId,
+                                        amount: app.feeAmount || 150,
+                                        id: app.id,
+                                        app
+                                      })
+                                    }
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-900/60 hover:bg-blue-600 text-white text-[10px] font-mono border border-blue-500/40 transition-colors shadow-sm"
+                                  >
+                                    <ImageIcon className="w-3 h-3 text-cyan-400" />
+                                    <span>View Proof (₹150)</span>
+                                  </button>
+                                ) : (
+                                  <div className="text-[10px] text-rose-400 font-mono">No screenshot</div>
+                                )}
+                              </div>
+                            )}
                           </td>
 
                           {/* Status Dropdown */}
@@ -2179,6 +2353,12 @@ export const AdminDashboardPage: React.FC = () => {
                               <option value="accepted">ACCEPTED</option>
                               <option value="rejected">REJECTED</option>
                             </select>
+                            {app.status === 'accepted' && (
+                              <div className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                <span>LOI Issued</span>
+                              </div>
+                            )}
                           </td>
 
                           {/* Direct Links */}
@@ -2223,14 +2403,30 @@ export const AdminDashboardPage: React.FC = () => {
 
                           {/* Actions */}
                           <td className="py-3.5 px-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
+                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                              {app.status !== 'accepted' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleVerifyAndAcceptInternship(app)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-semibold text-xs shadow-md transition-all"
+                                  title={
+                                    app.feeType === 'paid'
+                                      ? 'Verify ₹150 proof & accept candidate (Grant LOI)'
+                                      : 'Accept free early-bird candidate (Grant LOI)'
+                                  }
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  <span>{app.feeType === 'paid' ? 'Verify & Accept' : 'Accept'}</span>
+                                </button>
+                              )}
+
                               <button
                                 type="button"
                                 onClick={() => {
                                   setSelectedInternshipDetail(app);
                                   setInternshipNoteEdit(app.adminNotes || '');
                                 }}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#101A31] hover:bg-blue-600 text-cyan-300 hover:text-white font-semibold text-xs transition-all border border-slate-700/60"
+                                className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#101A31] hover:bg-blue-600 text-cyan-300 hover:text-white font-semibold text-xs transition-all border border-slate-700/60"
                                 title="Inspect Full Application Dossier"
                               >
                                 <Eye className="w-3.5 h-3.5" />
@@ -3452,6 +3648,99 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Admission Type & Verification Details */}
+            <div className="p-4 rounded-2xl bg-[#101A31] border border-slate-800 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="text-xs font-mono uppercase text-cyan-400 font-semibold flex items-center gap-1.5">
+                  <Receipt className="w-3.5 h-3.5" />
+                  <span>Admission Type & Fee Verification</span>
+                </span>
+                {selectedInternshipDetail.feeType === 'free' || selectedInternshipDetail.isFirst50 ? (
+                  <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                    🎉 Free Early-Bird Scholar (#{selectedInternshipDetail.slotNumber || 1}/50)
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                    ₹150 Registration Fee
+                  </span>
+                )}
+              </div>
+
+              {selectedInternshipDetail.feeType === 'paid' && (
+                <div className="space-y-3 pt-2 border-t border-slate-800">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                    <div className="p-2.5 rounded-xl bg-[#0A1024] border border-slate-800">
+                      <div className="text-slate-400 text-[10px]">UPI Transaction / UTR ID</div>
+                      <div className="font-bold text-cyan-300 text-sm mt-0.5">
+                        {selectedInternshipDetail.transactionId || 'Not provided'}
+                      </div>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-[#0A1024] border border-slate-800">
+                      <div className="text-slate-400 text-[10px]">Payment Proof Status</div>
+                      <div className="font-bold mt-0.5 flex items-center gap-1.5">
+                        {selectedInternshipDetail.paymentStatus === 'verified' ? (
+                          <span className="text-emerald-400">✅ Verified & Approved</span>
+                        ) : (
+                          <span className="text-amber-400">⚠️ Awaiting Verification</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {selectedInternshipDetail.paymentScreenshot && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                        <span>Candidate Payment Screenshot:</span>
+                        <a
+                          href={selectedInternshipDetail.paymentScreenshot}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-cyan-400 hover:underline inline-flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>Open Full Size</span>
+                        </a>
+                      </div>
+                      <div
+                        onClick={() =>
+                          setPreviewScreenshot({
+                            url: selectedInternshipDetail.paymentScreenshot!,
+                            candidateName: selectedInternshipDetail.fullName,
+                            utr: selectedInternshipDetail.transactionId,
+                            amount: selectedInternshipDetail.feeAmount || 150,
+                            id: selectedInternshipDetail.id,
+                            app: selectedInternshipDetail
+                          })
+                        }
+                        className="relative rounded-xl overflow-hidden border border-slate-700 max-h-60 cursor-pointer group bg-black/60 flex items-center justify-center"
+                      >
+                        <img
+                          src={selectedInternshipDetail.paymentScreenshot}
+                          alt="Payment Screenshot"
+                          className="max-h-60 object-contain group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-semibold gap-1.5">
+                          <ZoomIn className="w-4 h-4" />
+                          <span>Click to Zoom</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedInternshipDetail.status !== 'accepted' && (
+                    <button
+                      type="button"
+                      onClick={() => handleVerifyAndAcceptInternship(selectedInternshipDetail)}
+                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-semibold text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Confirm ₹150 Payment Proof & Accept (Issue LOI)</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Review Decision & Admin Notes */}
             <div className="p-4 rounded-2xl bg-[#101A31] border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
@@ -3516,6 +3805,90 @@ export const AdminDashboardPage: React.FC = () => {
                 className="px-5 py-2 rounded-xl bg-[#101A31] hover:bg-slate-800 text-slate-300 text-xs font-semibold"
               >
                 Close Dossier
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* ============================================================= */}
+      {/* MODAL: PAYMENT SCREENSHOT HIGH-RES VIEWER */}
+      {/* ============================================================= */}
+      <Modal
+        isOpen={!!previewScreenshot}
+        onClose={() => setPreviewScreenshot(null)}
+        title="Payment Verification Screenshot"
+        maxWidth="3xl"
+      >
+        {previewScreenshot && (
+          <div className="space-y-4">
+            {/* Header / Info bar */}
+            <div className="p-4 rounded-2xl bg-[#101A31] border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div>
+                <div className="text-slate-400 font-mono text-[10px]">Candidate</div>
+                <div className="font-bold text-white text-sm">{previewScreenshot.candidateName}</div>
+              </div>
+              <div>
+                <div className="text-slate-400 font-mono text-[10px]">Amount Due</div>
+                <div className="font-bold text-cyan-300 text-sm">₹{previewScreenshot.amount || 150}.00</div>
+              </div>
+              <div>
+                <div className="text-slate-400 font-mono text-[10px]">UTR / Transaction ID</div>
+                <div className="flex items-center gap-1.5 font-mono text-white text-xs font-bold">
+                  <span>{previewScreenshot.utr || 'N/A'}</span>
+                  {previewScreenshot.utr && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(previewScreenshot.utr!);
+                        setCopiedUtr(true);
+                        setTimeout(() => setCopiedUtr(false), 2000);
+                      }}
+                      className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400"
+                      title="Copy UTR"
+                    >
+                      {copiedUtr ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    </button>
+                  )}
+                </div>
+              </div>
+              <a
+                href={previewScreenshot.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600/80 hover:bg-blue-600 text-white font-mono text-xs transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Open Raw Image</span>
+              </a>
+            </div>
+
+            {/* High-Resolution Screenshot Image Display */}
+            <div className="rounded-2xl border border-slate-800 bg-[#050816] p-2 flex items-center justify-center max-h-[60vh] overflow-auto">
+              <img
+                src={previewScreenshot.url}
+                alt={`Payment receipt for ${previewScreenshot.candidateName}`}
+                className="max-h-[56vh] w-auto object-contain rounded-xl shadow-2xl"
+              />
+            </div>
+
+            {/* Verification Actions */}
+            <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setPreviewScreenshot(null)}
+                className="px-4 py-2 rounded-xl bg-[#101A31] hover:bg-slate-800 text-slate-300 text-xs font-semibold"
+              >
+                Close Preview
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleVerifyAndAcceptInternship(previewScreenshot.app)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-['Space_Grotesk'] font-bold text-xs shadow-lg shadow-emerald-500/25 transition-all"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Confirm ₹150 & Accept (Issue LOI)</span>
               </button>
             </div>
           </div>

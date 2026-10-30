@@ -17,7 +17,15 @@ import {
   Send,
   Clock,
   Award,
-  AlertCircle
+  AlertCircle,
+  Check,
+  Copy,
+  FileCheck,
+  FileBadge,
+  UploadCloud,
+  ExternalLink,
+  Lock,
+  Receipt
 } from 'lucide-react';
 import { SpotlightCard } from '../components/reactbits/SpotlightCard';
 import { ShinyText } from '../components/reactbits/ShinyText';
@@ -190,8 +198,44 @@ export const DOMAIN_TRACKS: DomainTrack[] = [
 export const CareersPage: React.FC = () => {
   const location = useLocation();
 
+  // Dynamic Free Slots & Stats from Backend
+  const [stats, setStats] = useState<{
+    totalApplications: number;
+    freeSlotsUsed: number;
+    freeSlotsTotal: number;
+    remainingFreeSlots: number;
+    isFreeSlotsFull: boolean;
+    standardFee: number;
+    upiId: string;
+    payeeName: string;
+  }>({
+    totalApplications: 3,
+    freeSlotsUsed: 3,
+    freeSlotsTotal: 50,
+    remainingFreeSlots: 47,
+    isFreeSlotsFull: false,
+    standardFee: 150,
+    upiId: 'kabilk2023@oksbi',
+    payeeName: 'Kabil'
+  });
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(apiUrl('/api/internships/stats'));
+      const data = await res.json();
+      if (data.success && data.stats) {
+        setStats(data.stats);
+      }
+    } catch (err) {
+      console.warn('Could not fetch real-time internship stats:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
   // Filter state
-  // Search filter state
   const [searchQuery, setSearchQuery] = useState('');
 
   // Application Modal state
@@ -215,8 +259,15 @@ export const CareersPage: React.FC = () => {
     resumeUrl: '',
     statementOfPurpose: '',
     duration: '3 Months',
-    startDate: 'Immediate'
+    startDate: 'Immediate',
+    feeType: 'free',
+    transactionId: '',
+    paymentScreenshot: ''
   });
+
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [activeQrMode, setActiveQrMode] = useState<'dynamic' | 'card'>('dynamic');
+  const [copiedUpi, setCopiedUpi] = useState(false);
 
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
@@ -239,7 +290,12 @@ export const CareersPage: React.FC = () => {
   const handleOpenApplyModal = (domainName?: string) => {
     const targetDomain = domainName || DOMAIN_TRACKS[0].name;
     setSelectedDomainForForm(targetDomain);
-    setFormData((prev) => ({ ...prev, domain: targetDomain }));
+    const initialFee = stats.remainingFreeSlots > 0 ? 'free' : 'paid';
+    setFormData((prev) => ({
+      ...prev,
+      domain: targetDomain,
+      feeType: initialFee
+    }));
     setFormError('');
     setIsApplyModalOpen(true);
   };
@@ -247,6 +303,22 @@ export const CareersPage: React.FC = () => {
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      setFormError('Screenshot image must be less than 15MB. Please upload a smaller file.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      setScreenshotPreview(base64);
+      setFormData((prev) => ({ ...prev, paymentScreenshot: base64 }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -267,10 +339,24 @@ export const CareersPage: React.FC = () => {
         throw new Error('Please fill out all required fields before submitting.');
       }
 
+      // If fee is paid, enforce payment screenshot and transaction ID
+      const isPaid = formData.feeType === 'paid' || stats.remainingFreeSlots <= 0;
+      if (isPaid) {
+        if (!formData.transactionId || !formData.transactionId.trim()) {
+          throw new Error('Please enter your 12-digit UPI Transaction / UTR ID from Google Pay.');
+        }
+        if (!formData.paymentScreenshot) {
+          throw new Error('Please upload your ₹150 payment screenshot. Proof of payment is required for enrollment verification.');
+        }
+      }
+
       const res = await fetch(apiUrl('/api/internships'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          feeType: isPaid ? 'paid' : 'free'
+        })
       });
 
       const data = await res.json();
@@ -279,6 +365,7 @@ export const CareersPage: React.FC = () => {
       }
 
       setSubmittedApplicationId(data.applicationId || data.internship?.id);
+      fetchStats();
     } catch (err: any) {
       setFormError(err.message || 'Error submitting application.');
     } finally {
@@ -401,6 +488,172 @@ export const CareersPage: React.FC = () => {
             <div className="p-4 rounded-2xl bg-[#0A1024]/80 border border-slate-800 text-center">
               <div className="font-['Space_Grotesk'] text-2xl sm:text-3xl font-bold text-purple-400">PPO</div>
               <div className="text-xs text-slate-400 font-mono mt-1">Full-Time Pathways</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================= */}
+        {/* DYNAMIC FREE 50 STUDENTS COUNTER & TALENT SCHOLARSHIP BANNER */}
+        {/* ============================================================= */}
+        <div className="relative rounded-3xl bg-gradient-to-br from-[#0B1536] via-[#080E24] to-[#040817] border border-cyan-500/40 p-6 sm:p-8 shadow-[0_0_50px_rgba(34,211,238,0.12)] overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-4 max-w-2xl text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 font-mono text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-spin" />
+                <span>2026 Talent Grant • 100% Free for First 50 Students</span>
+              </div>
+
+              <h2 className="font-['Space_Grotesk'] text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight">
+                Claim Your Free Internship Spot.{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                  Zero Fee for First 50 Enrollees.
+                </span>
+              </h2>
+
+              <p className="text-slate-300 text-sm leading-relaxed">
+                To empower passionate student developers, Alpha Encoders sponsors the entire admission cost for the first
+                50 selected students (100% Free). For applicants following slot 50, a standard verification fee of <strong>₹150</strong> applies.
+              </p>
+
+              {/* Dynamic Live Counter & Progress Bar */}
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-400 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>Dynamic Slot Counter:</span>
+                    <strong className="text-white font-bold">{stats.freeSlotsUsed} of {stats.freeSlotsTotal} Slots Claimed</strong>
+                  </span>
+                  <span className={stats.remainingFreeSlots > 0 ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
+                    {stats.remainingFreeSlots > 0
+                      ? `${stats.remainingFreeSlots} Free Slots Remaining!`
+                      : 'Free Slots Full • Standard ₹150 Active'}
+                  </span>
+                </div>
+
+                {/* Animated Glowing Progress Bar */}
+                <div className="w-full h-3.5 rounded-full bg-slate-900/90 border border-slate-700/80 overflow-hidden p-0.5">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400 transition-all duration-1000 shadow-[0_0_15px_rgba(34,211,238,0.5)]"
+                    style={{
+                      width: `${Math.min(100, Math.max(6, (stats.freeSlotsUsed / stats.freeSlotsTotal) * 100))}%`
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Action & Slot Claim Button */}
+            <div className="flex flex-col items-center sm:items-end gap-3 shrink-0 w-full sm:w-auto">
+              <div className="p-4 rounded-2xl bg-[#050816]/90 border border-slate-800 text-center sm:text-right space-y-1 w-full sm:w-64">
+                <div className="text-[11px] font-mono text-slate-400 uppercase">Current Admission Fee</div>
+                <div className="text-2xl font-bold font-['Space_Grotesk'] text-white">
+                  {stats.remainingFreeSlots > 0 ? (
+                    <span className="text-emerald-400">₹0 <span className="text-xs text-slate-400 line-through">₹150</span> (Free Grant)</span>
+                  ) : (
+                    <span className="text-cyan-400">₹150.00 <span className="text-xs text-slate-400">(Standard)</span></span>
+                  )}
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono">
+                  {stats.remainingFreeSlots > 0 ? `Next applicant gets Slot #${stats.freeSlotsUsed + 1}` : 'Direct review queue'}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleOpenApplyModal()}
+                className="w-full sm:w-64 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:brightness-110 text-white font-['Space_Grotesk'] font-bold text-sm shadow-[0_0_25px_rgba(16,185,129,0.35)] transition-all flex items-center justify-center gap-2"
+              >
+                <span>{stats.remainingFreeSlots > 0 ? 'Claim Free Scholarship Slot' : 'Enroll with ₹150'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================= */}
+        {/* PURE PROFESSIONAL PROGRAM: LOI, CERTIFICATE, LOR SHOWCASE */}
+        {/* ============================================================= */}
+        <div className="space-y-6">
+          <div className="text-center max-w-3xl mx-auto space-y-2">
+            <span className="text-xs font-mono uppercase tracking-widest text-cyan-400 font-semibold">
+              Industry Standard Accreditation
+            </span>
+            <h2 className="font-['Space_Grotesk'] text-3xl sm:text-4xl font-extrabold text-white">
+              Pure Professional Credentials for Every Intern
+            </h2>
+            <p className="text-slate-400 text-sm">
+              Whether you enroll via the Free 50 Grant or Standard ₹150 verification, you receive all 3 official engineering deliverables to jumpstart your career.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Credential 1: LOI */}
+            <div className="p-6 rounded-3xl bg-[#0A1024] border border-blue-500/30 hover:border-blue-400 transition-all duration-300 space-y-4 shadow-lg group relative overflow-hidden">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FileBadge className="w-6 h-6" />
+              </div>
+              <div className="space-y-1.5">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-blue-950 text-blue-300 border border-blue-500/30">
+                  Appointment Phase
+                </span>
+                <h3 className="font-['Space_Grotesk'] text-xl font-bold text-white">
+                  Letter of Intent (LOI)
+                </h3>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Official offer letter issued immediately upon board selection. Confirms your designated domain track, duration, architect mentor, and start date. Fully recognized for college internship credit approvals.
+              </p>
+              <div className="pt-2 border-t border-slate-800 text-[11px] font-mono text-cyan-400 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Issued upon board acceptance</span>
+              </div>
+            </div>
+
+            {/* Credential 2: Verified Completion Certificate */}
+            <div className="p-6 rounded-3xl bg-[#0A1024] border border-cyan-500/30 hover:border-cyan-400 transition-all duration-300 space-y-4 shadow-lg group relative overflow-hidden">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Award className="w-6 h-6" />
+              </div>
+              <div className="space-y-1.5">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-cyan-950 text-cyan-300 border border-cyan-500/30">
+                  Graduation Phase
+                </span>
+                <h3 className="font-['Space_Grotesk'] text-xl font-bold text-white">
+                  Verified Completion Certificate
+                </h3>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Tamper-proof completion certificate featuring a unique public Verification ID and scannable QR code. Seamlessly embeddable on LinkedIn, GitHub, and portfolios to prove hands-on production code contributions.
+              </p>
+              <div className="pt-2 border-t border-slate-800 text-[11px] font-mono text-cyan-400 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Cryptographically verifiable online</span>
+              </div>
+            </div>
+
+            {/* Credential 3: Letter of Recommendation (LOR) */}
+            <div className="p-6 rounded-3xl bg-[#0A1024] border border-purple-500/30 hover:border-purple-400 transition-all duration-300 space-y-4 shadow-lg group relative overflow-hidden">
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FileCheck className="w-6 h-6" />
+              </div>
+              <div className="space-y-1.5">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-purple-950 text-purple-300 border border-purple-500/30">
+                  Leadership Endorsement
+                </span>
+                <h3 className="font-['Space_Grotesk'] text-xl font-bold text-white">
+                  Letter of Recommendation (LOR)
+                </h3>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Personalized, detailed recommendation letter signed by engineering leadership detailing your sprint deliverables, technical mastery, problem-solving agility, and collaborative teamwork.
+              </p>
+              <div className="pt-2 border-t border-slate-800 text-[11px] font-mono text-purple-400 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Signed by Senior Software Architects</span>
+              </div>
             </div>
           </div>
         </div>
@@ -643,7 +896,16 @@ export const CareersPage: React.FC = () => {
                     {lookupResult.id}
                   </div>
                 </div>
-                <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {lookupResult.feeType === 'paid' ? (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                      ₹150 Fee • {lookupResult.paymentStatus === 'verified' ? 'Proof Verified' : 'Awaiting Proof Check'}
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                      🎉 Free Grant (Slot #{lookupResult.slotNumber || 1}/50)
+                    </span>
+                  )}
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-mono font-semibold uppercase tracking-wider ${
                       lookupResult.status === 'accepted'
@@ -719,8 +981,9 @@ export const CareersPage: React.FC = () => {
               Application Submitted Successfully!
             </h3>
             <p className="text-slate-300 text-sm max-w-md mx-auto">
-              Thank you for applying to Alpha Encoders. Our engineering and research review board will examine your
-              portfolio and reach out within 2-4 business days.
+              {formData.feeType === 'paid' || stats.remainingFreeSlots <= 0
+                ? 'Your application and ₹150 payment screenshot have been delivered to the admin dashboard. Once your payment proof is verified by the admin, your official Letter of Intent (LOI) will be granted.'
+                : `Congratulations! You have secured a Free Early-Bird Slot! Our technical review board is evaluating your profile and will grant your official Letter of Intent (LOI).`}
             </p>
 
             <div className="p-4 rounded-2xl bg-[#101A31] border border-slate-700 max-w-sm mx-auto font-mono text-center">
@@ -993,6 +1256,284 @@ export const CareersPage: React.FC = () => {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  {/* Section 5: Admission Category & Enrollment Verification */}
+                  <div className="space-y-4 pt-2 border-t border-slate-800">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <h4 className="font-['Space_Grotesk'] text-sm font-bold text-white border-l-2 border-cyan-400 pl-2 flex items-center gap-2">
+                        <span>5. Admission Category & Verification Fee</span>
+                      </h4>
+                      <span className="text-[11px] font-mono text-cyan-400">
+                        {stats.remainingFreeSlots > 0
+                          ? `🎉 ${stats.remainingFreeSlots}/50 Free Seats Active`
+                          : '⚡ Standard Admission (₹150)'}
+                      </span>
+                    </div>
+
+                    {/* Category Selector if free slots available */}
+                    {stats.remainingFreeSlots > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <label
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
+                            formData.feeType === 'free'
+                              ? 'bg-emerald-950/40 border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/50'
+                              : 'bg-[#101A31]/60 border-slate-700/60 hover:border-slate-600'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="font-bold text-white flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>Free Early-Bird Grant</span>
+                              </div>
+                              <div className="text-[11px] text-emerald-300 font-mono mt-0.5">
+                                Slot #{stats.freeSlotsUsed + 1} of 50
+                              </div>
+                            </div>
+                            <input
+                              type="radio"
+                              name="feeType"
+                              value="free"
+                              checked={formData.feeType === 'free'}
+                              onChange={handleFormChange}
+                              className="text-emerald-500 focus:ring-emerald-400 mt-1"
+                            />
+                          </div>
+                          <div className="mt-2 text-[10px] text-slate-300">
+                            100% Fee Waived (₹0). Includes full LOI, Completion Certificate & LOR.
+                          </div>
+                        </label>
+
+                        <label
+                          className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
+                            formData.feeType === 'paid'
+                              ? 'bg-blue-950/40 border-cyan-500/80 shadow-[0_0_15px_rgba(34,211,238,0.15)] ring-1 ring-cyan-500/50'
+                              : 'bg-[#101A31]/60 border-slate-700/60 hover:border-slate-600'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="font-bold text-white flex items-center gap-1.5">
+                                <Receipt className="w-3.5 h-3.5 text-cyan-400" />
+                                <span>Standard Admission</span>
+                              </div>
+                              <div className="text-[11px] text-cyan-300 font-mono mt-0.5">₹150 Registration Fee</div>
+                            </div>
+                            <input
+                              type="radio"
+                              name="feeType"
+                              value="paid"
+                              checked={formData.feeType === 'paid'}
+                              onChange={handleFormChange}
+                              className="text-cyan-500 focus:ring-cyan-400 mt-1"
+                            />
+                          </div>
+                          <div className="mt-2 text-[10px] text-slate-300">
+                            Direct queue, priority mentor code reviews & credential verification.
+                          </div>
+                        </label>
+                      </div>
+                    ) : (
+                      /* Free slots full - Standard only */
+                      <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-xs flex items-start gap-3">
+                        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                          <div className="font-bold text-amber-200">All 50 Free Scholarship Slots Claimed!</div>
+                          <div className="text-slate-300 text-[11px] mt-0.5">
+                            Standard admission is currently active. The internship fee is <strong>₹150</strong> which covers your Letter of Intent (LOI), Verified Completion Certificate, and Letter of Recommendation (LOR).
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* If Paid Slot: Show ₹150 UPI Scanner & Screenshot Upload */}
+                    {(formData.feeType === 'paid' || stats.remainingFreeSlots <= 0) && (
+                      <div className="p-4 rounded-2xl bg-[#080E24] border border-cyan-500/40 space-y-4">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                            <span className="font-['Space_Grotesk'] text-sm font-bold text-white">
+                              Scan & Pay ₹150 via Google Pay / Any UPI App
+                            </span>
+                          </div>
+                          {/* Toggle QR mode */}
+                          <div className="flex items-center bg-[#101A31] p-0.5 rounded-lg border border-slate-700 text-[10px] font-mono">
+                            <button
+                              type="button"
+                              onClick={() => setActiveQrMode('dynamic')}
+                              className={`px-2 py-1 rounded transition-colors ${
+                                activeQrMode === 'dynamic' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              ₹150 Preloaded QR
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveQrMode('card')}
+                              className={`px-2 py-1 rounded transition-colors ${
+                                activeQrMode === 'card' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              Official GPay Card
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* QR Code Container */}
+                        <div className="flex flex-col sm:flex-row items-center gap-5 bg-[#050816] p-4 rounded-2xl border border-slate-800">
+                          <div className="relative group shrink-0">
+                            {activeQrMode === 'dynamic' ? (
+                              <div className="relative p-2.5 bg-white rounded-2xl shadow-[0_0_25px_rgba(34,211,238,0.25)] flex flex-col items-center justify-center">
+                                <img
+                                  src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                                    'upi://pay?pa=kabilk2023@oksbi&pn=Kabil&am=150.00&cu=INR&tn=Alpha%20Encoders%20Internship%20Fee'
+                                  )}&margin=10`}
+                                  alt="UPI QR Scanner - Preloaded ₹150"
+                                  className="w-44 h-44 object-contain rounded-xl"
+                                />
+                                <div className="text-[10px] text-slate-800 font-mono font-bold mt-1 text-center">
+                                  ₹150 PRE-LOADED IN GPAY
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="relative p-1 bg-white rounded-2xl shadow-[0_0_25px_rgba(34,211,238,0.25)] flex flex-col items-center justify-center max-w-[200px]">
+                                <img
+                                  src="/images/gpay-scanner.jpg"
+                                  alt="Google Pay Scanner"
+                                  className="w-44 h-auto object-contain rounded-xl"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-2.5 text-xs flex-grow w-full">
+                            <div>
+                              <div className="text-slate-400 text-[10px] font-mono uppercase">Payee Name</div>
+                              <div className="font-bold text-white text-sm">Kabil (Alpha Encoders Lead)</div>
+                            </div>
+
+                            <div>
+                              <div className="text-slate-400 text-[10px] font-mono uppercase">Verified UPI ID</div>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <code className="px-2.5 py-1 rounded-lg bg-[#101A31] border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold">
+                                  kabilk2023@oksbi
+                                </code>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText('kabilk2023@oksbi');
+                                    setCopiedUpi(true);
+                                    setTimeout(() => setCopiedUpi(false), 2000);
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-[#101A31] hover:bg-slate-800 text-slate-300 text-xs font-mono inline-flex items-center gap-1 border border-slate-700"
+                                >
+                                  {copiedUpi ? (
+                                    <>
+                                      <Check className="w-3 h-3 text-emerald-400" />
+                                      <span className="text-emerald-400">Copied</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3 h-3" />
+                                      <span>Copy</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+
+                            <div>
+                              <div className="text-slate-400 text-[10px] font-mono uppercase">Fee Amount</div>
+                              <div className="text-emerald-400 font-bold text-base font-mono">
+                                ₹150.00 <span className="text-[11px] text-slate-400 font-normal">(One-time)</span>
+                              </div>
+                            </div>
+
+                            <a
+                              href="upi://pay?pa=kabilk2023@oksbi&pn=Kabil&am=150.00&cu=INR&tn=Alpha%20Encoders%20Internship%20Fee"
+                              className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold text-xs shadow-md hover:brightness-110 transition-all sm:hidden"
+                            >
+                              <span>Tap to Open GPay / UPI App (₹150)</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* Transaction ID & Screenshot Upload Form */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
+                          <div>
+                            <label className="block text-slate-300 font-mono mb-1">
+                              UPI Transaction ID / UTR Number *
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              name="transactionId"
+                              placeholder="e.g. 423456789012 (12 digits)"
+                              value={formData.transactionId}
+                              onChange={handleFormChange}
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-[#101A31] border border-cyan-500/40 focus:border-cyan-400 text-white placeholder-slate-500 font-mono text-xs focus:outline-none"
+                            />
+                            <span className="text-[10px] text-slate-400">Found on your GPay / UPI payment receipt</span>
+                          </div>
+
+                          <div>
+                            <label className="block text-slate-300 font-mono mb-1">
+                              Upload Payment Screenshot (₹150) *
+                            </label>
+                            <label className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#101A31] border border-dashed border-cyan-500/50 hover:border-cyan-400 cursor-pointer text-slate-300 text-xs font-mono transition-all">
+                              <UploadCloud className="w-4 h-4 text-cyan-400" />
+                              <span className="truncate">
+                                {screenshotPreview ? 'Change Screenshot' : 'Choose Receipt Image'}
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleScreenshotUpload}
+                                className="hidden"
+                              />
+                            </label>
+                            <span className="text-[10px] text-slate-400">JPG, PNG, WebP up to 15MB</span>
+                          </div>
+                        </div>
+
+                        {/* Live Screenshot Preview Thumbnail */}
+                        {screenshotPreview && (
+                          <div className="p-3 rounded-xl bg-[#050816] border border-cyan-500/40 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={screenshotPreview}
+                                alt="Screenshot Preview"
+                                className="w-14 h-14 object-cover rounded-lg border border-slate-700"
+                              />
+                              <div>
+                                <div className="font-bold text-white text-xs">Payment Screenshot Attached</div>
+                                <div className="text-[10px] text-emerald-400 font-mono">Ready for admin verification</div>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setScreenshotPreview(null);
+                                setFormData((prev) => ({ ...prev, paymentScreenshot: '' }));
+                              }}
+                              className="text-xs text-rose-400 hover:text-rose-300 font-mono px-2 py-1 rounded bg-slate-900 border border-rose-500/30"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Acceptance Gate Warning */}
+                        <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-[11px] text-amber-300 flex items-start gap-2.5">
+                          <Lock className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+                          <div className="leading-relaxed">
+                            <strong>Mandatory Acceptance Verification Policy:</strong> After sending the screenshot of ₹150, our administration team will verify your transaction. <strong>Until verified, you will not be accepted into the internship.</strong> Once the screenshot of 150 is approved by the admin, you will receive your official Letter of Intent (LOI) and onboarding package.
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Submission Buttons */}
