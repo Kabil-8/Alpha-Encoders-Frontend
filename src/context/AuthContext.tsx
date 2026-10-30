@@ -55,6 +55,8 @@ export function decodeJwt(token: string): any {
   }
 }
 
+export const GOOGLE_CLIENT_ID = '251890904590-3fea7rre1lt9egsadcarok3vqb06nhe5.apps.googleusercontent.com';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
@@ -72,15 +74,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [googleClientId, setGoogleClientIdState] = useState<string>(() => {
+    // Clean any old secret or bad data from localStorage
+    try {
+      const local = localStorage.getItem('ae_google_client_id') || '';
+      if (local.startsWith('GOCSPX-') || !local.includes('.apps.googleusercontent.com')) {
+        localStorage.removeItem('ae_google_client_id');
+      }
+    } catch {}
+
     const envId = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string) || '';
-    const localId = localStorage.getItem('ae_google_client_id') || '';
-    const active = (envId || localId).trim();
-    // GOCSPX is a Client Secret, not a Client ID. Ignore it if incorrectly passed.
-    if (active.startsWith('GOCSPX-')) {
-      localStorage.removeItem('ae_google_client_id');
-      return '';
+    if (envId && envId.includes('.apps.googleusercontent.com') && !envId.startsWith('GOCSPX-')) {
+      return envId.trim();
     }
-    return active;
+    const localId = localStorage.getItem('ae_google_client_id') || '';
+    if (localId && localId.includes('.apps.googleusercontent.com') && !localId.startsWith('GOCSPX-')) {
+      return localId.trim();
+    }
+    return GOOGLE_CLIENT_ID;
   });
 
   const setGoogleClientId = useCallback(async (newId: string) => {
