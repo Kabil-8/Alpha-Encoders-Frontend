@@ -236,7 +236,7 @@ export const HeroVisual: React.FC = () => {
         }}
       >
         <Code className="w-3.5 h-3.5 text-cyan-400" />
-        <span className="text-[11px] text-slate-300">&lt;AlphaEncoders.deploy /&gt;</span>
+        <span className="text-[11px] text-slate-300">&lt;AlphaEncoders.xyz /&gt;</span>
       </div>
     </div>
   );
