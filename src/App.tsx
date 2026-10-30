@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { GoogleAuthModal } from './components/auth/GoogleAuthModal';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ScrollToTop } from './components/shared/ScrollToTop';
@@ -28,6 +30,7 @@ function AppLayout() {
     <div className="flex flex-col min-h-screen bg-[#050816] text-[#F5F8FF] selection:bg-[#2563FF]/30 selection:text-[#22D3EE] relative">
       <ScrollToTop />
       {!isAdminRoute && <Navbar />}
+      <GoogleAuthModal />
       <PageTransition>
         <main className="flex-grow relative z-10">
           <Routes>
@@ -63,12 +66,12 @@ function AppLayout() {
 
 export function App() {
   return (
-    <>
+    <AuthProvider>
       <Preloader />
       <Router>
         <AppLayout />
       </Router>
-    </>
+    </AuthProvider>
   );
 }
 

@@ -13,11 +13,14 @@ import {
   Phone,
   Clock,
   Shield,
-  Sparkles
+  Sparkles,
+  Lock,
+  ShieldCheck
 } from 'lucide-react';
 import { apiUrl } from '../config/api';
 import { SignalBeaconGrid } from '../components/animations/SignalBeaconGrid';
 import { Hyperspeed } from '../components/reactbits/Hyperspeed';
+import { useAuth } from '../context/AuthContext';
 
 interface FormErrors {
   fullName?: string;
@@ -28,12 +31,13 @@ interface FormErrors {
 
 export const ContactPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const { user, isAuthenticated, openAuthModal } = useAuth();
 
   // Form State
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [company, setCompany] = useState('');
+  const [fullName, setFullName] = useState(user?.fullName || user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [company, setCompany] = useState(user?.company || '');
   const [websiteType, setWebsiteType] = useState('Business website');
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(['Contact form', 'SEO']);
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
@@ -41,6 +45,16 @@ export const ContactPage: React.FC = () => {
   const [completionTimeline, setCompletionTimeline] = useState('1-2 months');
   const [description, setDescription] = useState('');
   const [honeypot, setHoneypot] = useState(''); // Anti-spam trap
+
+  // Keep form synced with authenticated Google user
+  useEffect(() => {
+    if (user) {
+      if (user.fullName && !fullName) setFullName(user.fullName);
+      if (user.email && !email) setEmail(user.email);
+      if (user.phone && !phone) setPhone(user.phone);
+      if (user.company && !company) setCompany(user.company);
+    }
+  }, [user]);
 
   // UX & Submission States
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -337,9 +351,127 @@ export const ContactPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
+              ) : !isAuthenticated ? (
+                // GOOGLE AUTHENTICATION REQUIRED GATE
+                <div className="py-12 px-6 sm:px-10 text-center relative overflow-hidden rounded-2xl bg-[#050816]/90 border border-blue-500/40 shadow-2xl">
+                  <BorderBeam size={220} duration={8} colorFrom="#2563FF" colorTo="#22D3EE" />
+
+                  <div className="w-16 h-16 rounded-2xl bg-[#0A1024] border border-blue-500/40 p-3.5 mx-auto mb-5 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <svg className="w-9 h-9" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                      />
+                    </svg>
+                  </div>
+
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/80 border border-blue-500/40 text-xs font-mono text-cyan-300 mb-3">
+                    <Lock className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Verified Project Intake Security</span>
+                  </div>
+
+                  <h3 className="font-['Space_Grotesk'] text-2xl sm:text-3xl font-bold text-white mb-3">
+                    Sign in with Google to Enter Project Details
+                  </h3>
+
+                  <p className="text-slate-300 text-sm max-w-lg mx-auto mb-8 leading-relaxed">
+                    To maintain rigorous project timelines, secure development milestones, and deliver instant custom architectural quotations, please sign in with your Google account first.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                    <button
+                      type="button"
+                      onClick={openAuthModal}
+                      className="inline-flex items-center gap-3 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#2563FF] to-[#22D3EE] hover:brightness-110 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all transform hover:scale-[1.02]"
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path
+                          fill="#ffffff"
+                          d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+                        />
+                        <path
+                          fill="#ffffff"
+                          d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                        />
+                        <path
+                          fill="#ffffff"
+                          d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                        />
+                        <path
+                          fill="#ffffff"
+                          d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                        />
+                      </svg>
+                      <span>Sign in with Google to Continue</span>
+                    </button>
+                  </div>
+
+                  {/* Trust Factors */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto pt-6 border-t border-slate-800 text-[11px] font-mono text-slate-400">
+                    <div className="flex items-center justify-center gap-1.5 text-cyan-300">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      <span>Verified Client Identity</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1.5 text-emerald-400">
+                      <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                      <span>Confidential NDA Specs</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1.5 text-blue-300">
+                      <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                      <span>Instant Project Sync</span>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                // INQUIRY FORM
-                <form onSubmit={handleSubmit} noValidate className="space-y-8">
+                // INQUIRY FORM (UNLOCKED AFTER GOOGLE AUTH)
+                <form onSubmit={handleSubmit} noValidate className="space-y-8 animate-in fade-in">
+                  {/* Google Authenticated Client Status Banner */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/60 to-[#0A1024] border border-blue-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+                    <div className="flex items-center gap-3">
+                      {user?.picture ? (
+                        <img
+                          src={user.picture}
+                          alt={user.fullName || 'User'}
+                          className="w-10 h-10 rounded-xl object-cover border border-cyan-400/50 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center font-bold text-white text-sm shrink-0">
+                          {(user?.fullName || user?.email || 'U').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-white">{user?.fullName || user?.name}</span>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Verified Google Client</span>
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 font-mono">{user?.email}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={openAuthModal}
+                      className="text-xs text-cyan-400 hover:text-cyan-300 font-mono hover:underline self-start sm:self-center"
+                    >
+                      Switch Account
+                    </button>
+                  </div>
+
                   {/* Honeypot field (hidden for users, catches spam bots) */}
                   <div className="hidden" aria-hidden="true">
                     <label htmlFor="hp_field">Do not fill this</label>

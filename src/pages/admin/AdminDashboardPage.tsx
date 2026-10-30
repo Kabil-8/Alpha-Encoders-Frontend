@@ -27,7 +27,13 @@ import {
   Edit3,
   FileText,
   GraduationCap,
-  Globe
+  Globe,
+  ShieldCheck,
+  ShieldAlert,
+  Crown,
+  Table,
+  LayoutGrid,
+  UserCheck
 } from 'lucide-react';
 import { SpotlightCard } from '../../components/reactbits/SpotlightCard';
 import { Modal } from '../../components/shared/Modal';
@@ -125,7 +131,7 @@ export interface UserItemData {
   phone?: string;
   company?: string;
   location?: string;
-  role: 'client' | 'prospect' | 'lead' | 'vip';
+  role: 'admin' | 'client' | 'prospect' | 'lead' | 'vip';
   status: 'active' | 'in_discussion' | 'completed' | 'onboarding';
   totalInquiries: number;
   totalEstimatedValue: number;
@@ -134,6 +140,7 @@ export interface UserItemData {
   websiteTypes: string[];
   associatedProjects: string[];
   inquiryHistory: UserInquirySnapshot[];
+  picture?: string;
   createdAt: string;
   lastActiveAt: string;
   liveInquiries?: InquiryItem[];
@@ -220,12 +227,13 @@ export const AdminDashboardPage: React.FC = () => {
   const [userPhone, setUserPhone] = useState('');
   const [userCompany, setUserCompany] = useState('');
   const [userLocation, setUserLocation] = useState('');
-  const [userRole, setUserRole] = useState<'client' | 'prospect' | 'lead' | 'vip'>('lead');
+  const [userRole, setUserRole] = useState<'admin' | 'client' | 'prospect' | 'lead' | 'vip'>('lead');
   const [userStatus, setUserStatus] = useState<'active' | 'in_discussion' | 'completed' | 'onboarding'>('in_discussion');
   const [userValue, setUserValue] = useState('5000');
   const [userNotes, setUserNotes] = useState('');
   const [userWebsites, setUserWebsites] = useState('Business website');
   const [userProjects, setUserProjects] = useState('');
+  const [userViewMode, setUserViewMode] = useState<'grid' | 'table'>('grid');
 
   // Temporary note editing in user dossier
   const [dossierNote, setDossierNote] = useState('');
@@ -514,16 +522,49 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   const handleDeleteUser = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this client record from CRM?')) return;
+    if (!window.confirm('Are you sure you want to delete this user record from CRM?')) return;
     try {
       const res = await fetch(apiUrl(`/api/users/${id}`), { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setUsers((prev) => prev.filter((u) => u.id !== id));
         if (selectedUserDetail?.id === id) setSelectedUserDetail(null);
+      } else {
+        alert(data.message || 'Failed to delete user.');
       }
     } catch (err) {
       console.error('Failed to delete user', err);
+    }
+  };
+
+  const handleToggleAdminRole = async (usr: UserItemData) => {
+    const isCurrentlyAdmin = usr.role === 'admin';
+    const targetRole = isCurrentlyAdmin ? 'client' : 'admin';
+    const confirmText = isCurrentlyAdmin
+      ? `Revoke Admin status for ${usr.fullName} (${usr.email})? They will be demoted to Client and lose administrative access.`
+      : `Promote ${usr.fullName} (${usr.email}) to Studio Administrator? They will be granted full administrative command center control.`;
+
+    if (!window.confirm(confirmText)) return;
+
+    try {
+      const res = await fetch(apiUrl(`/api/users/${usr.id}/role`), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: targetRole }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === usr.id ? { ...u, role: targetRole } : u))
+        );
+        if (selectedUserDetail?.id === usr.id) {
+          setSelectedUserDetail((prev) => (prev ? { ...prev, role: targetRole } : null));
+        }
+      } else {
+        alert(data.message || 'Failed to update user role.');
+      }
+    } catch (err) {
+      console.error('Error toggling admin role', err);
     }
   };
 
@@ -1491,30 +1532,91 @@ export const AdminDashboardPage: React.FC = () => {
         )}
 
         {/* ============================================================= */}
-        {/* TAB 4: CLIENTS & USERS CRM (COMPLETE PROFILES) */}
+        {/* TAB 4: USERS & CLIENTS CRM MANAGEMENT (FULL CRUD & ADMIN PROMOTION) */}
         {/* ============================================================= */}
         {activeTab === 'users' && (
           <div className="space-y-6 animate-in fade-in">
+            {/* KPI Metric Summary Bar for Users Management */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-2xl bg-[#0A1024] border border-blue-500/30 flex items-center justify-between shadow-lg">
+                <div>
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    Registered Users
+                  </span>
+                  <span className="font-['Space_Grotesk'] text-2xl font-bold text-white">
+                    {users.length}
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-500/30 flex items-center justify-center text-cyan-300">
+                  <Users className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-gradient-to-tr from-[#130d2a] to-[#0A1024] border border-purple-500/40 flex items-center justify-between shadow-lg shadow-purple-500/10">
+                <div>
+                  <span className="text-[10px] font-mono text-purple-300 uppercase tracking-wider block flex items-center gap-1">
+                    <Crown className="w-3 h-3 text-purple-400" />
+                    <span>Studio Admins</span>
+                  </span>
+                  <span className="font-['Space_Grotesk'] text-2xl font-bold text-purple-200">
+                    {users.filter((u) => u.role === 'admin').length + 1}
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-purple-950/80 border border-purple-500/40 flex items-center justify-center text-purple-300">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#0A1024] border border-blue-500/30 flex items-center justify-between shadow-lg">
+                <div>
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    Active Clients
+                  </span>
+                  <span className="font-['Space_Grotesk'] text-2xl font-bold text-cyan-300">
+                    {users.filter((u) => u.role === 'client' || u.status === 'active' || u.status === 'completed').length}
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
+                  <UserCheck className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#0A1024] border border-slate-800 flex items-center justify-between shadow-lg">
+                <div>
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    Pipeline Volume
+                  </span>
+                  <span className="font-['Space_Grotesk'] text-2xl font-bold text-emerald-400">
+                    ${users.reduce((acc, u) => acc + (u.totalEstimatedValue || 0), 0).toLocaleString()}
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+
             {/* Header & Controls */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-              <div className="flex flex-wrap gap-2 items-center">
-                <div className="relative">
+            <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center p-4 rounded-2xl bg-[#0A1024] border border-slate-800">
+              <div className="flex flex-wrap gap-2 items-center w-full lg:w-auto">
+                <div className="relative flex-grow sm:flex-grow-0">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={userSearch}
                     onChange={(e) => setUserSearch(e.target.value)}
-                    placeholder="Search client, email, company, city..."
-                    className="pl-9 pr-4 py-2 rounded-xl bg-[#0A1024] border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-64"
+                    placeholder="Search name, email, company..."
+                    className="pl-9 pr-4 py-2 rounded-xl bg-[#050816] border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 w-full sm:w-64"
                   />
                 </div>
 
                 <select
                   value={userRoleFilter}
                   onChange={(e) => setUserRoleFilter(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-[#0A1024] border border-slate-800 text-xs text-slate-300 font-mono focus:outline-none focus:border-blue-500"
+                  className="px-3 py-2 rounded-xl bg-[#050816] border border-slate-800 text-xs text-slate-300 font-mono focus:outline-none focus:border-blue-500"
                 >
                   <option value="all">All Roles</option>
+                  <option value="admin">👑 Administrators (Admin)</option>
                   <option value="client">Client Partner</option>
                   <option value="vip">VIP Account</option>
                   <option value="prospect">Prospect</option>
@@ -1524,7 +1626,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <select
                   value={userStatusFilter}
                   onChange={(e) => setUserStatusFilter(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-[#0A1024] border border-slate-800 text-xs text-slate-300 font-mono focus:outline-none focus:border-blue-500"
+                  className="px-3 py-2 rounded-xl bg-[#050816] border border-slate-800 text-xs text-slate-300 font-mono focus:outline-none focus:border-blue-500"
                 >
                   <option value="all">All Statuses</option>
                   <option value="active">Active</option>
@@ -1534,153 +1636,352 @@ export const AdminDashboardPage: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
+                {/* View Mode Toggle */}
+                <div className="flex items-center rounded-xl bg-[#050816] border border-slate-800 p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setUserViewMode('grid')}
+                    className={`p-1.5 rounded-lg text-xs transition-all ${
+                      userViewMode === 'grid'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                    title="Grid Card View"
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUserViewMode('table')}
+                    className={`p-1.5 rounded-lg text-xs transition-all ${
+                      userViewMode === 'table'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                    title="Dense Table View"
+                  >
+                    <Table className="w-4 h-4" />
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   onClick={exportUsersJSON}
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#101A31] hover:bg-slate-800 border border-slate-700/60 text-xs font-mono text-cyan-300 transition-all"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Export CRM</span>
+                  <span className="hidden sm:inline">Export</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={openNewUserModal}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md shadow-blue-600/30 transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-semibold text-xs shadow-md shadow-blue-600/30 transition-all"
                 >
                   <UserPlus className="w-4 h-4" />
-                  <span>Register Client</span>
+                  <span>Register User / Admin</span>
                 </button>
               </div>
             </div>
 
-            {/* Clients Roster Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredUsers.map((u) => (
-                <div
-                  key={u.id}
-                  className="rounded-2xl bg-[#0A1024] border border-slate-800 p-5 space-y-4 hover:border-blue-500/40 transition-all shadow-lg flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    {/* Header with Avatar and Role */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#101A31] border border-blue-500/30 flex items-center justify-center font-bold text-cyan-300 font-['Space_Grotesk'] text-base">
-                          {u.fullName.charAt(0)}
+            {/* TAB CONTENT: GRID VIEW */}
+            {userViewMode === 'grid' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredUsers.map((u) => (
+                  <div
+                    key={u.id}
+                    className={`rounded-2xl bg-[#0A1024] p-5 space-y-4 transition-all shadow-lg flex flex-col justify-between ${
+                      u.role === 'admin'
+                        ? 'border border-purple-500/50 shadow-purple-500/10 hover:border-purple-400'
+                        : 'border border-slate-800 hover:border-blue-500/40'
+                    }`}
+                  >
+                    <div className="space-y-3">
+                      {/* Header with Avatar and Role */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {u.picture ? (
+                            <img
+                              src={u.picture}
+                              alt={u.fullName}
+                              className="w-10 h-10 rounded-xl object-cover border border-cyan-500/40 shrink-0"
+                            />
+                          ) : (
+                            <div className={`w-10 h-10 rounded-xl border flex items-center justify-center font-bold font-['Space_Grotesk'] text-base shrink-0 ${
+                              u.role === 'admin'
+                                ? 'bg-purple-950/80 border-purple-500/50 text-purple-200'
+                                : 'bg-[#101A31] border-blue-500/30 text-cyan-300'
+                            }`}>
+                              {u.fullName.charAt(0)}
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <h4 className="font-['Space_Grotesk'] text-base font-bold text-white leading-tight truncate">
+                              {u.fullName}
+                            </h4>
+                            {u.company && <p className="text-xs text-slate-400 truncate">{u.company}</p>}
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-['Space_Grotesk'] text-base font-bold text-white leading-tight">
-                            {u.fullName}
-                          </h4>
-                          {u.company && <p className="text-xs text-slate-400">{u.company}</p>}
-                        </div>
-                      </div>
 
-                      <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold uppercase ${
-                          u.role === 'vip'
-                            ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
-                            : u.role === 'client'
-                            ? 'bg-blue-950/80 text-cyan-300 border border-blue-500/40'
-                            : 'bg-slate-800 text-slate-300'
-                        }`}
-                      >
-                        {u.role}
-                      </span>
-                    </div>
-
-                    {/* Contact & Location Info */}
-                    <div className="text-xs text-slate-300 space-y-1 font-mono pt-1">
-                      <div className="flex items-center gap-2 text-slate-400 truncate">
-                        <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                        <span className="truncate">{u.email}</span>
-                      </div>
-                      {u.phone && (
-                        <div className="flex items-center gap-2 text-emerald-400">
-                          <Phone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                          <span>{u.phone}</span>
-                        </div>
-                      )}
-                      {u.location && (
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <Building className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                          <span>{u.location}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Associated Projects and Scope */}
-                    {u.associatedProjects && u.associatedProjects.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {u.associatedProjects.map((pName, pIdx) => (
-                          <span
-                            key={pIdx}
-                            className="text-[10px] px-2 py-0.5 rounded bg-blue-950/80 border border-blue-500/30 text-cyan-300 font-mono font-medium"
-                          >
-                            Project: {pName}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Metrics Bar */}
-                    <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-[#101A31]/50 border border-slate-800/80 text-[11px] font-mono">
-                      <div>
-                        <span className="text-slate-500 block text-[9px] uppercase">Inquiries</span>
-                        <span className="font-bold text-white">{u.totalInquiries || 0} Submitted</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-[9px] uppercase">Pipeline</span>
-                        <span className="font-bold text-emerald-400">
-                          ${u.totalEstimatedValue?.toLocaleString() || '0'}
+                        <span
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase flex items-center gap-1 ${
+                            u.role === 'admin'
+                              ? 'bg-purple-950/90 text-purple-200 border border-purple-500/50 shadow-sm shadow-purple-500/30'
+                              : u.role === 'vip'
+                              ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                              : u.role === 'client'
+                              ? 'bg-blue-950/80 text-cyan-300 border border-blue-500/40'
+                              : 'bg-slate-800 text-slate-300'
+                          }`}
+                        >
+                          {u.role === 'admin' && <Crown className="w-3 h-3 text-purple-300" />}
+                          <span>{u.role}</span>
                         </span>
                       </div>
+
+                      {/* Contact & Location Info */}
+                      <div className="text-xs text-slate-300 space-y-1 font-mono pt-1">
+                        <div className="flex items-center gap-2 text-slate-400 truncate">
+                          <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                          <span className="truncate">{u.email}</span>
+                        </div>
+                        {u.phone && (
+                          <div className="flex items-center gap-2 text-emerald-400">
+                            <Phone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                            <span>{u.phone}</span>
+                          </div>
+                        )}
+                        {u.location && (
+                          <div className="flex items-center gap-2 text-slate-400">
+                            <Building className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                            <span>{u.location}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Associated Projects and Scope */}
+                      {u.associatedProjects && u.associatedProjects.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {u.associatedProjects.map((pName, pIdx) => (
+                            <span
+                              key={pIdx}
+                              className="text-[10px] px-2 py-0.5 rounded bg-blue-950/80 border border-blue-500/30 text-cyan-300 font-mono font-medium"
+                            >
+                              Project: {pName}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Metrics Bar */}
+                      <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-[#101A31]/50 border border-slate-800/80 text-[11px] font-mono">
+                        <div>
+                          <span className="text-slate-500 block text-[9px] uppercase">Inquiries</span>
+                          <span className="font-bold text-white">{u.totalInquiries || 0} Submitted</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 block text-[9px] uppercase">Pipeline</span>
+                          <span className="font-bold text-emerald-400">
+                            ${u.totalEstimatedValue?.toLocaleString() || '0'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenUserDossier(u)}
-                      className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:underline font-semibold"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Full Dossier</span>
-                    </button>
-
-                    <div className="flex items-center gap-2">
+                    {/* Actions */}
+                    <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
                       <button
                         type="button"
-                        onClick={() => openEditUserModal(u)}
-                        className="p-1.5 rounded-lg bg-[#101A31] text-slate-300 hover:text-white"
-                        title="Edit Client Profile"
+                        onClick={() => handleOpenUserDossier(u)}
+                        className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:underline font-semibold"
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Full Dossier</span>
                       </button>
 
-                      <a
-                        href={`mailto:${u.email}`}
-                        className="p-1.5 rounded-lg bg-[#101A31] text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
-                        title="Email Client"
-                      >
-                        <Mail className="w-3.5 h-3.5" />
-                      </a>
+                      <div className="flex items-center gap-1.5">
+                        {/* Quick 1-Click Make Admin / Revoke Admin Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleAdminRole(u)}
+                          className={`p-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1 ${
+                            u.role === 'admin'
+                              ? 'bg-purple-950/80 text-purple-200 border border-purple-500/50 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-500'
+                              : 'bg-[#101A31] text-slate-300 hover:text-cyan-300 hover:border-cyan-400 border border-slate-800'
+                          }`}
+                          title={u.role === 'admin' ? 'Revoke Admin Access' : 'Make User Administrator'}
+                        >
+                          {u.role === 'admin' ? (
+                            <ShieldAlert className="w-3.5 h-3.5 text-purple-300" />
+                          ) : (
+                            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                          )}
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteUser(u.id)}
-                        className="p-1.5 rounded-lg bg-rose-950/60 text-rose-300 hover:bg-rose-600 hover:text-white transition-all"
-                        title="Remove from CRM"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => openEditUserModal(u)}
+                          className="p-1.5 rounded-lg bg-[#101A31] text-slate-300 hover:text-white"
+                          title="Edit User Profile"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+
+                        <a
+                          href={`mailto:${u.email}`}
+                          className="p-1.5 rounded-lg bg-[#101A31] text-blue-400 hover:bg-blue-600 hover:text-white transition-all"
+                          title="Email User"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteUser(u.id)}
+                          className="p-1.5 rounded-lg bg-rose-950/60 text-rose-300 hover:bg-rose-600 hover:text-white transition-all"
+                          title="Remove from CRM"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+
+            {/* TAB CONTENT: DENSE TABLE VIEW */}
+            {userViewMode === 'table' && (
+              <div className="rounded-2xl bg-[#0A1024] border border-slate-800 overflow-hidden shadow-xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-slate-300">
+                    <thead className="bg-[#101A31] text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800">
+                      <tr>
+                        <th className="py-3 px-4">User / Client</th>
+                        <th className="py-3 px-4">Role & Privilege</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4">Phone / Location</th>
+                        <th className="py-3 px-4">Inquiries</th>
+                        <th className="py-3 px-4">Pipeline Value</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 font-mono">
+                      {filteredUsers.map((u) => (
+                        <tr key={u.id} className="hover:bg-slate-900/40 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              {u.picture ? (
+                                <img
+                                  src={u.picture}
+                                  alt={u.fullName}
+                                  className="w-8 h-8 rounded-lg object-cover border border-cyan-500/40 shrink-0"
+                                />
+                              ) : (
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                                  u.role === 'admin'
+                                    ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                                    : 'bg-[#152344] text-cyan-300 border border-blue-500/30'
+                                }`}>
+                                  {u.fullName.charAt(0)}
+                                </div>
+                              )}
+                              <div>
+                                <span className="font-['Space_Grotesk'] text-sm font-bold text-white block">
+                                  {u.fullName}
+                                </span>
+                                <span className="text-[11px] text-slate-400 block">{u.email}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase inline-flex items-center gap-1 ${
+                                  u.role === 'admin'
+                                    ? 'bg-purple-950 text-purple-200 border border-purple-500/50 shadow-sm'
+                                    : u.role === 'vip'
+                                    ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                    : u.role === 'client'
+                                    ? 'bg-blue-950 text-cyan-300 border border-blue-500/40'
+                                    : 'bg-slate-800 text-slate-300'
+                                }`}
+                              >
+                                {u.role === 'admin' && <Crown className="w-3 h-3 text-purple-300" />}
+                                <span>{u.role}</span>
+                              </span>
+
+                              {/* Direct 1-Click Toggle Admin */}
+                              <button
+                                type="button"
+                                onClick={() => handleToggleAdminRole(u)}
+                                className={`text-[10px] px-2 py-0.5 rounded transition-all font-semibold ${
+                                  u.role === 'admin'
+                                    ? 'text-rose-400 hover:text-rose-300 hover:underline'
+                                    : 'text-cyan-400 hover:text-cyan-300 hover:underline'
+                                }`}
+                              >
+                                {u.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
+                              </button>
+                            </div>
+                          </td>
+
+                          <td className="py-3 px-4">
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 uppercase">
+                              {u.status.replace('_', ' ')}
+                            </span>
+                          </td>
+
+                          <td className="py-3 px-4">
+                            <span className="block text-slate-300">{u.phone || 'No phone'}</span>
+                            <span className="block text-[11px] text-slate-500">{u.location || 'Remote'}</span>
+                          </td>
+
+                          <td className="py-3 px-4 text-white font-bold">
+                            {u.totalInquiries || 0}
+                          </td>
+
+                          <td className="py-3 px-4 text-emerald-400 font-bold">
+                            ${u.totalEstimatedValue?.toLocaleString() || '0'}
+                          </td>
+
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenUserDossier(u)}
+                                className="p-1.5 rounded-lg bg-[#101A31] text-cyan-400 hover:text-white"
+                                title="View Dossier"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openEditUserModal(u)}
+                                className="p-1.5 rounded-lg bg-[#101A31] text-slate-300 hover:text-white"
+                                title="Edit Profile"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteUser(u.id)}
+                                className="p-1.5 rounded-lg bg-rose-950/60 text-rose-300 hover:bg-rose-600 hover:text-white transition-all"
+                                title="Delete User"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -2303,24 +2604,58 @@ export const AdminDashboardPage: React.FC = () => {
         maxWidth="3xl"
         title={
           selectedUserDetail ? (
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-blue-950 border border-blue-500/40 flex items-center justify-center font-bold text-cyan-300 font-['Space_Grotesk'] text-xl shrink-0">
-                {selectedUserDetail.fullName.charAt(0)}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-['Space_Grotesk'] text-2xl font-bold text-white">
-                    {selectedUserDetail.fullName}
-                  </span>
-                  <span className="text-xs px-2 py-0.5 rounded bg-blue-950 border border-blue-500/30 text-cyan-300 font-mono uppercase">
-                    {selectedUserDetail.role}
-                  </span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full pr-8">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center font-bold font-['Space_Grotesk'] text-xl shrink-0 ${
+                  selectedUserDetail.role === 'admin'
+                    ? 'bg-purple-950 border-purple-500 text-purple-200'
+                    : 'bg-blue-950 border-blue-500/40 text-cyan-300'
+                }`}>
+                  {selectedUserDetail.fullName.charAt(0)}
                 </div>
-                <p className="text-xs text-slate-400 font-mono font-normal mt-0.5">
-                  {selectedUserDetail.company ? `${selectedUserDetail.company} • ` : ''}
-                  Client ID: {selectedUserDetail.id}
-                </p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-['Space_Grotesk'] text-2xl font-bold text-white">
+                      {selectedUserDetail.fullName}
+                    </span>
+                    <span className={`text-xs px-2.5 py-0.5 rounded font-mono uppercase font-bold flex items-center gap-1 ${
+                      selectedUserDetail.role === 'admin'
+                        ? 'bg-purple-950 border border-purple-500 text-purple-200 shadow-sm'
+                        : 'bg-blue-950 border border-blue-500/30 text-cyan-300'
+                    }`}>
+                      {selectedUserDetail.role === 'admin' && <Crown className="w-3 h-3 text-purple-300" />}
+                      <span>{selectedUserDetail.role}</span>
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 font-mono font-normal mt-0.5">
+                    {selectedUserDetail.company ? `${selectedUserDetail.company} • ` : ''}
+                    Client ID: {selectedUserDetail.id}
+                  </p>
+                </div>
               </div>
+
+              {/* Quick Admin Toggle In Dossier */}
+              <button
+                type="button"
+                onClick={() => handleToggleAdminRole(selectedUserDetail)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all self-start sm:self-center ${
+                  selectedUserDetail.role === 'admin'
+                    ? 'bg-purple-950 text-purple-300 border border-purple-500/50 hover:bg-rose-950 hover:text-rose-300'
+                    : 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-md hover:brightness-110'
+                }`}
+              >
+                {selectedUserDetail.role === 'admin' ? (
+                  <>
+                    <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Revoke Admin Role</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-3.5 h-3.5 text-cyan-200" />
+                    <span>Make Administrator</span>
+                  </>
+                )}
+              </button>
             </div>
           ) : undefined
         }
@@ -2844,10 +3179,11 @@ export const AdminDashboardPage: React.FC = () => {
                     onChange={(e) => setUserRole(e.target.value as any)}
                     className="w-full px-3.5 py-2 rounded-xl bg-[#101A31] border border-slate-800 text-white focus:outline-none focus:border-blue-500 font-mono"
                   >
-                    <option value="lead">Lead</option>
-                    <option value="prospect">Prospect</option>
+                    <option value="admin">👑 Studio Administrator (Admin)</option>
                     <option value="client">Client Partner</option>
-                    <option value="vip">VIP Account</option>
+                    <option value="vip">VIP Enterprise Account</option>
+                    <option value="lead">Sales Lead</option>
+                    <option value="prospect">Discovery Prospect</option>
                   </select>
                 </div>
 
@@ -2867,6 +3203,15 @@ export const AdminDashboardPage: React.FC = () => {
                   </select>
                 </div>
               </div>
+
+              {userRole === 'admin' && (
+                <div className="p-3.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-200 text-xs flex items-center gap-2.5 animate-in fade-in">
+                  <ShieldCheck className="w-4 h-4 text-purple-300 shrink-0" />
+                  <span>
+                    <strong>Studio Administrator Privilege:</strong> Setting this user as Admin grants full access to the Admin Command Center, users CRM CRUD, project publishing, and system database controls.
+                  </span>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
