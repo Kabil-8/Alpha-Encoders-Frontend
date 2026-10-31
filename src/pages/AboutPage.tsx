@@ -331,36 +331,226 @@ export const AboutPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ═══ SECTION: FOUNDER & CEO PROFILE (EXACT SPECIFICATION) ═══ */}
-        <div className="my-20 rounded-3xl bg-gradient-to-br from-[#0B1229] via-[#070B14] to-[#0D1836] border border-blue-500/30 p-8 sm:p-12 relative overflow-hidden">
+        {/* ═══ SECTION: EXECUTIVE LEADERSHIP TEAM ═══ */}
+        <div className="my-20 border-t border-slate-850 pt-16">
+          <SectionHeading
+            eyebrow="Leadership & Governance"
+            title="The Executive"
+            titleHighlight="Leadership Team."
+            description="Meet the leaders driving strategic vision, agile operations, and engineering standards at Alpha Encoders."
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-14">
+            {/* LEADER 1: KABIL K (FOUNDER & CEO) */}
+            <SpotlightCard
+              spotlightColor="rgba(34, 211, 238, 0.16)"
+              className="p-7 rounded-3xl bg-[#0A1024] border border-blue-500/30 flex flex-col justify-between hover:border-cyan-400/60 transition-all duration-300 group"
+            >
+              <div className="space-y-5">
+                <div className="relative">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform duration-300 bg-[#050816]">
+                    <img
+                      src="/images/team/kabil.jpg"
+                      alt="Kabil K - Founder & CEO"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                  <span className="absolute -bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-blue-950 text-cyan-300 border border-blue-500/40">
+                    Founder &amp; CEO
+                  </span>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white tracking-tight">
+                    Kabil K.
+                  </h3>
+                  <p className="text-xs font-mono text-cyan-400 uppercase tracking-widest font-semibold mt-0.5">
+                    Chief Executive Officer
+                  </p>
+                </div>
+
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Steers Alpha Encoders' organizational vision, strategic client partnerships, and enterprise digital architecture. Oversees end-to-end execution across full-stack platforms, distributed systems, and modern digital products.
+                </p>
+
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[10px] font-mono uppercase text-slate-400 block font-semibold">
+                    Core Focus Areas:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Platform Architecture', 'Enterprise Solutions', 'Client Growth'].map((skill, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-lg bg-[#050816] border border-slate-800 text-cyan-300 text-xs font-mono"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/80 mt-6">
+                <a
+                  href="https://www.linkedin.com/in/k-kabil-091233325/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#050816] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 group/btn"
+                >
+                  <LinkedinIcon className="w-4 h-4 text-cyan-400 group-hover/btn:text-white transition-colors" />
+                  <span>Connect with Kabil</span>
+                </a>
+              </div>
+            </SpotlightCard>
+
+            {/* LEADER 2: M TARUN (COO) */}
+            <SpotlightCard
+              spotlightColor="rgba(34, 211, 238, 0.16)"
+              className="p-7 rounded-3xl bg-[#0A1024] border border-blue-500/30 flex flex-col justify-between hover:border-emerald-400/60 transition-all duration-300 group"
+            >
+              <div className="space-y-5">
+                <div className="relative">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-emerald-400/50 shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-[#051A2E] to-[#0A2E28] flex items-center justify-center text-emerald-300 font-['Space_Grotesk'] font-bold text-3xl">
+                    MT
+                  </div>
+                  <span className="absolute -bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                    Co-Founder &amp; COO
+                  </span>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white tracking-tight">
+                    M Tarun
+                  </h3>
+                  <p className="text-xs font-mono text-emerald-400 uppercase tracking-widest font-semibold mt-0.5">
+                    Chief Operating Officer
+                  </p>
+                </div>
+
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Directs business operations, agile delivery roadmaps, and client engagement lifecycles. Orchestrates cross-functional development sprints to guarantee dependable product execution, strict timeline adherence, and transparent client communication.
+                </p>
+
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[10px] font-mono uppercase text-slate-400 block font-semibold">
+                    Core Focus Areas:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Operations Strategy', 'Agile Delivery', 'Client Engagement'].map((skill, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-lg bg-[#050816] border border-slate-800 text-emerald-300 text-xs font-mono"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/80 mt-6">
+                <a
+                  href="https://www.linkedin.com/in/tarun-murugesan-264b3b293/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#050816] hover:bg-emerald-600 border border-slate-800 hover:border-emerald-500 text-slate-300 hover:text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 group/btn"
+                >
+                  <LinkedinIcon className="w-4 h-4 text-emerald-400 group-hover/btn:text-white transition-colors" />
+                  <span>Connect with M Tarun</span>
+                </a>
+              </div>
+            </SpotlightCard>
+
+            {/* LEADER 3: ASHWITHA P C (CTO) */}
+            <SpotlightCard
+              spotlightColor="rgba(34, 211, 238, 0.16)"
+              className="p-7 rounded-3xl bg-[#0A1024] border border-blue-500/30 flex flex-col justify-between hover:border-purple-400/60 transition-all duration-300 group"
+            >
+              <div className="space-y-5">
+                <div className="relative">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-purple-400/50 shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-[#1C0F38] to-[#120B2E] flex items-center justify-center text-purple-300 font-['Space_Grotesk'] font-bold text-3xl">
+                    AP
+                  </div>
+                  <span className="absolute -bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-purple-950 text-purple-300 border border-purple-500/40">
+                    Co-Founder &amp; CTO
+                  </span>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white tracking-tight">
+                    Ashwitha P C
+                  </h3>
+                  <p className="text-xs font-mono text-purple-400 uppercase tracking-widest font-semibold mt-0.5">
+                    Chief Technology Officer
+                  </p>
+                </div>
+
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Spearheads technical strategy, software engineering standards, and cloud architecture across frontend and backend systems. Specializes in building resilient, high-throughput architectures, microservices, and database performance optimization.
+                </p>
+
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[10px] font-mono uppercase text-slate-400 block font-semibold">
+                    Core Focus Areas:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Technical Architecture', 'Engineering Governance', 'Systems Scaling'].map((skill, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-lg bg-[#050816] border border-slate-800 text-purple-300 text-xs font-mono"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/80 mt-6">
+                <a
+                  href="https://www.linkedin.com/in/p-c-ashwitha06/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#050816] hover:bg-purple-600 border border-slate-800 hover:border-purple-500 text-slate-300 hover:text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 group/btn"
+                >
+                  <LinkedinIcon className="w-4 h-4 text-purple-400 group-hover/btn:text-white transition-colors" />
+                  <span>Connect with Ashwitha</span>
+                </a>
+              </div>
+            </SpotlightCard>
+          </div>
+        </div>
+
+        {/* ═══ SECTION: FOUNDER'S EXECUTIVE STATEMENT ═══ */}
+        <div className="my-16 rounded-3xl bg-gradient-to-br from-[#0B1229] via-[#070B14] to-[#0D1836] border border-blue-500/30 p-8 sm:p-12 relative overflow-hidden">
           <BorderBeam size={320} duration={16} colorFrom="#2563FF" colorTo="#22D3EE" />
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left: Founder Bio */}
+            {/* Left: Founder Bio & Philosophy */}
             <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-xs font-mono font-medium text-cyan-300">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                FOUNDER &amp; CEO · ALPHA ENCODERS
+                EXECUTIVE VISION · ALPHA ENCODERS
               </div>
 
               <div>
                 <h2 className="font-['Space_Grotesk'] text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                  Kabil <span className="text-gradient-blue">K.</span>
+                  Turning Engineering Into <span className="text-gradient-blue">Commercial Impact.</span>
                 </h2>
                 <p className="text-xs font-mono text-cyan-400 uppercase tracking-widest font-semibold mt-1">
-                  Founder &amp; CEO, Alpha Encoders
+                  Message from Kabil K., Founder &amp; CEO
                 </p>
               </div>
 
               <div className="space-y-3.5 text-slate-300 text-sm sm:text-base leading-relaxed">
                 <p>
-                  I founded Alpha Encoders with a clear vision: to help businesses turn ideas into impactful digital experiences. As Founder &amp; CEO, I lead our vision, technology strategy, and project execution, ensuring every solution we build aligns with our clients’ goals.
+                  At Alpha Encoders, we believe that world-class web development is not about generic templates or superficial aesthetics. It is about understanding commercial intent, engineering resilient systems, and creating digital interfaces that earn trust from the very first interaction.
                 </p>
                 <p>
-                  From business websites and e-commerce platforms to custom web applications, I work with our team to deliver digital solutions that combine thoughtful design, reliable engineering, and real business value.
+                  Together with our leadership team—spanning operations and deep technical governance—we deliver tailored digital platforms that combine thoughtful design, robust engineering, and tangible business value.
                 </p>
-                <p className="font-medium text-white border-l-2 border-cyan-400 pl-3.5 italic bg-[#050816]/60 py-2 rounded-r-xl">
-                  &ldquo;My focus is simple: build meaningful digital products, create lasting client relationships, and help businesses grow through technology.&rdquo;
+                <p className="font-medium text-white border-l-2 border-cyan-400 pl-3.5 italic bg-[#050816]/60 py-2.5 rounded-r-xl">
+                  &ldquo;Our focus is simple: build meaningful digital products, create lasting client partnerships, and help businesses scale through reliable technology.&rdquo;
                 </p>
               </div>
 
@@ -371,8 +561,8 @@ export const AboutPage: React.FC = () => {
                     15+
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-white">Projects Built</div>
-                    <div className="text-xs text-slate-400 font-mono">End-to-end client &amp; custom solutions</div>
+                    <div className="text-sm font-bold text-white">Production Solutions Delivered</div>
+                    <div className="text-xs text-slate-400 font-mono">Bespoke client platforms &amp; cloud systems</div>
                   </div>
                 </div>
               </div>
@@ -384,7 +574,7 @@ export const AboutPage: React.FC = () => {
                     to="/projects"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#2563FF] to-[#22D3EE] text-white font-bold text-sm shadow-lg shadow-cyan-500/20 hover:brightness-110 transition-all"
                   >
-                    <span>Discover Alpha Encoders</span>
+                    <span>View Our Client Work</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Magnet>
@@ -395,56 +585,56 @@ export const AboutPage: React.FC = () => {
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#050816] border border-slate-800 text-slate-300 hover:text-white hover:border-cyan-500/50 text-sm font-medium transition-all"
                 >
                   <LinkedinIcon className="w-4 h-4 text-cyan-400" />
-                  <span>Connect on LinkedIn</span>
+                  <span>Connect with CEO</span>
                 </a>
               </div>
             </div>
 
-            {/* Right: Leadership & Expertise */}
+            {/* Right: Leadership & Governance Matrix */}
             <div className="lg:col-span-5 rounded-2xl bg-[#050816] border border-slate-800 p-6 sm:p-7 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <h3 className="font-['Space_Grotesk'] text-base font-bold text-white">
-                  Leadership &amp; Expertise
+                  Leadership Governance
                 </h3>
                 <span className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider">
-                  Executive Focus
+                  Executive Matrix
                 </span>
               </div>
 
               <div className="space-y-3">
                 <div className="p-3.5 rounded-xl bg-[#0A1024] border border-slate-800/80 space-y-1">
                   <div className="font-['Space_Grotesk'] font-bold text-sm text-cyan-300">
-                    Business &amp; Product Strategy
+                    Executive Strategy &amp; Architecture
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Understanding business goals and translating ideas into practical digital solutions.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-[#0A1024] border border-slate-800/80 space-y-1">
-                  <div className="font-['Space_Grotesk'] font-bold text-sm text-blue-400">
-                    Technology &amp; Engineering
-                  </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Guiding full-stack development, application architecture, API integration, and database design.
+                    Led by Kabil K. (CEO) — Aligning technology roadmaps with client commercial outcomes.
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-[#0A1024] border border-slate-800/80 space-y-1">
                   <div className="font-['Space_Grotesk'] font-bold text-sm text-emerald-400">
-                    Project Delivery
+                    Operations &amp; Agile Delivery
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Overseeing development workflows, quality, and delivery to create dependable digital products.
+                    Led by M Tarun (COO) — Guaranteeing strict milestone completion and sprint velocity.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#0A1024] border border-slate-800/80 space-y-1">
+                  <div className="font-['Space_Grotesk'] font-bold text-sm text-purple-400">
+                    Technology &amp; Engineering Governance
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Led by Ashwitha P C (CTO) — Enforcing rigorous code quality and cloud scalability.
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-[#0A1024] border border-slate-800/80 space-y-1">
                   <div className="font-['Space_Grotesk'] font-bold text-sm text-amber-400">
-                    Client Partnerships
+                    Long-Term Client Partnerships
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Building transparent, collaborative relationships focused on long-term value and business growth.
+                    Transparent post-launch maintenance, iterative feature enhancements, and continuous support.
                   </p>
                 </div>
               </div>
