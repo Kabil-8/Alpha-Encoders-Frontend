@@ -472,8 +472,12 @@ export const AboutPage: React.FC = () => {
             >
               <div className="space-y-5">
                 <div className="relative">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-purple-400/50 shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-[#1C0F38] to-[#120B2E] flex items-center justify-center text-purple-300 font-['Space_Grotesk'] font-bold text-3xl">
-                    AP
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-purple-400/50 shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300 bg-[#050816]">
+                    <img
+                      src="/images/team/ashwitha.jpg"
+                      alt="Ashwitha P C - Co-Founder & CTO"
+                      className="w-full h-full object-cover object-top"
+                    />
                   </div>
                   <span className="absolute -bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-purple-950 text-purple-300 border border-purple-500/40">
                     Co-Founder &amp; CTO
