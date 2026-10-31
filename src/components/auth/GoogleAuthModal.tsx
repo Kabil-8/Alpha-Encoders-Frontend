@@ -8,6 +8,9 @@ export const GoogleAuthModal: React.FC = () => {
   const [clientIdInput, setClientIdInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showDirectEmail, setShowDirectEmail] = useState(false);
+  const [showClientIdConfig, setShowClientIdConfig] = useState(false);
+  const [directEmail, setDirectEmail] = useState('');
   const gisButtonRef = useRef<HTMLDivElement>(null);
 
   // Initialize official Google Identity Services
@@ -65,6 +68,24 @@ export const GoogleAuthModal: React.FC = () => {
     setIsLoading(true);
     await setGoogleClientId(clientIdInput.trim());
     setIsLoading(false);
+  };
+
+  const handleDirectEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!directEmail.trim() || !directEmail.includes('@')) {
+      setErrorMessage('Please enter a valid Google account email.');
+      return;
+    }
+    setErrorMessage(null);
+    setIsLoading(true);
+    const res = await loginWithGoogle({
+      email: directEmail.trim().toLowerCase(),
+      name: directEmail.trim().split('@')[0],
+    });
+    setIsLoading(false);
+    if (!res.success) {
+      setErrorMessage(res.message || 'Authentication failed.');
+    }
   };
 
   return (
@@ -127,55 +148,93 @@ export const GoogleAuthModal: React.FC = () => {
         )}
 
         {/* Authentic Official Google Button */}
-        {googleClientId ? (
-          <div className="flex flex-col items-center justify-center py-4 space-y-4">
-            <div ref={gisButtonRef} className="min-h-[46px] flex items-center justify-center w-full" />
-            {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-cyan-300 font-mono">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Authenticating with Google...</span>
+        <div className="flex flex-col items-center justify-center py-4 space-y-4">
+          <div ref={gisButtonRef} className="min-h-[46px] flex items-center justify-center w-full" />
+          {isLoading && (
+            <div className="flex items-center gap-2 text-xs text-cyan-300 font-mono">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Authenticating with Google...</span>
+            </div>
+          )}
+        </div>
+
+        {/* Direct Google Account Email Fallback */}
+        <div className="pt-2 border-t border-slate-800/80 space-y-2">
+          {!showDirectEmail ? (
+            <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <span>Google popup blocked or invalid client?</span>
+              <button
+                type="button"
+                onClick={() => setShowDirectEmail(true)}
+                className="text-cyan-400 hover:text-cyan-300 underline font-mono transition-colors"
+              >
+                Sign in with Google Email
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleDirectEmailSubmit} className="space-y-3 pt-2">
+              <div className="p-3 rounded-xl bg-[#050816] border border-slate-800 text-xs space-y-2">
+                <label className="block text-[11px] font-mono uppercase text-slate-300">
+                  Google Account Email
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    required
+                    placeholder="kabilk2023@gmail.com"
+                    value={directEmail}
+                    onChange={(e) => setDirectEmail(e.target.value)}
+                    className="flex-grow px-3 py-2 rounded-lg bg-[#0A1024] border border-slate-700 focus:border-cyan-400 text-xs text-white focus:outline-none font-mono"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-semibold text-xs shadow-md transition-all shrink-0"
+                  >
+                    {isLoading ? 'Signing In...' : 'Continue'}
+                  </button>
+                </div>
               </div>
+            </form>
+          )}
+
+          {/* Optional Client ID Configuration toggle */}
+          <div className="pt-1 text-center">
+            <button
+              type="button"
+              onClick={() => setShowClientIdConfig(!showClientIdConfig)}
+              className="text-[10px] text-slate-500 hover:text-slate-400 font-mono transition-colors"
+            >
+              {showClientIdConfig ? '▲ Hide Client ID Config' : '⚙ Change Google OAuth Client ID'}
+            </button>
+            {showClientIdConfig && (
+              <form onSubmit={handleSaveClientId} className="mt-2 space-y-2 text-left animate-in fade-in">
+                <div className="flex items-center gap-1.5 text-[11px] text-cyan-400 font-mono">
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>Update Google OAuth Client ID</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    placeholder="1234567890-xxx.apps.googleusercontent.com"
+                    value={clientIdInput}
+                    onChange={(e) => setClientIdInput(e.target.value)}
+                    className="flex-grow px-3 py-1.5 rounded-lg bg-[#050816] border border-slate-800 focus:border-cyan-400 text-[11px] text-white font-mono focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[11px] transition-all flex items-center gap-1 shrink-0"
+                  >
+                    <span>Save</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </form>
             )}
           </div>
-        ) : (
-          /* Client ID Input prompt if not configured yet */
-          <div className="py-2 space-y-4">
-            <div className="p-4 rounded-2xl bg-[#050816] border border-slate-800 text-xs text-slate-300 space-y-2">
-              <div className="flex items-center gap-2 text-cyan-400 font-mono font-semibold">
-                <KeyRound className="w-4 h-4" />
-                <span>Google OAuth Client ID</span>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                Paste your Google OAuth <strong>Client ID</strong> from Google Cloud Console (ends with <code className="text-cyan-300">.apps.googleusercontent.com</code>) to activate the official Google sign-in:
-              </p>
-            </div>
-
-            <form onSubmit={handleSaveClientId} className="space-y-3">
-              <input
-                type="text"
-                required
-                placeholder="1234567890-xxx.apps.googleusercontent.com"
-                value={clientIdInput}
-                onChange={(e) => setClientIdInput(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#050816] border border-slate-800 focus:border-cyan-400 text-xs text-white placeholder-slate-500 font-mono focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-semibold text-xs transition-all shadow-md flex items-center justify-center gap-2"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <span>Connect Google Client ID</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        )}
+        </div>
 
         {/* Standard Google OAuth Disclaimer */}
         <div className="mt-6 pt-4 border-t border-slate-800/80 text-center">

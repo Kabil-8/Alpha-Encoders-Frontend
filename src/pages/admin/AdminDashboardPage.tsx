@@ -63,7 +63,7 @@ export interface InternshipApplicationData {
   statementOfPurpose: string;
   duration: string;
   startDate: string;
-  status: 'pending' | 'reviewing' | 'shortlisted' | 'interview' | 'accepted' | 'rejected';
+  status: 'pending' | 'reviewing' | 'awaiting_payment' | 'payment_submitted' | 'accepted' | 'rejected' | 'shortlisted' | 'interview';
   adminNotes?: string;
   feeType?: 'free' | 'paid';
   feeAmount?: number;
@@ -1644,7 +1644,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <span>Studio Admins</span>
                   </span>
                   <span className="font-['Space_Grotesk'] text-2xl font-bold text-purple-200">
-                    {users.filter((u) => u.role === 'admin').length + 1}
+                    {users.filter((u) => u.role === 'admin' || u.email?.toLowerCase() === 'kabilk2023@gmail.com').length || 1}
                   </span>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-purple-950/80 border border-purple-500/40 flex items-center justify-center text-purple-300">
@@ -2120,19 +2120,26 @@ export const AdminDashboardPage: React.FC = () => {
                 </select>
 
                 {/* Status Filter Buttons */}
-                <div className="hidden sm:flex items-center gap-1 bg-[#101A31] p-1 rounded-xl border border-slate-800">
-                  {['all', 'pending', 'reviewing', 'shortlisted', 'accepted', 'rejected'].map((st) => (
+                <div className="hidden sm:flex items-center gap-1 bg-[#101A31] p-1 rounded-xl border border-slate-800 overflow-x-auto">
+                  {[
+                    { key: 'all', label: 'All' },
+                    { key: 'pending', label: 'Pending' },
+                    { key: 'awaiting_payment', label: 'Awaiting ₹150' },
+                    { key: 'payment_submitted', label: 'Proof Submitted' },
+                    { key: 'accepted', label: 'Accepted (LOI)' },
+                    { key: 'rejected', label: 'Rejected' },
+                  ].map((st) => (
                     <button
-                      key={st}
+                      key={st.key}
                       type="button"
-                      onClick={() => setInternshipStatusFilter(st)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-mono capitalize transition-all ${
-                        internshipStatusFilter === st
+                      onClick={() => setInternshipStatusFilter(st.key)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all whitespace-nowrap ${
+                        internshipStatusFilter === st.key
                           ? 'bg-blue-600 text-white font-semibold shadow-sm'
                           : 'text-slate-400 hover:text-white'
                       }`}
                     >
-                      {st}
+                      {st.label}
                     </button>
                   ))}
                 </div>
@@ -2337,26 +2344,42 @@ export const AdminDashboardPage: React.FC = () => {
                               className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold uppercase border focus:outline-none cursor-pointer ${
                                 app.status === 'accepted'
                                   ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40'
+                                  : app.status === 'payment_submitted'
+                                  ? 'bg-cyan-950 text-cyan-300 border-cyan-500/50 shadow-sm'
+                                  : app.status === 'awaiting_payment'
+                                  ? 'bg-amber-950 text-amber-300 border-amber-500/50'
                                   : app.status === 'shortlisted' || app.status === 'interview'
                                   ? 'bg-cyan-950 text-cyan-300 border-cyan-500/40'
                                   : app.status === 'reviewing'
                                   ? 'bg-blue-950 text-blue-300 border-blue-500/40'
                                   : app.status === 'rejected'
                                   ? 'bg-rose-950 text-rose-300 border-rose-500/40'
-                                  : 'bg-amber-950 text-amber-300 border-amber-500/40'
+                                  : 'bg-slate-900 text-slate-300 border-slate-700'
                               }`}
                             >
                               <option value="pending">PENDING</option>
                               <option value="reviewing">REVIEWING</option>
+                              <option value="awaiting_payment">AWAITING ₹150 PAYMENT</option>
+                              <option value="payment_submitted">PAYMENT SUBMITTED</option>
+                              <option value="accepted">ACCEPTED (LOI ISSUED)</option>
                               <option value="shortlisted">SHORTLISTED</option>
                               <option value="interview">INTERVIEW</option>
-                              <option value="accepted">ACCEPTED</option>
                               <option value="rejected">REJECTED</option>
                             </select>
                             {app.status === 'accepted' && (
                               <div className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
                                 <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                                 <span>LOI Issued</span>
+                              </div>
+                            )}
+                            {app.status === 'awaiting_payment' && (
+                              <div className="text-[10px] text-amber-400 font-mono mt-1">
+                                ⏳ Awaiting candidate ₹150
+                              </div>
+                            )}
+                            {app.status === 'payment_submitted' && (
+                              <div className="text-[10px] text-cyan-300 font-mono mt-1 animate-pulse">
+                                💳 Verify proof below
                               </div>
                             )}
                           </td>
@@ -2404,20 +2427,66 @@ export const AdminDashboardPage: React.FC = () => {
                           {/* Actions */}
                           <td className="py-3.5 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                              {app.status !== 'accepted' && (
+                              {/* Status Action Workflow */}
+                              {(app.status === 'pending' || app.status === 'reviewing' || app.status === 'shortlisted' || app.status === 'interview') && (
                                 <button
                                   type="button"
-                                  onClick={() => handleVerifyAndAcceptInternship(app)}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-semibold text-xs shadow-md transition-all"
+                                  onClick={() => {
+                                    if (app.feeType === 'free') {
+                                      handleVerifyAndAcceptInternship(app);
+                                    } else {
+                                      handleUpdateInternshipStatus(app.id, 'awaiting_payment');
+                                    }
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-semibold text-xs shadow-md transition-all"
                                   title={
-                                    app.feeType === 'paid'
-                                      ? 'Verify ₹150 proof & accept candidate (Grant LOI)'
-                                      : 'Accept free early-bird candidate (Grant LOI)'
+                                    app.feeType === 'free'
+                                      ? 'Accept free slot candidate and issue LOI'
+                                      : 'Accept candidate and set status to Awaiting ₹150 Payment'
                                   }
                                 >
                                   <CheckCircle2 className="w-3.5 h-3.5" />
-                                  <span>{app.feeType === 'paid' ? 'Verify & Accept' : 'Accept'}</span>
+                                  <span>{app.feeType === 'free' ? 'Accept (Free LOI)' : 'Accept (Set Awaiting ₹150)'}</span>
                                 </button>
+                              )}
+
+                              {app.status === 'awaiting_payment' && (
+                                <div className="flex items-center gap-1">
+                                  {app.paymentScreenshot ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleVerifyAndAcceptInternship(app)}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-semibold text-xs shadow-md transition-all animate-pulse"
+                                      title="Verify candidate proof and issue official LOI"
+                                    >
+                                      <CheckCircle2 className="w-3.5 h-3.5" />
+                                      <span>Verify Proof & Accept</span>
+                                    </button>
+                                  ) : (
+                                    <span className="px-2 py-1 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-500/40 text-[11px] font-mono">
+                                      ⏳ Awaiting ₹150
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
+                              {app.status === 'payment_submitted' && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleVerifyAndAcceptInternship(app)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-semibold text-xs shadow-md transition-all animate-pulse"
+                                  title="Verify candidate ₹150 proof and issue official LOI"
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  <span>Verify Proof & Accept (Issue LOI)</span>
+                                </button>
+                              )}
+
+                              {app.status === 'accepted' && (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 text-[11px] font-mono">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                  <span>Accepted (LOI Issued)</span>
+                                </span>
                               )}
 
                               <button
@@ -3726,15 +3795,41 @@ export const AdminDashboardPage: React.FC = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
 
-                  {selectedInternshipDetail.status !== 'accepted' && (
+              {/* Action buttons inside dossier for all candidate types */}
+              {selectedInternshipDetail.status !== 'accepted' && (
+                <div className="space-y-2 pt-2 border-t border-slate-800">
+                  {(selectedInternshipDetail.status === 'pending' || selectedInternshipDetail.status === 'reviewing' || selectedInternshipDetail.status === 'shortlisted' || selectedInternshipDetail.status === 'interview') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (selectedInternshipDetail.feeType === 'free') {
+                          handleVerifyAndAcceptInternship(selectedInternshipDetail);
+                        } else {
+                          handleUpdateInternshipStatus(selectedInternshipDetail.id, 'awaiting_payment');
+                        }
+                      }}
+                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-semibold text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>
+                        {selectedInternshipDetail.feeType === 'free'
+                          ? 'Accept Free Candidate & Grant Official LOI'
+                          : 'Accept Candidate & Move to Awaiting ₹150 Payment'}
+                      </span>
+                    </button>
+                  )}
+
+                  {(selectedInternshipDetail.status === 'payment_submitted' || selectedInternshipDetail.paymentScreenshot) && (
                     <button
                       type="button"
                       onClick={() => handleVerifyAndAcceptInternship(selectedInternshipDetail)}
                       className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white font-semibold text-xs transition-all shadow-md flex items-center justify-center gap-2"
                     >
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>Confirm ₹150 Payment Proof & Accept (Issue LOI)</span>
+                      <span>Verify ₹150 Payment Proof & Officially Accept (Grant LOI)</span>
                     </button>
                   )}
                 </div>
@@ -3756,9 +3851,11 @@ export const AdminDashboardPage: React.FC = () => {
                 >
                   <option value="pending">PENDING REVIEW</option>
                   <option value="reviewing">UNDER REVIEW</option>
+                  <option value="awaiting_payment">AWAITING ₹150 PAYMENT</option>
+                  <option value="payment_submitted">PAYMENT SUBMITTED (AUDIT NEEDED)</option>
+                  <option value="accepted">ACCEPTED (OFFICIAL LOI ISSUED)</option>
                   <option value="shortlisted">SHORTLISTED</option>
                   <option value="interview">INTERVIEW SCHEDULED</option>
-                  <option value="accepted">ACCEPTED / OFFER SENT</option>
                   <option value="rejected">REJECTED</option>
                 </select>
               </div>

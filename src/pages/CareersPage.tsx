@@ -25,7 +25,8 @@ import {
   UploadCloud,
   ExternalLink,
   Lock,
-  Receipt
+  Receipt,
+  Image as ImageIcon
 } from 'lucide-react';
 import { SpotlightCard } from '../components/reactbits/SpotlightCard';
 import { ShinyText } from '../components/reactbits/ShinyText';
@@ -279,6 +280,14 @@ export const CareersPage: React.FC = () => {
   const [lookupResult, setLookupResult] = useState<any>(null);
   const [lookupError, setLookupError] = useState('');
 
+  // Candidate payment submission from lookup tracker
+  const [trackerUtr, setTrackerUtr] = useState('');
+  const [trackerScreenshot, setTrackerScreenshot] = useState<string | null>(null);
+  const [trackerIsSubmitting, setTrackerIsSubmitting] = useState(false);
+  const [trackerPayError, setTrackerPayError] = useState('');
+  const [trackerPaySuccess, setTrackerPaySuccess] = useState('');
+  const [trackerQrMode, setTrackerQrMode] = useState<'dynamic' | 'card'>('dynamic');
+
   // Auto-scroll to application form if url has #apply
   useEffect(() => {
     if (location.hash === '#apply') {
@@ -388,10 +397,67 @@ export const CareersPage: React.FC = () => {
         throw new Error('No application found with this Application ID or Email. Please check and try again.');
       }
       setLookupResult(data.internship);
+      setTrackerPaySuccess('');
+      setTrackerPayError('');
+      if (data.internship.transactionId) {
+        setTrackerUtr(data.internship.transactionId);
+      }
+      if (data.internship.paymentScreenshot) {
+        setTrackerScreenshot(data.internship.paymentScreenshot);
+      }
     } catch (err: any) {
       setLookupError(err.message || 'Lookup failed.');
     } finally {
       setLookupLoading(false);
+    }
+  };
+
+  const handleTrackerScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      setTrackerPayError('Screenshot image must be less than 15MB. Please upload a smaller file.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setTrackerScreenshot(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleTrackerPaymentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!trackerUtr.trim()) {
+      setTrackerPayError('Please enter your 12-digit UPI / UTR Transaction ID.');
+      return;
+    }
+    if (!trackerScreenshot) {
+      setTrackerPayError('Please upload your ₹150 payment screenshot.');
+      return;
+    }
+    setTrackerPayError('');
+    setTrackerIsSubmitting(true);
+    try {
+      const res = await fetch(apiUrl(`/api/internships/${lookupResult.id}/payment`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transactionId: trackerUtr.trim(),
+          paymentScreenshot: trackerScreenshot,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Payment submission failed.');
+      }
+      setTrackerPaySuccess(data.message || 'Payment screenshot submitted! Admin will audit your payment shortly.');
+      setLookupResult(data.internship);
+      fetchStats();
+    } catch (err: any) {
+      setTrackerPayError(err.message || 'Failed to submit payment.');
+    } finally {
+      setTrackerIsSubmitting(false);
     }
   };
 
@@ -945,6 +1011,288 @@ export const CareersPage: React.FC = () => {
                     Review Board Feedback:
                   </span>
                   <p className="text-slate-300">{lookupResult.adminNotes}</p>
+                </div>
+              )}
+
+              {/* DYNAMIC STAGE 1: CANDIDATE ACCEPTED - AWAITING ₹150 PAYMENT */}
+              {lookupResult.status === 'awaiting_payment' && (
+                <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#0c1836] via-[#081026] to-[#050816] border-2 border-cyan-500/60 shadow-[0_0_35px_rgba(34,211,238,0.25)] space-y-5 animate-in fade-in">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cyan-500/30 pb-4">
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/90 text-emerald-300 border border-emerald-500/50 text-xs font-mono font-bold uppercase tracking-wider mb-2">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Accepted for Internship • Action Required</span>
+                      </div>
+                      <h3 className="font-['Space_Grotesk'] text-xl sm:text-2xl font-bold text-white">
+                        Complete ₹150 Verification to Receive Your Official LOI
+                      </h3>
+                      <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                        Congratulations, <strong className="text-cyan-300">{lookupResult.fullName}</strong>! You have been accepted for the <strong className="text-cyan-300">{lookupResult.domain}</strong> Internship track. To complete your seat reservation and have your official <strong>Letter of Intent (LOI)</strong> issued immediately, scan the Google Pay QR below and submit your screenshot.
+                      </p>
+                    </div>
+
+                    <div className="text-right sm:text-right shrink-0">
+                      <span className="text-[10px] font-mono text-slate-400 block uppercase">Verification Fee</span>
+                      <span className="font-['Space_Grotesk'] text-3xl font-extrabold text-cyan-300">₹150</span>
+                      <span className="text-[10px] text-slate-400 block">LOI + Certificate + LOR</span>
+                    </div>
+                  </div>
+
+                  {trackerPaySuccess && (
+                    <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/60 text-xs text-emerald-200 flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>{trackerPaySuccess}</span>
+                    </div>
+                  )}
+
+                  {trackerPayError && (
+                    <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-500/60 text-xs text-rose-300 flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                      <span>{trackerPayError}</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    {/* Left: Google Pay QR Scanner */}
+                    <div className="p-4 rounded-2xl bg-[#050816] border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                          <span className="font-['Space_Grotesk'] text-xs font-bold text-white uppercase tracking-wider">
+                            Google Pay / UPI Scanner
+                          </span>
+                        </div>
+                        <div className="flex items-center bg-[#101A31] p-0.5 rounded-lg border border-slate-700 text-[10px] font-mono">
+                          <button
+                            type="button"
+                            onClick={() => setTrackerQrMode('dynamic')}
+                            className={`px-2 py-0.5 rounded transition-colors ${
+                              trackerQrMode === 'dynamic' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            ₹150 Dynamic
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setTrackerQrMode('card')}
+                            className={`px-2 py-0.5 rounded transition-colors ${
+                              trackerQrMode === 'card' ? 'bg-cyan-500 text-black font-bold' : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            GPay Card
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-center justify-center p-3 bg-white rounded-2xl shadow-[0_0_25px_rgba(34,211,238,0.2)]">
+                        {trackerQrMode === 'dynamic' ? (
+                          <div className="flex flex-col items-center">
+                            <img
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                                'upi://pay?pa=kabilk2023@oksbi&pn=Kabil&am=150.00&cu=INR&tn=Alpha%20Encoders%20Internship%20Fee'
+                              )}&margin=10`}
+                              alt="₹150 Preloaded UPI Scanner"
+                              className="w-44 h-44 object-contain rounded-xl"
+                            />
+                            <span className="text-[10px] font-mono font-bold text-slate-800 mt-1">
+                              ₹150 PRELOADED IN SCANNER
+                            </span>
+                          </div>
+                        ) : (
+                          <img
+                            src="/images/gpay-scanner.jpg"
+                            alt="Google Pay Scanner"
+                            className="w-44 h-auto object-contain rounded-xl"
+                          />
+                        )}
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-[#0A1024] border border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <div>
+                          <span className="text-[10px] text-slate-400 block uppercase">UPI ID (Kabil)</span>
+                          <span className="text-cyan-300 font-bold select-all">kabilk2023@oksbi</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText('kabilk2023@oksbi');
+                            setCopiedUpi(true);
+                            setTimeout(() => setCopiedUpi(false), 2000);
+                          }}
+                          className="px-2.5 py-1 rounded bg-[#101A31] hover:bg-slate-800 text-slate-300 text-xs border border-slate-700"
+                        >
+                          {copiedUpi ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
+
+                      <a
+                        href="upi://pay?pa=kabilk2023@oksbi&pn=Kabil&am=150.00&cu=INR&tn=Alpha%20Encoders%20Internship%20Fee"
+                        className="w-full py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 text-white font-semibold text-xs transition-all shadow-md flex items-center justify-center gap-1.5"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Open Directly in UPI / GPay App (₹150)</span>
+                      </a>
+                    </div>
+
+                    {/* Right: Upload Screenshot & Submit UTR */}
+                    <form onSubmit={handleTrackerPaymentSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-slate-300 font-mono text-xs uppercase mb-1.5 font-semibold">
+                          1. Enter 12-Digit UPI / UTR Transaction ID *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. 430129847123"
+                          value={trackerUtr}
+                          onChange={(e) => setTrackerUtr(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#050816] border border-slate-800 focus:border-cyan-400 text-white font-mono text-xs focus:outline-none"
+                        />
+                        <span className="text-[10px] text-slate-500 mt-1 block">
+                          You can find this 12-digit reference number in your Google Pay or banking app transaction details.
+                        </span>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-mono text-xs uppercase mb-1.5 font-semibold">
+                          2. Upload ₹150 Payment Screenshot *
+                        </label>
+                        <div className="relative border-2 border-dashed border-slate-700 hover:border-cyan-400 rounded-2xl p-4 text-center cursor-pointer bg-[#050816] transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            required={!trackerScreenshot}
+                            onChange={handleTrackerScreenshotUpload}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          {trackerScreenshot ? (
+                            <div className="space-y-2">
+                              <img
+                                src={trackerScreenshot}
+                                alt="Payment Proof Preview"
+                                className="h-32 object-contain mx-auto rounded-lg border border-slate-700"
+                              />
+                              <span className="text-xs text-emerald-400 font-mono block">
+                                ✓ Screenshot selected. Click to replace.
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="space-y-1.5 text-xs text-slate-400">
+                              <ImageIcon className="w-8 h-8 text-cyan-400 mx-auto" />
+                              <div className="font-semibold text-slate-200">
+                                Click or tap to browse payment screenshot
+                              </div>
+                              <div className="text-[10px] text-slate-500">Supports JPG, PNG, WEBP up to 15MB</div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={trackerIsSubmitting}
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 hover:brightness-110 text-white font-['Space_Grotesk'] font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {trackerIsSubmitting ? (
+                          <span>Uploading & Verifying...</span>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>Submit Payment Proof for LOI Release</span>
+                          </>
+                        )}
+                      </button>
+
+                      <div className="p-3 rounded-xl bg-[#050816] border border-slate-800 text-[11px] text-slate-400 space-y-1 leading-relaxed">
+                        <div className="font-bold text-cyan-300">What happens next?</div>
+                        <p>
+                          1. Our admin team will verify your ₹150 transaction receipt in the verification ledger.
+                        </p>
+                        <p>
+                          2. Once verified, your status updates to <strong>Officially Accepted</strong> and your official <strong>Letter of Intent (LOI)</strong> is released immediately.
+                        </p>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* DYNAMIC STAGE 2: PAYMENT SUBMITTED - AWAITING ADMIN AUDIT */}
+              {lookupResult.status === 'payment_submitted' && (
+                <div className="p-5 rounded-2xl bg-gradient-to-r from-[#0d1f3b] to-[#0A1024] border border-cyan-500/50 space-y-3 animate-in fade-in">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shrink-0 animate-pulse">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-mono uppercase text-cyan-400 font-bold">
+                        Payment Proof Received (₹150) • Under Verification
+                      </div>
+                      <h4 className="font-['Space_Grotesk'] text-lg font-bold text-white">
+                        Admin Audit in Progress
+                      </h4>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Thank you! Your payment screenshot and Transaction ID (<code className="text-cyan-300 font-mono font-bold">{lookupResult.transactionId || 'Pending'}</code>) have been securely delivered to the Alpha Encoders review team. We will verify your transaction shortly. As soon as verification is confirmed, your status will switch to <strong>Accepted</strong> and your official <strong>Letter of Intent (LOI)</strong> will be released.
+                  </p>
+                </div>
+              )}
+
+              {/* DYNAMIC STAGE 3: OFFICIALLY ACCEPTED & LOI RELEASED */}
+              {lookupResult.status === 'accepted' && (
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-[#06241a] via-[#0A1024] to-[#050816] border-2 border-emerald-500/60 shadow-[0_0_35px_rgba(16,185,129,0.25)] space-y-4 animate-in fade-in">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-500/30 pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-950 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/30">
+                        <CheckCircle2 className="w-7 h-7" />
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-mono font-bold uppercase text-emerald-400 tracking-wider">
+                          Official Confirmation
+                        </span>
+                        <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white">
+                          Enrolled &amp; Letter of Intent (LOI) Granted!
+                        </h3>
+                      </div>
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold uppercase">
+                      LOI Verified & Released
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-200 leading-relaxed">
+                    Congratulations <strong className="text-white">{lookupResult.fullName}</strong>! You have been officially enrolled in the Alpha Encoders 2026 Internship Program for the <strong className="text-emerald-300">{lookupResult.domain}</strong> specialization track.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-[#050816] border border-slate-800 text-xs">
+                    <div>
+                      <span className="text-slate-400 block font-mono text-[10px] uppercase">Admission Track</span>
+                      <span className="font-bold text-white">{lookupResult.domain}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block font-mono text-[10px] uppercase">Duration & Start Date</span>
+                      <span className="font-bold text-cyan-300">{lookupResult.duration || '3 Months'} • {lookupResult.startDate || 'Immediate'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block font-mono text-[10px] uppercase">Guaranteed Credentials</span>
+                      <span className="font-bold text-emerald-300">LOI + Certificate + LOR</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-200 flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4 text-emerald-400" />
+                      <span>Your official Letter of Intent (LOI) documentation has been generated for your college/records.</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => alert(`Official LOI Reference: ${lookupResult.id}\nCandidate: ${lookupResult.fullName}\nDomain: ${lookupResult.domain}\nInstitution: ${lookupResult.college}\nIssuer: Alpha Encoders (CEO Kabil K)\nStatus: Officially Verified & Granted`)}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors"
+                    >
+                      View LOI Credentials
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
