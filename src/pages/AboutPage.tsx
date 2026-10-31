@@ -410,8 +410,12 @@ export const AboutPage: React.FC = () => {
             >
               <div className="space-y-5">
                 <div className="relative">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-emerald-400/50 shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 bg-gradient-to-br from-[#051A2E] to-[#0A2E28] flex items-center justify-center text-emerald-300 font-['Space_Grotesk'] font-bold text-3xl">
-                    MT
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-emerald-400/50 shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 bg-[#050816]">
+                    <img
+                      src="/images/team/tarun.jpg"
+                      alt="M Tarun - Co-Founder & COO"
+                      className="w-full h-full object-cover object-top"
+                    />
                   </div>
                   <span className="absolute -bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-950 text-emerald-300 border border-emerald-500/40">
                     Co-Founder &amp; COO
