@@ -341,69 +341,7 @@ export const AboutPage: React.FC = () => {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-14">
-            {/* LEADER 1: KABIL K (FOUNDER & CEO) */}
-            <SpotlightCard
-              spotlightColor="rgba(34, 211, 238, 0.16)"
-              className="p-7 rounded-3xl bg-[#0A1024] border border-blue-500/30 flex flex-col justify-between hover:border-cyan-400/60 transition-all duration-300 group"
-            >
-              <div className="space-y-5">
-                <div className="relative">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform duration-300 bg-[#050816]">
-                    <img
-                      src="/images/team/kabil.jpg"
-                      alt="Kabil K - Founder & CEO"
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
-                  <span className="absolute -bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-blue-950 text-cyan-300 border border-blue-500/40">
-                    Founder &amp; CEO
-                  </span>
-                </div>
-
-                <div className="pt-2">
-                  <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white tracking-tight">
-                    Kabil K.
-                  </h3>
-                  <p className="text-xs font-mono text-cyan-400 uppercase tracking-widest font-semibold mt-0.5">
-                    Chief Executive Officer
-                  </p>
-                </div>
-
-                <p className="text-slate-300 text-sm leading-relaxed">
-                  Steers Alpha Encoders' organizational vision, strategic client partnerships, and enterprise digital architecture. Oversees end-to-end execution across full-stack platforms, distributed systems, and modern digital products.
-                </p>
-
-                <div className="space-y-1.5 pt-1">
-                  <span className="text-[10px] font-mono uppercase text-slate-400 block font-semibold">
-                    Core Focus Areas:
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {['Platform Architecture', 'Enterprise Solutions', 'Client Growth'].map((skill, i) => (
-                      <span
-                        key={i}
-                        className="px-2.5 py-1 rounded-lg bg-[#050816] border border-slate-800 text-cyan-300 text-xs font-mono"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 border-t border-slate-800/80 mt-6">
-                <a
-                  href="https://www.linkedin.com/in/k-kabil-091233325/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#050816] hover:bg-blue-600 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 group/btn"
-                >
-                  <LinkedinIcon className="w-4 h-4 text-cyan-400 group-hover/btn:text-white transition-colors" />
-                  <span>Connect with Kabil</span>
-                </a>
-              </div>
-            </SpotlightCard>
-
-            {/* LEADER 2: M TARUN (COO) */}
+            {/* LEADER 1: M TARUN (COO) */}
             <SpotlightCard
               spotlightColor="rgba(34, 211, 238, 0.16)"
               className="p-7 rounded-3xl bg-[#0A1024] border border-blue-500/30 flex flex-col justify-between hover:border-emerald-400/60 transition-all duration-300 group"
@@ -461,6 +399,68 @@ export const AboutPage: React.FC = () => {
                 >
                   <LinkedinIcon className="w-4 h-4 text-emerald-400 group-hover/btn:text-white transition-colors" />
                   <span>Connect with M Tarun</span>
+                </a>
+              </div>
+            </SpotlightCard>
+
+            {/* LEADER 2 (CENTER): KABIL K (FOUNDER & CEO) */}
+            <SpotlightCard
+              spotlightColor="rgba(34, 211, 238, 0.22)"
+              className="p-7 rounded-3xl bg-[#0B142E] border-2 border-cyan-500/50 flex flex-col justify-between hover:border-cyan-400 transition-all duration-300 group shadow-2xl shadow-cyan-500/10 md:-translate-y-2"
+            >
+              <div className="space-y-5">
+                <div className="relative">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform duration-300 bg-[#050816]">
+                    <img
+                      src="/images/team/kabil.jpg"
+                      alt="Kabil K - Founder & CEO"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                  <span className="absolute -bottom-2 left-2 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-blue-950 text-cyan-300 border border-blue-500/50 shadow-md">
+                    Founder &amp; CEO
+                  </span>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="font-['Space_Grotesk'] text-2xl font-bold text-white tracking-tight">
+                    Kabil K.
+                  </h3>
+                  <p className="text-xs font-mono text-cyan-400 uppercase tracking-widest font-semibold mt-0.5">
+                    Chief Executive Officer
+                  </p>
+                </div>
+
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Steers Alpha Encoders' organizational vision, strategic client partnerships, and enterprise digital architecture. Oversees end-to-end execution across full-stack platforms, distributed systems, and modern digital products.
+                </p>
+
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[10px] font-mono uppercase text-slate-400 block font-semibold">
+                    Core Focus Areas:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Platform Architecture', 'Enterprise Solutions', 'Client Growth'].map((skill, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-lg bg-[#050816] border border-slate-800 text-cyan-300 text-xs font-mono"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/80 mt-6">
+                <a
+                  href="https://www.linkedin.com/in/k-kabil-091233325/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:brightness-110 border border-cyan-400/40 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 group/btn shadow-md shadow-blue-500/20"
+                >
+                  <LinkedinIcon className="w-4 h-4 text-white transition-colors" />
+                  <span>Connect with Kabil</span>
                 </a>
               </div>
             </SpotlightCard>
